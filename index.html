@@ -19,9 +19,9 @@
                         'snow-white': '#F9FAFB',        
                         'ice-blue': '#E0F2FE',          
                         'light-snow-blue': '#F0F9FF',   
-                        'deep-sea-blue': '#0369A1',     
-                        'accent-yellow': '#FBBF24',     
-                        'spicy-red': '#DC2626',         
+                        'deep-sea-blue': '#0369A1',     // 改為稍微亮一點的藍，適合四川風格
+                        'accent-yellow': '#FBBF24',     // 熊貓/銀杏黃
+                        'spicy-red': '#DC2626',         // 麻辣火鍋紅 (新增)
                         'soft-gray': '#F3F4F6'          
                     }
                 }
@@ -64,7 +64,7 @@
             width: 100%;
             height: 250px; 
             overflow: hidden;
-            background-color: #0c4a6e;
+            background-color: #0c4a6e; /* 圖片載入前的底色 */
             border-bottom-left-radius: 35px; 
             border-bottom-right-radius: 35px;
             position: relative;
@@ -78,6 +78,7 @@
             opacity: 0.9;
         }
         
+        /* 熊貓/竹子風格裝飾 */
         .snow-layer {
             position: absolute;
             top: 0;
@@ -167,18 +168,10 @@
             max-height: 2.5rem;
             overflow: hidden;
             transition: max-height 0.3s ease-out;
-            line-height: 1.5;
         }
 
-        /* 處理 v-html 內容的樣式 */
-        .note-content b, .note-content strong { font-weight: 800; color: #000; }
-        .note-content u { text-decoration: underline; }
-        .note-content font[size="1"] { font-size: 0.75rem; }
-        .note-content font[size="3"] { font-size: 1rem; }
-        .note-content font[size="5"] { font-size: 1.25rem; line-height: 1.2; font-weight: bold; color: #0369A1; }
-        
         .note-content.expanded {
-            max-height: 1000px; /* 增加展開高度以容納富文本 */
+            max-height: 500px;
         }
         
         .expense-category-tag {
@@ -194,6 +187,7 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* 花費頁 Banner - 改為火鍋紅漸層 */
         .expenses-banner {
             background: linear-gradient(135deg, #BE123C 0%, #FB7185 100%);
         }
@@ -204,29 +198,6 @@
             z-index: 20; 
             top: 0; 
         }
-
-        /* 編輯器樣式 */
-        .rich-editor-toolbar button {
-            padding: 4px 8px;
-            border-radius: 6px;
-            margin-right: 2px;
-            background: #f1f5f9;
-            color: #475569;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-        .rich-editor-toolbar button:hover {
-            background: #e2e8f0;
-            color: #0369A1;
-        }
-        .rich-editor-content {
-            min-height: 100px;
-            max-height: 200px;
-            overflow-y: auto;
-            outline: none;
-            word-wrap: break-word;
-        }
-        .rich-editor-content b { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -265,8 +236,9 @@
                 <i class="fa-solid fa-coins"></i>
             </button>
         </div>
-    </div>
+        </div>
 
+    
     <main class="p-4 app-main">
         
         <div v-if="currentTab === 'itinerary'" class="animate-fade-in">
@@ -275,7 +247,9 @@
                 <div v-for="(day, index) in dates" :key="index" 
                      @click="selectedDateIndex = index"
                      class="snap-center flex-shrink-0 w-[58px] h-[68px] rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 border-2 shadow-sm"
-                     :class="selectedDateIndex === index ? 'bg-deep-sea-blue text-white border-deep-sea-blue shadow-lg scale-105' : 'bg-white text-slate-400 border-white hover:bg-soft-gray'">
+                     :class="selectedDateIndex === index ?
+'bg-deep-sea-blue text-white border-deep-sea-blue shadow-lg scale-105' : 'bg-white text-slate-400 border-white hover:bg-soft-gray'">
+                    
                     <span class="text-sm font-bold uppercase tracking-wider">{{ day.weekday }}</span> 
                     <span class="text-xs font-medium opacity-70">{{ day.date }}</span> 
                 </div>
@@ -284,6 +258,7 @@
             <div v-if="weatherData[selectedDateIndex]" class="mb-4 bg-snow-white border border-ice-blue rounded-2xl p-4 flex justify-between items-center shadow-md">
                 <div class="flex items-start text-deep-sea-blue space-x-4">
                     <i :class="getWeatherIcon(weatherData[selectedDateIndex].condition)" class="text-5xl text-blue-500"></i>
+                    
                     <div class="pt-1">
                         <span class="text-3xl font-extrabold leading-none">{{ weatherData[selectedDateIndex].temp.split('/')[0] }}°</span>
                         <span class="text-sm font-light text-slate-500 ml-1">/ {{ weatherData[selectedDateIndex].temp.split('/')[1] }}°C</span>
@@ -292,6 +267,7 @@
                 </div>
                 <div class="text-right text-xs text-slate-600 pl-3">
                     <span class="font-bold block text-slate-700">{{ getWeatherDescription(weatherData[selectedDateIndex].condition) }}</span>
+                    
                     <span v-if="dates[selectedDateIndex].hasTrain" class="mt-1 block text-deep-sea-blue font-bold">
                         <i class="fa-solid fa-train mr-1 text-accent-yellow"></i> 高鐵移動日
                     </span>
@@ -304,6 +280,7 @@
                     
                     <div v-if="idx > 0" class="pl-8 pb-2 flex items-center text-xs text-slate-400">
                         <div class="h-6 w-0.5 bg-slate-200 absolute left-6 -top-3"></div>
+                        
                         <i :class="getTransportIcon(currentItinerary[idx].transportType)" 
                             class="mr-2 text-slate-300 cursor-pointer hover:text-deep-sea-blue transition-colors" 
                            @click="openMapDirections(currentItinerary[idx - 1], item)">
@@ -329,12 +306,13 @@
                                 <p v-if="item.address" class="flex items-start"><i class="fa-solid fa-location-dot w-4 text-center mr-2 mt-1 text-ice-blue"></i> {{ item.address }}</p>
                             </div>
 
-                            <div v-if="item.note && item.note.length > 0" class="mt-3 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                            <div v-if="item.note && item.note.length > 0" 
+class="mt-3 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                                 <p class="text-slate-600 font-bold mb-1 flex items-center">
                                     <i class="fa-solid fa-highlighter text-accent-yellow mr-2"></i> 備註
                                 </p>
-                                <div class="note-content" :class="{'expanded': item.isNoteExpanded}" v-html="formatNoteDisplay(item.note)"></div>
-                                <button v-if="item.note.length > 50 || item.note.includes('<')" @click="item.isNoteExpanded = !item.isNoteExpanded" class="text-deep-sea-blue font-bold mt-1 block">
+                                <div class="note-content whitespace-pre-line" :class="{'expanded': item.isNoteExpanded}">{{ item.note }}</div>
+                                <button v-if="item.note.length > 50" @click="item.isNoteExpanded = !item.isNoteExpanded" class="text-deep-sea-blue font-bold mt-1 block">
                                     {{ item.isNoteExpanded ? '收合備註' : '查看更多...' }}
                                 </button>
                             </div>
@@ -365,13 +343,16 @@
         </div>
 
         <div v-if="currentTab === 'info'" class="space-y-5 animate-fade-in">
+            
             <div class="bg-gradient-to-r from-red-700 to-red-500 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-                <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+                <div class="absolute bottom-0 left-0 w-32 h-32 
+bg-white/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
                 <h3 class="font-bold text-lg mb-4 flex items-center relative z-10"><i class="fa-solid fa-calculator mr-2"></i> 匯率換算</h3>
                 <div class="flex items-center justify-between space-x-3 relative z-10">
                     <div class="flex-1">
-                        <label class="text-[10px] text-red-200 block mb-1 uppercase tracking-wider">CNY (人民幣)</label>
+                        <label class="text-[10px] 
+text-red-200 block mb-1 uppercase tracking-wider">CNY (人民幣)</label>
                         <input type="number" v-model="currencyInput" @input="calculateCurrency" class="w-full bg-white/20 border border-white/30 rounded-xl px-3 py-2.5 text-white placeholder-white/50 focus:outline-none focus:bg-white/30 text-lg font-bold" placeholder="¥">
                     </div>
                     <i class="fa-solid fa-arrow-right-arrow-left text-red-200 mt-5"></i>
@@ -439,7 +420,8 @@
                     <a href="tel:110" class="bg-white py-3 rounded-xl shadow-sm text-red-600 font-bold block border border-red-100 hover:bg-red-600 hover:text-white transition-all">
                         <i class="fa-solid fa-user-shield mr-1"></i> 公安 110
                     </a>
-                    <a href="tel:120" class="bg-white py-3 rounded-xl shadow-sm text-red-600 font-bold block border border-red-100 hover:bg-red-600 hover:text-white transition-all">
+                    <a href="tel:120" class="bg-white py-3 rounded-xl shadow-sm text-red-600 font-bold block border border-red-100 hover:bg-red-600 
+hover:text-white transition-all">
                         <i class="fa-solid fa-truck-medical mr-1"></i> 急救 120
                     </a>
                 </div>
@@ -475,11 +457,13 @@
 
         <div v-if="currentTab === 'expenses'" class="animate-fade-in">
             <div class="expenses-banner text-white rounded-3xl p-8 mb-6 relative overflow-hidden">
+               
                 <div class="absolute -right-10 -top-10 bg-white/10 w-48 h-48 rounded-full blur-3xl"></div>
                 <div class="absolute -left-10 -bottom-10 bg-orange-400/20 w-40 h-40 rounded-full blur-2xl"></div>
                 <p class="text-sm text-red-100 mb-2 relative z-10">目前總花費 (CNY)</p>
                 <h2 class="text-5xl font-bold relative z-10 tracking-tight">¥ {{ formatNumber(totalExpensesCNY) }}</h2>
-                <p class="text-sm text-right mt-2 opacity-80 relative z-10">約 HK$ {{ formatNumber(totalExpensesHKD) }}</p>
+                <p class="text-sm text-right mt-2 opacity-80 
+relative z-10">約 HK$ {{ formatNumber(totalExpensesHKD) }}</p>
             </div>
 
             <div class="bg-white rounded-t-3xl min-h-[500px] p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] -mx-4 px-8">
@@ -489,12 +473,14 @@
                 <div class="space-y-5">
                     <div v-for="(exp, idx) in expenses" :key="idx" class="flex items-center justify-between border-b border-slate-50 pb-4 last:border-0">
                         <div class="flex items-center">
+                            
                             <div class="expense-category-tag mr-4" :class="[getCategoryColor(exp.category), 'text-white']">
                                 {{ getCategoryLabel(exp.category) }}
                             </div>
                             <div>
                                 <p class="font-bold text-slate-700 text-sm mb-0.5">{{ exp.name }}</p>
-                                <p class="text-[10px] text-slate-400 uppercase tracking-wide">{{ exp.date }} · {{ exp.payment === 'card' ? '電子支付' : '現金' }}</p>
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wide">{{ exp.date }} · {{ exp.payment === 'card' ?
+'電子支付' : '現金' }}</p>
                             </div>
                         </div>
                         <div class="text-right flex items-center">
@@ -518,7 +504,8 @@
     <div v-if="showShoppingModal" class="fixed inset-0 bg-deep-sea-blue/40 z-50 flex items-center justify-center p-6 backdrop-blur-sm animate-fade-in">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl">
             <h3 class="font-bold text-lg mb-5 text-center text-slate-800">新增購物清單</h3>
-            <input v-model="newShoppingItem.name" type="text" placeholder="商品名稱" class="w-full bg-slate-50 border-none rounded-xl p-4 mb-4 focus:ring-2 focus:ring-deep-sea-blue text-sm">
+            <input v-model="newShoppingItem.name" type="text" placeholder="商品名稱" class="w-full 
+bg-slate-50 border-none rounded-xl p-4 mb-4 focus:ring-2 focus:ring-deep-sea-blue text-sm">
             <div class="relative mb-6">
                 <input type="file" @change="handleImageUpload" class="hidden" id="fileInput">
                 <label for="fileInput" class="w-full h-36 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center cursor-pointer text-slate-400 hover:bg-slate-100 hover:border-border-slate-300 transition-all">
@@ -527,6 +514,7 @@
                     </span>
                     <img v-else :src="newShoppingItem.image" class="h-full w-full object-contain rounded-xl">
                 </label>
+           
             </div>
             <div class="flex space-x-3">
                 <button @click="showShoppingModal = false" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-500 font-bold text-sm">取消</button>
@@ -540,7 +528,8 @@
             <h3 class="font-bold text-lg mb-5 text-center text-slate-800">記一筆</h3>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <input v-model="newExpense.date" type="date" class="bg-slate-50 rounded-xl p-3 text-sm text-slate-600 outline-none">
-                <select v-model="newExpense.category" class="bg-slate-50 rounded-xl p-3 text-sm text-slate-600 outline-none">
+                <select v-model="newExpense.category" class="bg-slate-50 
+rounded-xl p-3 text-sm text-slate-600 outline-none">
                     <option value="food">飲食</option>
                     <option value="shopping">購物</option>
                     <option value="transport">交通</option>
@@ -551,6 +540,7 @@
             </div>
             <input v-model="newExpense.name" placeholder="名稱 (如: 串串香)" class="w-full bg-slate-50 rounded-xl p-4 mb-4 text-sm outline-none focus:ring-2 focus:ring-accent-yellow">
             <div class="relative mb-4">
+   
                 <span class="absolute left-4 top-4 text-slate-400 font-bold">¥</span>
                 <input v-model.number="newExpense.amount" type="number" placeholder="金額" class="w-full bg-slate-50 rounded-xl p-4 pl-8 text-sm outline-none focus:ring-2 focus:ring-accent-yellow font-bold text-lg">
             </div>
@@ -598,27 +588,7 @@
                     <input v-model="newItinerary.hours" type="text" placeholder="營業時間" class="bg-slate-50 rounded-xl p-3 text-sm outline-none">
                 </div>
                 <input v-model="newItinerary.price" type="text" placeholder="門票/費用" class="w-full bg-slate-50 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-deep-sea-blue">
-                
-                <div class="w-full bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                    <div class="rich-editor-toolbar flex flex-wrap gap-1 p-2 bg-slate-100 border-b border-slate-200">
-                        <button @click.prevent="execCmd('bold')" title="粗體"><i class="fa-solid fa-bold"></i></button>
-                        <button @click.prevent="execCmd('hiliteColor', '#fef08a')" title="高亮"><i class="fa-solid fa-highlighter text-yellow-600"></i></button>
-                        <div class="w-px h-6 bg-slate-300 mx-1"></div>
-                        <button @click.prevent="execCmd('fontSize', '1')" title="小字"><i class="fa-solid fa-font text-[10px]"></i></button>
-                        <button @click.prevent="execCmd('fontSize', '3')" title="正常"><i class="fa-solid fa-font text-xs"></i></button>
-                        <button @click.prevent="execCmd('fontSize', '5')" title="大字"><i class="fa-solid fa-font text-lg"></i></button>
-                         <div class="w-px h-6 bg-slate-300 mx-1"></div>
-                        <button @click.prevent="execCmd('removeFormat')" title="清除格式"><i class="fa-solid fa-eraser"></i></button>
-                    </div>
-                    <div 
-                        id="noteEditor"
-                        contenteditable="true" 
-                        class="rich-editor-content p-3 text-sm outline-none min-h-[80px]"
-                        @input="updateNoteContent"
-                    ></div>
-                </div>
-                <p class="text-[10px] text-slate-400 pl-1">備註欄支援粗體、高亮與字體調整</p>
-
+                <textarea v-model="newItinerary.note" placeholder="備註/細節" rows="3" class="w-full bg-slate-50 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-deep-sea-blue"></textarea>
             </div>
             <div class="flex space-x-3 mt-6">
                 <button @click="showItineraryModal = false; isEditMode = false" :class="isEditMode ? 'w-1/3' : 'flex-1'" class="py-3 rounded-xl bg-slate-100 text-slate-500 font-bold text-sm">取消</button>
@@ -634,7 +604,7 @@
 
 
 </div> <script>
-    const { createApp, ref, computed, onMounted, nextTick } = Vue
+    const { createApp, ref, computed, onMounted } = Vue
 
     createApp({
         setup() {
@@ -644,7 +614,7 @@
             // 標籤顏色與圖示定義
             const CATEGORY_MAP = {
                 sightseeing: { color: 'bg-green-600', icon: 'fa-solid fa-camera' },
-                food: { color: 'bg-red-600', icon: 'fa-solid fa-bowl-food' }, 
+                food: { color: 'bg-red-600', icon: 'fa-solid fa-bowl-food' }, // 麻辣鍋風格
                 shopping: { color: 'bg-indigo-500', icon: 'fa-solid fa-bag-shopping' },
                 accommodation: { color: 'bg-purple-600', icon: 'fa-solid fa-bed' },
                 flight: { color: 'bg-blue-600', icon: 'fa-solid fa-plane-departure' },
@@ -657,8 +627,11 @@
                 sightseeing: '景點', food: '飲食', shopping: '購物', accommodation: '住宿', flight: '航班', transport: '交通', ticket: '門票', other: '其他', stay: '住宿'
             };
 
+            // 當前頁面
             const currentTab = ref('itinerary');
 
+            // --- 資料定義 ---
+            
             const dates = ref([
                 { date: '12/24', weekday: '三', hasTrain: false, tollFee: 0 },
                 { date: '12/25', weekday: '四', hasTrain: true, tollFee: 0 },
@@ -764,24 +737,27 @@
                 ],
             ]);
 
+            // 預設天氣資訊 (四川冬季：濕冷，九寨溝：雪/極冷)
             const weatherData = ref([
-                { condition: 'cloudy', temp: '10/5', feel: '3' }, 
-                { condition: 'rain', temp: '9/4', feel: '2' },    
-                { condition: 'snow', temp: '2/-5', feel: '-8' },  
-                { condition: 'snow', temp: '-2/-10', feel: '-15' }, 
-                { condition: 'snow', temp: '-1/-12', feel: '-16' }, 
-                { condition: 'cloudy', temp: '8/3', feel: '1' },   
-                { condition: 'cloudy', temp: '11/7', feel: '5' },  
-                { condition: 'cloudy', temp: '10/6', feel: '4' },  
-                { condition: 'sunny', temp: '12/6', feel: '5' },   
+                { condition: 'cloudy', temp: '10/5', feel: '3' }, // 12/24 成都
+                { condition: 'rain', temp: '9/4', feel: '2' },    // 12/25 樂山 (濕冷)
+                { condition: 'snow', temp: '2/-5', feel: '-8' },  // 12/26 峨眉山 (金頂冷)
+                { condition: 'snow', temp: '-2/-10', feel: '-15' }, // 12/27 九寨溝 (極冷)
+                { condition: 'snow', temp: '-1/-12', feel: '-16' }, // 12/28 九寨溝
+                { condition: 'cloudy', temp: '8/3', feel: '1' },   // 12/29 成都/重慶
+                { condition: 'cloudy', temp: '11/7', feel: '5' },  // 12/30 重慶
+                { condition: 'cloudy', temp: '10/6', feel: '4' },  // 12/31 重慶
+                { condition: 'sunny', temp: '12/6', feel: '5' },   // 1/1 重慶/深圳
             ]);
             
+            // 購物清單 (範例資料)
             const shoppingList = ref([
                 { name: '橋頭火鍋底料', image: null },
                 { name: '熊貓玩偶', image: null },
                 { name: '陳麻花 (磁器口)', image: null },
             ]);
 
+            // 花費紀錄 (範例資料)
             const expenses = ref([
                 { name: '深圳往返機票', amount: 2000, category: 'flight', date: '2024-11-15', payment: 'card' },
                 { name: '九寨溝門票預訂', amount: 560, category: 'ticket', date: '2024-12-14', payment: 'card' },
@@ -794,18 +770,24 @@
             const showItineraryModal = ref(false);
             const isEditMode = ref(false); 
             
+            // 新增/編輯行程狀態
             const newItinerary = ref({
                 id: null, name: '', category: 'sightseeing', startTime: '', hours: '', address: '', price: '', note: '', transportType: 'car', travelTime: '', isNoteExpanded: false
             });
-            const newShoppingItem = ref({ name: '', image: null });
+            // 新增購物狀態
+            const newShoppingItem = ref({
+                name: '', image: null
+            });
+            // 新增花費狀態
             const newExpense = ref({
                 name: '', amount: null, category: 'food', date: new Date().toISOString().substring(0, 10), payment: 'cash'
             });
 
+            // 貨幣轉換
             const currencyInput = ref(100);
             const currencyResult = ref(0);
             
-            // --- Computed ---
+            // --- Computed Properties ---
             
             const currentItinerary = computed(() => {
                 if (!itineraryData.value[selectedDateIndex.value]) {
@@ -835,17 +817,7 @@
                 return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             };
 
-            // 處理備註顯示: 將 \n 轉為 <br>, 但保留 HTML 標籤
-            const formatNoteDisplay = (note) => {
-                if (!note) return '';
-                // 如果已經包含 HTML tag (e.g., <div>, <br>, <b>)，則假設已經格式化過，不需再轉 \n
-                if (note.match(/<[a-z][\s\S]*>/i)) {
-                    return note;
-                }
-                // 否則視為純文字，將 \n 轉為 <br>
-                return note.replace(/\n/g, '<br>');
-            };
-
+            // 取得顏色/圖示/描述
             const getCategoryColor = (category) => CATEGORY_MAP[category]?.color || CATEGORY_MAP.other.color;
             const getCategoryIcon = (category) => CATEGORY_MAP[category]?.icon || CATEGORY_MAP.other.icon;
             const getCategoryLabel = (category) => CATEGORY_LABEL_MAP[category] || '其他';
@@ -880,6 +852,7 @@
                 return map[type] || 'fa-solid fa-arrow-right-long';
             };
 
+            // 地圖功能
             const openMap = (query) => {
                 if (query) {
                     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
@@ -899,6 +872,7 @@
                 }
             };
             
+            // 浮動按鈕點擊處理
             const handleAddClick = () => {
                 if (currentTab.value === 'itinerary') {
                     resetItineraryForm();
@@ -912,51 +886,18 @@
                 }
             };
             
-            // --- 行程管理 (包含富文本邏輯) ---
-            
-            // 執行富文本命令
-            const execCmd = (command, value = null) => {
-                document.execCommand(command, false, value);
-                const editor = document.getElementById('noteEditor');
-                if(editor) {
-                    newItinerary.value.note = editor.innerHTML;
-                }
-            };
-            
-            // 當編輯框內容變動時同步數據
-            const updateNoteContent = (event) => {
-                newItinerary.value.note = event.target.innerHTML;
-            };
-
+            // --- 行程管理 ---
             const resetItineraryForm = () => {
                 isEditMode.value = false;
                 newItinerary.value = {
                     id: Date.now(), name: '', category: 'sightseeing', startTime: '', hours: '', address: '', price: '', note: '', transportType: 'car', travelTime: '', isNoteExpanded: false
                 };
-                // 清空編輯器
-                nextTick(() => {
-                    const editor = document.getElementById('noteEditor');
-                    if (editor) editor.innerHTML = '';
-                });
             };
 
             const editItem = (item) => {
                 isEditMode.value = true;
                 newItinerary.value = JSON.parse(JSON.stringify(item)); 
                 showItineraryModal.value = true;
-                
-                // 填充編輯器內容
-                nextTick(() => {
-                    const editor = document.getElementById('noteEditor');
-                    if (editor) {
-                        // 如果是舊純文字資料，將 \n 轉為 <br> 再放入編輯器，讓編輯器能正確顯示換行
-                        let displayContent = newItinerary.value.note || '';
-                        if (!displayContent.match(/<[a-z][\s\S]*>/i)) {
-                            displayContent = displayContent.replace(/\n/g, '<br>');
-                        }
-                        editor.innerHTML = displayContent;
-                    }
-                });
             };
 
             const saveItineraryItem = () => {
@@ -965,12 +906,6 @@
                     return;
                 }
                 
-                // 確保從編輯器獲取最新內容
-                const editor = document.getElementById('noteEditor');
-                if (editor) {
-                    newItinerary.value.note = editor.innerHTML;
-                }
-
                 if (isEditMode.value) {
                     const index = currentItinerary.value.findIndex(item => item.id === newItinerary.value.id);
                     if (index !== -1) {
@@ -1070,6 +1005,7 @@
             };
 
 
+            // 載入時執行
             onMounted(() => {
                 calculateCurrency();
                 expenses.value.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -1086,8 +1022,7 @@
                 addExpense, removeExpense, editItem, saveItineraryItem,
                 removeItineraryItem, 
                 moveItineraryUp, moveItineraryDown, 
-                openMap, openMapDirections, formatNumber,
-                execCmd, updateNoteContent, formatNoteDisplay
+                openMap, openMapDirections, formatNumber
             };
         }
     }).mount('#app');
