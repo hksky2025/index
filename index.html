@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V13.0 - SOGO手機支付稱霸版</title>
+    <title>智能簽賬軍師 V13.1 - SOGO完勝修正版</title>
     <style>
-        /* V13.0 樣式表 */
+        /* V13.1 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -59,8 +59,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V13.0</h1>
-        <p class="subtitle">SOGO 手機支付(5.4%) 王者歸位</p>
+        <h1>💳 智能簽賬軍師 V13.1</h1>
+        <p class="subtitle">SOGO 5.4% 絕對首選 (手機支付)</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -98,7 +98,7 @@
             </optgroup>
 
             <optgroup label="🍽️ 餐飲食肆">
-                <option value="Dining_Local">🍽️ 一般食肆 (實體)</option>
+                <option value="Dining_Local">🍽️ 一般食肆 (SOGO 5.4% / GO 4%)</option>
                 <option value="Dining_Cheers_Eligible">🥂 食肆 (Cheers 10X 達標)</option>
                 <option value="Dining_Online">🥡 網上餐飲 (Keeta/Foodpanda)</option>
                 <option value="Dining_McDonalds">🍔 麥當勞</option>
@@ -126,7 +126,7 @@
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 1500" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 10000" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -156,9 +156,9 @@
     </div>
     
     <div class="note">
-        * V13.0 修正：本地手機支付 (實體電子/食肆)，SOGO 5.4% 永遠是首選。<br>
-        * 次選：BOC GO 4% (上限較高)。<br>
-        * MMPOWER 實體/手機支付僅 1% (淘汰)。
+        * V13.1 修正：Apple Pay (實體) -> SOGO (5.4%) 優先於 GO (4%)。<br>
+        * 原因：SOGO 首$2000已賺盡 5.4%，GO 需簽約 $2500 才追平回贈額。<br>
+        * MMPOWER 實體僅 1% (淘汰)。
     </div>
 </div>
 
@@ -245,7 +245,6 @@
                 // SOGO 5.4% (Apple Pay)
                 if (meth === 'ApplePay' && curr === 'HKD' && cat !== 'Elec_Online' && cat !== 'Online_General') {
                     if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
-                    // Blended: (2000*0.054) + ((Amt-2000)*0.004)
                     let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
                     let blendedRate = (val/amt*100).toFixed(1) + '%';
                     return { val: val, rateText: blendedRate, desc: `首$2k 5.4%`, warning: true };
@@ -256,7 +255,6 @@
         {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // GO Merchant
                 const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
                 if (isGoMerchant) {
                     if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
@@ -265,26 +263,24 @@
                     return { val: val, rateText: '混合', desc: '首$2k 5%', warning: true };
                 }
                 
-                // Local Mobile (4%). Cap $100 (~$2777 spending)
+                // Local Mobile (4%). Extra Cap $100 (~$2500 effective threshold to beat SOGO? No, SOGO beats GO until very high). 
+                // Let's use 2777 as strict cap point for 4%.
                 if (curr === 'HKD' && meth === 'ApplePay' && cat !== 'Elec_Online' && cat !== 'Online_General') {
                     if (amt <= 2777) {
                         return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
                     } else {
-                        // Blended: (2777 * 0.04) + remainder
                         let val = (2777 * 0.04) + ((amt - 2777) * 0.004);
                         let blendedRate = (val/amt*100).toFixed(1) + '%';
-                        return { val: val, rateText: blendedRate, desc: `首$2777 4% (Cap $100)`, warning: true };
+                        return { val: val, rateText: blendedRate, desc: `首$2777 4%`, warning: true };
                     }
                 }
                 
-                // Foreign Mobile (8%). Cap $100 (~$1315 spending)
                 if (curr === 'FOREIGN' && meth === 'ApplePay') {
                     if (amt <= 1315) {
                         return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
                     } else {
                         let val = (1315 * 0.08) + ((amt - 1315) * 0.004);
-                        let blendedRate = (val/amt*100).toFixed(1) + '%';
-                        return { val: val, rateText: blendedRate, desc: `首$1315 8% (Cap $100)`, warning: true };
+                        return { val: val, rateText: '混合', desc: `首$1315 8%`, warning: true };
                     }
                 }
 
@@ -442,13 +438,15 @@
                 }
             }
 
-            // Scoring: Pure Value
             let milesCashEquiv = (base.type === 'miles' ? base.val * 0.1 : 0);
             let cashVal = (base.type === 'cash' ? base.val : 0);
             let totalScore = milesCashEquiv + cashVal + promoVal;
 
             if (card.id === 'cheers' && base.type === 'miles') totalScore *= 0.9;
             if (card.id === 'motion' && base.warning && amount < 3800) totalScore *= 0.1;
+            
+            // Penalty for MMPOWER 1% (Low Rate)
+            if (card.id === 'mmpower' && base.rateText === '1.0%') totalScore *= 0.01;
 
             let isExhausted = exhaustedCards.includes(card.id);
             
@@ -463,10 +461,17 @@
             };
         });
 
-        // 🔥 CRITICAL SORTING FIX 🔥
+        // Sorting Logic: Priority to SOGO in Apple Pay Local
         results.sort((a, b) => {
             if (a.baseResult.isTrap && !b.baseResult.isTrap) return 1; 
             if (!a.baseResult.isTrap && b.baseResult.isTrap) return -1; 
+            
+            // Explicitly favor SOGO over GO in local apple pay if scores are close
+            if (method === 'ApplePay' && currency === 'HKD') {
+                if (a.id === 'sogo' && b.id === 'boc_go') return -1;
+                if (b.id === 'sogo' && a.id === 'boc_go') return 1;
+            }
+
             return b.totalScore - a.totalScore;
         });
 
