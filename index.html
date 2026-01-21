@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V5.0 - 獨立Promo版</title>
+    <title>智能簽賬軍師 V5.1 - 修復版</title>
     <style>
-        /* V5.0 樣式表 */
+        /* V5.1 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -20,7 +20,9 @@
         
         .toggle-container { display: flex; gap: 8px; background: #f0f2f5; padding: 4px; border-radius: 10px; }
         .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
-        .toggle-btn.active { background-color: #fff; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        /* 狀態顏色 */
+        .toggle-btn.active { background-color: #fff; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid transparent; }
         .red-day-btn.active { background-color: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; }
         .promo-btn.active { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
 
@@ -40,7 +42,6 @@
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
         .card-name { font-weight: 700; font-size: 15px; color: #333; }
         
-        /* 重點：實質回報樣式 */
         .earn-value { font-size: 18px; font-weight: 800; display: block; text-align: right; }
         .miles-text { color: var(--primary-miles); }
         .cash-text { color: var(--primary-cash); }
@@ -62,19 +63,19 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V5.0</h1>
-        <p class="subtitle">實質回報計算 + 獨立 Promo 開關</p>
+        <h1>💳 智能簽賬軍師 V5.1</h1>
+        <p class="subtitle">修復版：按鈕邏輯重寫 + 實質回報</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
     <div class="input-group">
         <label>推廣優惠 (BOC 狂賞派至 6/2026)</label>
-        <div class="toggle-container">
+        <div class="toggle-container" id="promo-container">
             <button class="toggle-btn active" onclick="setPromo(false, this)">不適用</button>
             <button class="toggle-btn promo-btn" onclick="setPromo(true, this)">🔥 疊加狂賞派</button>
         </div>
         <div id="day-selector" style="display:none; margin-top:8px;">
-            <div class="toggle-container">
+            <div class="toggle-container" id="day-container">
                 <button class="toggle-btn active" onclick="setDay('Weekday', this)">平日 (+2%)</button>
                 <button class="toggle-btn red-day-btn" onclick="setDay('RedDay', this)">紅日 (+5%)</button>
             </div>
@@ -119,7 +120,7 @@
 
     <div class="input-group">
         <label>貨幣種類</label>
-        <div class="toggle-container">
+        <div class="toggle-container" id="currency-container">
             <button class="toggle-btn active" onclick="setCurrency('HKD', this)">HKD 港幣</button>
             <button class="toggle-btn" onclick="setCurrency('FOREIGN', this)">外幣 (海外/網上)</button>
         </div>
@@ -127,7 +128,7 @@
 
     <div class="input-group">
         <label>支付方式</label>
-        <div class="toggle-container">
+        <div class="toggle-container" id="method-container">
             <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">Apple Pay</button>
             <button class="toggle-btn" onclick="setMethod('Physical', this)">實體卡</button>
             <button class="toggle-btn" onclick="setMethod('Online', this)">網上支付</button>
@@ -144,82 +145,98 @@
     </div>
     
     <div class="note">
-        * 提示：已啟動實質回報計算 (Amount x Rate)。<br>
-        * 狂賞派已設為獨立選項，方便未來維護。
+        * V5.1 更新：修復所有按鈕點擊問題，確保單選功能正常。<br>
+        * 已啟用實質回報 (Amount x Rate) 顯示。
     </div>
 </div>
 
 <script>
+    // --- State ---
     let currency = 'HKD';
     let method = 'ApplePay';
     let promoActive = false;
     let dayType = 'Weekday';
     let exhaustedCards = JSON.parse(localStorage.getItem('exhaustedCards')) || [];
 
-    // --- UI Logic ---
-    function setPromo(isActive, btn) {
-        promoActive = isActive;
-        updateToggles(0, btn);
-        document.getElementById('day-selector').style.display = isActive ? 'block' : 'none';
-    }
-    function setDay(d, btn) {
-        dayType = d;
-        // Day selector is inside a hidden div, manually handle class
-        const container = document.querySelector('#day-selector .toggle-container');
+    // --- UI Helper: Robust Toggle Logic ---
+    // 萬能切換函數：自動尋找父容器，無需手動指定 index
+    function toggleActive(btn) {
+        const container = btn.closest('.toggle-container'); // 尋找最近的父層容器
+        if (!container) return;
+        
+        // 移除同層級其他按鈕的 active
         container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        // 激活當前按鈕
         btn.classList.add('active');
     }
-    function setCurrency(c, btn) { currency = c; updateToggles(2, btn); }
-    function setMethod(m, btn) { method = m; updateToggles(3, btn); }
 
-    function updateToggles(idx, btn) {
-        const container = document.querySelectorAll('.input-group > .toggle-container')[idx];
-        if(container) {
-            container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    // --- Actions ---
+    function setPromo(isActive, btn) {
+        promoActive = isActive;
+        toggleActive(btn);
+        document.getElementById('day-selector').style.display = isActive ? 'block' : 'none';
+    }
+
+    function setDay(d, btn) {
+        dayType = d;
+        toggleActive(btn);
+    }
+
+    function setCurrency(c, btn) { 
+        currency = c; 
+        toggleActive(btn);
+    }
+
+    function setMethod(m, btn) { 
+        method = m; 
+        toggleActive(btn);
+    }
+
+    // --- Auto Defaults ---
+    function selectBtnInContainer(containerId, btnIndex) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const btns = container.querySelectorAll('.toggle-btn');
+        if (btns[btnIndex]) {
+            // 模擬點擊以觸發邏輯和視覺更新
+            btns[btnIndex].click();
         }
     }
 
     function autoSetDefaults() {
         const cat = document.getElementById('categorySelect').value;
-        const methodBtns = document.querySelectorAll('.input-group:nth-of-type(5) .toggle-btn');
-        const currBtns = document.querySelectorAll('.input-group:nth-of-type(4) .toggle-btn');
         
         if (cat.includes('Online') || cat.includes('App') || cat.includes('OTA')) {
-            setMethod('Online', methodBtns[2]);
+            // 網上支付 (Index 2 in Method Container)
+            selectBtnInContainer('method-container', 2);
         } else if (cat === 'Overseas_Physical') {
-            setCurrency('FOREIGN', currBtns[1]);
-            setMethod('Physical', methodBtns[1]);
+            // 外幣 (Index 1 in Currency)
+            selectBtnInContainer('currency-container', 1);
+            // 實體卡 (Index 1 in Method)
+            selectBtnInContainer('method-container', 1);
         } else {
-            setMethod('ApplePay', methodBtns[0]);
+            // Apple Pay (Index 0 in Method)
+            selectBtnInContainer('method-container', 0);
         }
     }
 
-    // --- 獨立 Promo 計算邏輯 (BOC 狂賞派) ---
+    // --- Calculation Logic (Same as V5.0) ---
     function calculatePromoReward(cardId, amount, category, method, currency, isRedDay) {
-        // 1. 只適用於 BOC 卡
         if (cardId !== 'cheers' && cardId !== 'sogo') return null;
-
-        // 2. 門檻: $500
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
-        // 3. 類別檢查
         const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets'];
-        // 寬鬆檢查: 只要包含 Dining 或 Travel 關鍵字也算 (除了 OTA 定義)
         let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         if (!isValid) return null;
-
-        // 4. 外幣限制 (假設狂賞派主攻本地，但條款細節通常容許網上外幣。這裡保守起見，實體外幣不計)
         if (currency === 'FOREIGN' && method !== 'Online') return null;
 
-        // 5. 計算回贈
         let rate = isRedDay ? 0.05 : 0.02;
         let cap = 0;
         
         if (method === 'Physical' || method === 'ApplePay') {
-            cap = isRedDay ? 300 : 120; // 實體 Caps
+            cap = isRedDay ? 300 : 120;
         } else if (method === 'Online') {
-            cap = isRedDay ? 200 : 60; // 網上 Caps
+            cap = isRedDay ? 200 : 60;
         }
 
         let promoVal = Math.min(amount * rate, cap);
@@ -232,14 +249,11 @@
         };
     }
 
-    // --- 信用卡基本邏輯 (不含 Promo) ---
     const myCards = [
         { 
             id: 'cheers', name: 'BocHK Cheers VI', type: 'miles',
             logic: (amt, cat, meth, curr) => {
-                // 10X Logic
                 if (cat.includes('Dining') || curr === 'FOREIGN') {
-                    // $1.5/里 = 4% equivalent roughly for ranking
                     let miles = Math.floor(amt / 1.5);
                     return { type: 'miles', val: miles, rateText: '$1.5/里', desc: '餐飲/外幣 10X' };
                 }
@@ -287,8 +301,8 @@
             logic: (amt, cat, meth, curr) => {
                 const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook';
                 if (isTarget && curr === 'HKD') {
-                    if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800無回贈', warning: true, zeroIfFail: true }; // 標記如果未達標其實是 0
-                    if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限 (僅基本)' }; // 簡化計算
+                    if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800無回贈', warning: true, zeroIfFail: true };
+                    if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限 (僅基本)' };
                     return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
                 }
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
@@ -343,17 +357,10 @@
         const amount = parseFloat(document.getElementById('amount').value) || 0;
         const category = document.getElementById('categorySelect').value;
         
-        // --- 核心計算 Loop ---
         let results = myCards.map(card => {
-            // 1. 計算基本回贈
             let base = card.logic(amount, category, method, currency);
-            
-            // 2. 處理 Motion 卡門檻失敗情況
-            if (base.zeroIfFail && amount < 3800) {
-                 base.val = 0; // 強制歸零或極低
-            }
+            if (base.zeroIfFail && amount < 3800) base.val = 0;
 
-            // 3. 計算 Promo (如果開關開啟)
             let promoDesc = '';
             let promoVal = 0;
             if (promoActive) {
@@ -364,8 +371,6 @@
                 }
             }
 
-            // 4. 組合結果 (Total Value)
-            // 為了排序，將里數轉換為現金價值 (假設 1 里 = $0.1)
             let milesCashEquiv = (base.type === 'miles' ? base.val * 0.1 : 0);
             let cashVal = (base.type === 'cash' ? base.val : 0);
             let totalScore = milesCashEquiv + cashVal + promoVal;
@@ -383,23 +388,15 @@
             };
         });
 
-        // 排序
         results.sort((a, b) => b.totalScore - a.totalScore);
-
-        // 分離列表
-        // 里數卡：只顯示基本是里數卡的
         renderList('miles-list', results.filter(c => c.type === 'miles'));
-        // 現金卡：基本是現金卡
         renderList('cash-list', results.filter(c => c.type === 'cash'));
-        
         document.getElementById('results').style.display = 'block';
     }
 
     function renderList(elemId, results) {
         const container = document.getElementById(elemId);
         container.innerHTML = '';
-        
-        // 顯示前 2 名
         let activeCards = results.filter(c => !c.isExhausted).slice(0, 2);
         
         if (activeCards.length === 0) { container.innerHTML = '<div class="card-box" style="color:#999;text-align:center">沒有推薦</div>'; return; }
@@ -409,7 +406,6 @@
             let styleClass = item.type === 'miles' ? 'miles-card' : 'cash-card';
             let rateClass = item.type === 'miles' ? 'miles-text' : 'cash-text';
             
-            // 顯示邏輯： "賺取: 1000里 + $50" or "賺取: $200"
             let earnText = '';
             if (item.baseResult.type === 'miles') {
                 earnText = `賺取: ${item.baseResult.val} 里`;
