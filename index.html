@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V7.1 - 排序修正版</title>
+    <title>智能簽賬軍師 V7.3 - 食肆排序優化版</title>
     <style>
-        /* V7.1 樣式表 */
+        /* V7.3 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -61,8 +61,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V7.1</h1>
-        <p class="subtitle">修正版：SOGO 5.4% > Citi 4% > Cheers</p>
+        <h1>💳 智能簽賬軍師 V7.3</h1>
+        <p class="subtitle">食肆優化：SOGO 5.4% > Motion 6% (如有門檻)</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -85,30 +85,27 @@
         <select id="categorySelect" onchange="autoSetDefaults()">
             <option value="General">-- 請選擇 --</option>
             
-            <optgroup label="🍔 Citi Club 4% 指定商戶">
-                <option value="Dining_McDonalds">麥當勞 (App/實體: Citi 4%)</option>
-                <option value="Dining_Starbucks">Starbucks (App/實體: Citi 4%)</option>
-                <option value="Shop_CitySuper">City'super / LOG-ON (實體: Citi 4%)</option>
-                <option value="Shop_CircleK">Circle K 便利店 (實體: Citi 4%)</option>
-                <option value="Entertainment_Movie">戲院: 百老匯/MCL (Citi 4%)</option>
-                <option value="Shop_Fashion_Online">Farfetch (網上: Citi 4%)</option>
+            <optgroup label="🍽️ 餐飲食肆">
+                <option value="Dining_Local">🍽️ 一般食肆 (實體/ApplePay)</option>
+                <option value="Dining_Cheers_Eligible">🥂 食肆 (Cheers 10X 達標)</option>
+                <option value="Dining_Online">🥡 網上餐飲 (Keeta/Foodpanda)</option>
+                <option value="Dining_McDonalds">🍔 麥當勞 (App/實體)</option>
+                <option value="Dining_Starbucks">☕ Starbucks</option>
             </optgroup>
 
             <optgroup label="✨ GO卡/超市指定">
-                <option value="Dining_Online">🥡 網上餐飲: Keeta/Foodpanda (GO 5% / Citi 4%)</option>
                 <option value="Home_Supermarket">🛒 超市: 惠康/MarketPlace (GO 5% / Mox 3%)</option>
+                <option value="Shop_CitySuper">🛒 City'super (Citi 4%)</option>
             </optgroup>
 
-            <optgroup label="🚆 交通 (實體 vs 網上)">
+            <optgroup label="🚆 交通">
                 <option value="Transport_Public">公共交通: MTR/Bus (SOGO 5.4%)</option>
-                <option value="Transport_HSR">高鐵櫃位/售票機 (GO 5%)</option>
+                <option value="Transport_HSR">高鐵櫃位 (GO 5%)</option>
                 <option value="Transport_DiDi">滴滴/Uber (Waku 6%)</option>
-                <option value="Transport_Driving">駕駛 (入油/泊車)</option>
             </optgroup>
             
-            <optgroup label="🎉 狂賞派 7大類別">
-                <option value="Dining_Local">🍽️ 一般食肆</option>
-                <option value="Travel_Klook">🎡 Klook/Disney (Waku 6% / Citi 4%)</option>
+            <optgroup label="🎉 狂賞派其他類別">
+                <option value="Travel_Klook">🎡 Klook/Disney</option>
                 <option value="Travel_OTA">✈️ 網上旅遊 (Trip/Agoda)</option>
                 <option value="Medical">🏥 醫療 / 診所</option>
                 <option value="Shop_Jewelry">💍 珠寶 / 服飾</option>
@@ -124,7 +121,7 @@
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 200" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 500" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -154,8 +151,8 @@
     </div>
     
     <div class="note">
-        * V7.1 修正：一般食肆/麥當勞 (Apple Pay) -> SOGO 5.4% 優先。<br>
-        * SOGO (5.4%) > GO (4%) > Citi (4%) > Cheers (4%)。
+        * V7.3 修正：食肆 (Apple Pay) 若未達 Motion 門檻，SOGO 5.4% 會排第一。<br>
+        * 邏輯：SOGO (5.4% 無門檻) > Motion (6% 有門檻) > GO (4%) > Citi (4%)。
     </div>
 </div>
 
@@ -199,8 +196,8 @@
         } else if (cat === 'Overseas_Physical') {
             selectBtnInContainer('currency-container', 1); // Foreign
             selectBtnInContainer('method-container', 0); // ApplePay
-        } else if (cat.includes('Supermarket') || cat.includes('Public') || cat.includes('McDonalds') || cat.includes('Starbucks')) {
-            selectBtnInContainer('method-container', 0); // ApplePay (Preferred)
+        } else if (cat.includes('Supermarket') || cat.includes('Public') || cat.includes('McDonalds') || cat.includes('Starbucks') || cat.includes('Local') || cat.includes('Eligible')) {
+            selectBtnInContainer('method-container', 0); // ApplePay (Preferred for SOGO/GO)
         } else {
             selectBtnInContainer('method-container', 0); // ApplePay
         }
@@ -211,7 +208,7 @@
         if (cardId !== 'cheers' && cardId !== 'sogo' && cardId !== 'boc_go') return null;
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
-        const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR', 'Dining_McDonalds', 'Dining_Starbucks', 'Entertainment_Movie'];
+        const validCats = ['Dining_Cheers_Eligible', 'Dining_General', 'Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR', 'Dining_McDonalds', 'Dining_Starbucks', 'Entertainment_Movie'];
         
         let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         
@@ -231,14 +228,13 @@
         return { val: promoVal, rateText: (rate * 100).toFixed(0) + '%', desc: `+ 狂賞派 $${promoVal.toFixed(0)}` };
     }
 
-    // --- Card Logic (V7.1 Adjusted) ---
+    // --- Card Logic ---
     const myCards = [
         {
             id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
             logic: (amt, cat, meth, curr) => {
                 if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
-                // SOGO 5.4% (Apple Pay) - 適用於任何實體 (包括麥當勞)
-                // 優先級高
+                // SOGO 5.4% (Apple Pay)
                 if (meth === 'ApplePay' && curr === 'HKD') {
                     if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
                     let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
@@ -250,18 +246,14 @@
         {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // GO 商戶
                 const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
                 if (isGoMerchant) {
                     if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
                     let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
                     return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: '首$2k 5%', warning: true };
                 }
-                // 內地 8%
                 if (curr === 'FOREIGN' && meth === 'ApplePay') return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
-                // 本地 4% (Apple Pay) - 這是 SOGO 之後的次選
                 if (curr === 'HKD' && meth === 'ApplePay') return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
-                // 海外 0.8%
                 if (curr === 'FOREIGN') return { val: amt * 0.008, rateText: '0.8%', desc: '海外', tag: '2X' };
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本', tag: '基本' };
             }
@@ -269,41 +261,13 @@
         {
             id: 'citi_club', name: 'Citi The Club', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // Citi Club 4% (指定商戶)
-                // 戰略定位：實體簽賬 / 網上指定 (當手機支付爆額或不可用時)
                 let isTarget = false;
-                // 1. Online
                 if (meth === 'Online' && (cat === 'Dining_Online' || cat === 'Travel_Klook' || cat === 'Shop_Fashion_Online')) isTarget = true;
-                // 2. Physical
                 if ((meth === 'Physical' || meth === 'ApplePay') && (cat === 'Shop_CitySuper' || cat === 'Shop_CircleK')) isTarget = true;
-                // 3. Both
                 if (cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie') isTarget = true;
 
                 if (isTarget) return { val: amt * 0.04, rateText: '4.0%', desc: '指定商戶', tag: 'Club 4%' };
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
-            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (cat === 'Transport_Public' || cat === 'Transport_HSR') return { val: amt * 0.005, rateText: '0.5%', desc: '非網上', tag: '基本' };
-                if (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie') {
-                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
-                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (含App)', tag: '網購6%' };
-                }
-                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
-            }
-        },
-        { 
-            id: 'cheers', name: 'BocHK Cheers VI', type: 'miles',
-            logic: (amt, cat, meth, curr) => {
-                if (cat.includes('Dining') || curr === 'FOREIGN') {
-                    // Cheers is 10X (4%). Lower priority for CASH users than SOGO(5.4) or GO(4 - No Annual Fee).
-                    let miles = Math.floor(amt / 1.5);
-                    return { type: 'miles', val: miles, rateText: '$1.5/里', desc: '餐飲/外幣 10X' };
-                }
-                let miles = Math.floor(amt / 15);
-                return { type: 'miles', val: miles, rateText: '$15/里', desc: '基本積分' };
             }
         },
         { 
@@ -316,6 +280,37 @@
                     return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
                 }
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
+        { 
+            id: 'cheers', name: 'BocHK Cheers VI', type: 'miles',
+            logic: (amt, cat, meth, curr) => {
+                // Logic: Must be eligible dining or foreign
+                let isDining = cat.includes('Dining');
+                // Dining_General means "NOT eligible" for 10X
+                let isEligible10X = (cat === 'Dining_Cheers_Eligible' || (isDining && cat !== 'Dining_General')) || curr === 'FOREIGN';
+                
+                // Specific override
+                if (cat === 'Dining_General') isEligible10X = false;
+
+                if (isEligible10X) {
+                    let miles = Math.floor(amt / 1.5);
+                    return { type: 'miles', val: miles, rateText: '$1.5/里', desc: '餐飲/外幣 10X' };
+                }
+                let miles = Math.floor(amt / 15);
+                return { type: 'miles', val: miles, rateText: '$15/里', desc: '基本積分' };
+            }
+        },
+        // ... (Waku, Red, EveryMile, VS, Eye, MMPower, Mox - kept same) ...
+        { 
+            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                if (cat === 'Transport_Public' || cat === 'Transport_HSR') return { val: amt * 0.005, rateText: '0.5%', desc: '非網上', tag: '基本' };
+                if (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie') {
+                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
+                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (含App)', tag: '網購6%' };
+                }
+                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
             }
         },
         { 
@@ -399,14 +394,19 @@
                 }
             }
 
-            // --- 智能排序權重 (Scoring System) ---
+            // Scoring for sorting
             let milesCashEquiv = (base.type === 'miles' ? base.val * 0.1 : 0);
             let cashVal = (base.type === 'cash' ? base.val : 0);
             let totalScore = milesCashEquiv + cashVal + promoVal;
 
-            // 修正: 若 Cheers 純現金價值與 GO/Citi 一樣，扣減權重以讓 GO/Citi 優先 (因為 Cheers 有潛在門檻)
-            if (card.id === 'cheers' && base.type === 'miles') {
-                totalScore *= 0.9; // 輕微降分，確保 Cash 卡在同等價值下優先
+            // Penalty Logic for Ranking only (to favor Safer cards)
+            // 1. Cheers Mile Penalty (so Cash cards like SOGO can rank higher if user prefers cash)
+            if (card.id === 'cheers' && base.type === 'miles') totalScore *= 0.9;
+            
+            // 2. Motion Threshold Penalty (if amount is small and warning exists)
+            // This ensures SOGO (5.4%) ranks above Motion (6% with warning) for small amounts
+            if (card.id === 'motion' && base.warning && amount < 3800) {
+                totalScore *= 0.8; // Reduce effective score so SOGO wins
             }
 
             let isExhausted = exhaustedCards.includes(card.id);
