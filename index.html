@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V20.0 - 網購動態排序版</title>
+    <title>智能簽賬軍師 V22.0 - 網購三梯隊戰略版</title>
     <style>
-        /* V20.0 樣式表 */
+        /* V22.0 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -31,7 +31,7 @@
         .miles-header { color: var(--primary-miles); }
         .cash-header { color: var(--primary-cash); margin-top: 25px; }
         
-        .card-box { background: #fff; border: 1px solid #edf2f7; border-radius: 12px; padding: 15px; margin-bottom: 10px; position: relative; }
+        .card-box { background: #fff; border: 1px solid #edf2f7; border-radius: 12px; padding: 15px; margin-bottom: 10px; position: relative; transition: all 0.3s ease; }
         .card-box.miles-card { background: linear-gradient(to right, #f8fbff, #ffffff); border-left: 5px solid var(--primary-miles); }
         .card-box.cash-card { background: linear-gradient(to right, #fff5f5, #ffffff); border-left: 5px solid var(--primary-cash); }
         .card-box.combo-card { background: linear-gradient(to right, #fff8e1, #ffffff); border-left: 5px solid #ff9800; }
@@ -49,10 +49,9 @@
         .tag-blue { background: #e3f2fd; color: #1565c0; }
         .tag-orange { background: #fff3e0; color: #ef6c00; }
         .tag-warn { background: #fff3cd; color: #856404; }
-        .tag-win { background: #e8f5e9; color: #2e7d32; font-weight: 700; }
         
         .burst-btn { width: 100%; background: #fff; border: 1px solid #ff4444; color: #ff4444; padding: 6px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-        .burst-btn.is-burst { background: #eee; color: #999; border-color: #ddd; }
+        .burst-btn:hover { background: #fff5f5; }
         .note { font-size: 11px; color: #888; text-align: center; margin-top: 20px; }
     </style>
 </head>
@@ -60,8 +59,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V20.0</h1>
-        <p class="subtitle">網購動態：$6000時 MM > Red > Waku</p>
+        <h1>💳 智能簽賬軍師 V22.0</h1>
+        <p class="subtitle">網購三梯隊：Waku > MM > Red</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -93,7 +92,7 @@
             <option value="General">-- 請選擇 --</option>
             
             <optgroup label="📱 電子產品 / 網購">
-                <option value="Online_General">🛍️ 一般網購/淘寶 (MM/Red/Waku)</option>
+                <option value="Online_General">🛍️ 一般網購/淘寶 (Waku/MM/Red)</option>
                 <option value="Elec_Online">💻 網上電子 (Apple/豐澤網店)</option>
                 <option value="Elec_Physical">🔌 實體電子 (SOGO 5.4% / GO 4%)</option>
             </optgroup>
@@ -131,7 +130,7 @@
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 6000" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 3000" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -161,9 +160,9 @@
     </div>
     
     <div class="note">
-        * V20.0 修正：網購排名依金額動態變化。<br>
-        * 大額 (>$5400)：MMPOWER(5%) > Red(4%) > Waku(3.x%)。<br>
-        * 小額 (<$4200)：Waku(6%) > MMPOWER(5%) > Red(4%)。
+        * V22.0 戰略：<br>
+        * 網購梯隊：Waku(6%) -> MM(5%) -> Red(4%)。<br>
+        * 請點擊「🔴 此卡已爆額」來模擬你的消費組合。
     </div>
 </div>
 
@@ -244,10 +243,28 @@
     // --- Card Logic ---
     const myCards = [
         { 
+            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                const isOnline = meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Elec_Online' || cat === 'Travel_Airline';
+                if (isOnline) {
+                    if (amt > 3571) {
+                        let val = (3571 * 0.06) + ((amt - 3571) * 0.005);
+                        let blendedRate = (val/amt*100).toFixed(1) + '%';
+                        return { val: val, rateText: blendedRate, desc: `首$3571 6%`, warning: true };
+                    }
+                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (6%)', tag: '網購6%' };
+                }
+                if (curr === 'FOREIGN') return { val: amt * 0.03, rateText: '3.0%', desc: '外幣 (日本3%)', tag: '日本3%' };
+                if (cat.includes('Dining') && curr === 'HKD') return { val: amt * 0.01, rateText: '1.0%', desc: '本地餐飲', tag: '餐飲1%' };
+                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
+            }
+        },
+        { 
             id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // Threshold Check
-                if (!thresholdMet && amt < 5000) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k門檻', warning: true };
+                // If Threshold NOT met and current amt < 5000, then it's 0.4%
+                let effectiveThreshold = thresholdMet || amt >= 5000;
+                if (!effectiveThreshold) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k門檻', warning: true };
 
                 if (curr === 'FOREIGN') {
                     let rate = 0.06; let cap = 8929;
@@ -277,7 +294,6 @@
                 if (cat.includes('Red_Promo')) return { val: amt * 0.08, rateText: '8.0%', desc: '限時優惠' };
                 const isOnline = meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat === 'Transport_DiDi' || cat === 'Elec_Online' || cat === 'Travel_Airline';
                 if (isOnline) {
-                    // Cap $10,000
                     if (amt > 10000) {
                         let val = (10000 * 0.04) + ((amt-10000)*0.004);
                         let blendedRate = (val/amt*100).toFixed(1) + '%';
@@ -289,34 +305,7 @@
                 return { val: amt * 0.01, rateText: '1.0%', desc: '基本' };
             }
         },
-        { 
-            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                const isOnline = meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Elec_Online' || cat === 'Travel_Airline';
-                if (isOnline) {
-                    // Cap ~$3571
-                    if (amt > 3571) {
-                        let val = (3571 * 0.06) + ((amt - 3571) * 0.005);
-                        let blendedRate = (val/amt*100).toFixed(1) + '%';
-                        return { val: val, rateText: blendedRate, desc: `網購: 首$3571 6%`, warning: true };
-                    }
-                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (6%)', tag: '網購6%' };
-                }
-                if (curr === 'FOREIGN') return { val: amt * 0.03, rateText: '3.0%', desc: '外幣 (日本3%)', tag: '日本3%' };
-                if (cat.includes('Dining') && curr === 'HKD') return { val: amt * 0.01, rateText: '1.0%', desc: '本地餐飲', tag: '餐飲1%' };
-                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
-            }
-        },
-        {
-            id: 'mox', name: 'Mox Credit', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                // Mox 3% (Unlimited) for Supermarket
-                const is3Percent = cat.includes('Shop_') || cat === 'Home_Supermarket';
-                if (is3Percent) return { val: amt * 0.03, rateText: '3.0%', desc: '超市/雜貨 (無上限)', tag: '無上限3%' };
-                return { val: amt * 0.01, rateText: '1.0%', desc: '無上限 (1%)', tag: '基本1%' };
-            }
-        },
-        // ... (SOGO, GO, Miles cards preserved) ...
+        // ... (Other cards preserved) ...
         {
             id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
             logic: (amt, cat, meth, curr) => {
@@ -353,6 +342,14 @@
                 }
                 if (curr === 'FOREIGN') return { val: amt * 0.008, rateText: '0.8%', desc: '海外', tag: '2X' };
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
+        {
+            id: 'mox', name: 'Mox Credit', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                const is3Percent = cat.includes('Shop_') || cat === 'Home_Supermarket';
+                if (is3Percent) return { val: amt * 0.03, rateText: '3.0%', desc: '超市/雜貨 (無上限)', tag: '無上限3%' };
+                return { val: amt * 0.01, rateText: '1.0%', desc: '無上限 (1%)', tag: '基本1%' };
             }
         },
         {
@@ -464,7 +461,7 @@
             };
         });
 
-        // Sorting
+        // Sorting: Pure Value High to Low
         results.sort((a, b) => {
             if (a.baseResult.isTrap && !b.baseResult.isTrap) return 1; 
             if (!a.baseResult.isTrap && b.baseResult.isTrap) return -1; 
