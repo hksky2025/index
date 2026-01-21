@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V6.5 - MTR交通修正版</title>
+    <title>智能簽賬軍師 V6.6 - UI優化版</title>
     <style>
-        /* V6.5 樣式表 */
+        /* V6.6 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -20,11 +20,13 @@
         
         .toggle-container { display: flex; gap: 8px; background: #f0f2f5; padding: 4px; border-radius: 10px; }
         .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
+        
         .toggle-btn.active { background-color: #fff; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid transparent; }
         .red-day-btn.active { background-color: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; }
         .promo-btn.active { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
 
         .analyze-btn { width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        
         .results-area { margin-top: 30px; display: none; }
         .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 5px; border-bottom: 2px solid #eee; }
         .section-title { font-size: 16px; font-weight: 700; }
@@ -38,6 +40,7 @@
 
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
         .card-name { font-weight: 700; font-size: 15px; color: #333; }
+        
         .earn-value { font-size: 18px; font-weight: 800; display: block; text-align: right; }
         .miles-text { color: var(--primary-miles); }
         .cash-text { color: var(--primary-cash); }
@@ -59,15 +62,15 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V6.5</h1>
-        <p class="subtitle">交通邏輯修正：MTR首選SOGO/GO</p>
+        <h1>💳 智能簽賬軍師 V6.6</h1>
+        <p class="subtitle">BOC GO卡 + Wakuwaku + 狂賞派</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
     <div class="input-group">
         <label>推廣優惠 (BOC 狂賞派至 6/2026)</label>
         <div class="toggle-container" id="promo-container">
-            <button class="toggle-btn active" onclick="setPromo(false, this)">不適用</button>
+            <button class="toggle-btn active" onclick="setPromo(false, this)">一般簽賬 (無狂賞)</button>
             <button class="toggle-btn promo-btn" onclick="setPromo(true, this)">🔥 疊加狂賞派</button>
         </div>
         <div id="day-selector" style="display:none; margin-top:8px;">
@@ -148,8 +151,7 @@
     </div>
     
     <div class="note">
-        * V6.5 修正：MTR/巴士 (Apple Pay) 正確推薦 SOGO (5.4%) 或 GO (4%)。<br>
-        * Wakuwaku (6%) 僅適用於網上/App交通 (如 DiDi/Uber)。
+        * V6.6 更新：按鈕文字改為「一般簽賬」，代表只計算信用卡基本回贈，不疊加限時推廣。
     </div>
 </div>
 
@@ -207,7 +209,7 @@
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
         const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR'];
-        // MTR/Bus (Transport_Public) 通常不計狂賞派
+        
         let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         
         if (!isValid) return null;
@@ -265,11 +267,11 @@
         { 
             id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 強制排除實體交通
+                // 強制排除實體交通 (MTR/Bus/HSR)
                 if (cat === 'Transport_Public' || cat === 'Transport_HSR') {
                     return { val: amt * 0.005, rateText: '0.5%', desc: '非網上簽賬', tag: '基本' };
                 }
-                // 正常網購
+                // 正常網購 (DiDi/Keeta/Online)
                 if (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi') {
                     if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
                     return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (無門檻)', tag: '網購6%' };
@@ -306,7 +308,7 @@
             logic: (amt, cat, meth, curr) => {
                 const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook' || cat === 'Transport_DiDi';
                 if (isTarget && curr === 'HKD') {
-                    if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800無回贈', warning: true, zeroIfFail: true };
+                    if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800門檻', warning: true, zeroIfFail: true };
                     if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限 (僅基本)' };
                     return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
                 }
@@ -350,7 +352,7 @@
         { 
             id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 已在上方特別處理交通，此處為一般邏輯備份
+                // 一般邏輯 (DiDi已在上方處理)
                 if (meth === 'Online' || cat.includes('Online')) {
                     if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
                     return { val: amt * 0.06, rateText: '6.0%', desc: '網購' };
