@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V5.1 - 修復版</title>
+    <title>智能簽賬軍師 V6.0 - GO卡強勢加盟</title>
     <style>
-        /* V5.1 樣式表 */
+        /* V6.0 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -21,7 +21,6 @@
         .toggle-container { display: flex; gap: 8px; background: #f0f2f5; padding: 4px; border-radius: 10px; }
         .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
         
-        /* 狀態顏色 */
         .toggle-btn.active { background-color: #fff; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid transparent; }
         .red-day-btn.active { background-color: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; }
         .promo-btn.active { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
@@ -63,8 +62,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V5.1</h1>
-        <p class="subtitle">修復版：按鈕邏輯重寫 + 實質回報</p>
+        <h1>💳 智能簽賬軍師 V6.0</h1>
+        <p class="subtitle">BOC GO卡加盟：內地8% / Keeta&超市5%</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -86,9 +85,13 @@
         <label>消費類別</label>
         <select id="categorySelect" onchange="autoSetDefaults()">
             <option value="General">-- 請選擇 --</option>
-            <optgroup label="🎉 狂賞派 7大類別 (如適用)">
+            <optgroup label="✨ GO卡指定 (5%)">
+                <option value="Dining_Online">🥡 網上餐飲: Keeta/美團 (GO卡 5%)</option>
+                <option value="Home_Supermarket">🛒 超市: 惠康/MarketPlace (GO卡 5%)</option>
+                <option value="Transport_Travel">🚄 旅遊交通: 高鐵/滴滴 (GO卡 5%)</option>
+            </optgroup>
+            <optgroup label="🎉 狂賞派 7大類別">
                 <option value="Dining_Local">🍽️ 實體食肆</option>
-                <option value="Dining_Online">🥡 網上餐飲 (Keeta/Foodpanda)</option>
                 <option value="Travel_Klook">🎡 娛樂/門票 (Klook/Disney)</option>
                 <option value="Travel_OTA">✈️ 網上旅遊 (Trip/Agoda)</option>
                 <option value="Medical">🏥 醫療 / 診所</option>
@@ -105,7 +108,6 @@
                 <option value="Red_Promo_Dining">紅卡8%: 壽司郎/譚仔</option>
                 <option value="Red_Promo_Shop">紅卡8%: GU/Decathlon</option>
                 <option value="Sogo_Supermarket">SOGO超市 (週一95折)</option>
-                <option value="Home_Supermarket">一般超市 (百佳/萬寧)</option>
             </optgroup>
             <optgroup label="🌍 海外">
                 <option value="Overseas_Physical">海外實體店 (外幣)</option>
@@ -115,21 +117,21 @@
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 1500" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 800" inputmode="numeric">
     </div>
 
     <div class="input-group">
         <label>貨幣種類</label>
         <div class="toggle-container" id="currency-container">
             <button class="toggle-btn active" onclick="setCurrency('HKD', this)">HKD 港幣</button>
-            <button class="toggle-btn" onclick="setCurrency('FOREIGN', this)">外幣 (海外/網上)</button>
+            <button class="toggle-btn" onclick="setCurrency('FOREIGN', this)">外幣 (海外/內地)</button>
         </div>
     </div>
 
     <div class="input-group">
         <label>支付方式</label>
         <div class="toggle-container" id="method-container">
-            <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">Apple Pay</button>
+            <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付 (Apple/BoC Pay)</button>
             <button class="toggle-btn" onclick="setMethod('Physical', this)">實體卡</button>
             <button class="toggle-btn" onclick="setMethod('Online', this)">網上支付</button>
         </div>
@@ -145,8 +147,8 @@
     </div>
     
     <div class="note">
-        * V5.1 更新：修復所有按鈕點擊問題，確保單選功能正常。<br>
-        * 已啟用實質回報 (Amount x Rate) 顯示。
+        * V6.0 更新：加入 BOC GO 卡 (內地手機支付8% / Keeta&惠康5%)。<br>
+        * GO卡 5% 僅限每月首 $2,000 簽賬；超市不包括自助及網店。
     </div>
 </div>
 
@@ -158,15 +160,11 @@
     let dayType = 'Weekday';
     let exhaustedCards = JSON.parse(localStorage.getItem('exhaustedCards')) || [];
 
-    // --- UI Helper: Robust Toggle Logic ---
-    // 萬能切換函數：自動尋找父容器，無需手動指定 index
+    // --- UI Helper ---
     function toggleActive(btn) {
-        const container = btn.closest('.toggle-container'); // 尋找最近的父層容器
+        const container = btn.closest('.toggle-container');
         if (!container) return;
-        
-        // 移除同層級其他按鈕的 active
         container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-        // 激活當前按鈕
         btn.classList.add('active');
     }
 
@@ -177,58 +175,42 @@
         document.getElementById('day-selector').style.display = isActive ? 'block' : 'none';
     }
 
-    function setDay(d, btn) {
-        dayType = d;
-        toggleActive(btn);
-    }
-
-    function setCurrency(c, btn) { 
-        currency = c; 
-        toggleActive(btn);
-    }
-
-    function setMethod(m, btn) { 
-        method = m; 
-        toggleActive(btn);
-    }
+    function setDay(d, btn) { dayType = d; toggleActive(btn); }
+    function setCurrency(c, btn) { currency = c; toggleActive(btn); }
+    function setMethod(m, btn) { method = m; toggleActive(btn); }
 
     // --- Auto Defaults ---
     function selectBtnInContainer(containerId, btnIndex) {
         const container = document.getElementById(containerId);
         if (!container) return;
         const btns = container.querySelectorAll('.toggle-btn');
-        if (btns[btnIndex]) {
-            // 模擬點擊以觸發邏輯和視覺更新
-            btns[btnIndex].click();
-        }
+        if (btns[btnIndex]) btns[btnIndex].click();
     }
 
     function autoSetDefaults() {
         const cat = document.getElementById('categorySelect').value;
-        
         if (cat.includes('Online') || cat.includes('App') || cat.includes('OTA')) {
-            // 網上支付 (Index 2 in Method Container)
-            selectBtnInContainer('method-container', 2);
+            selectBtnInContainer('method-container', 2); // Online
         } else if (cat === 'Overseas_Physical') {
-            // 外幣 (Index 1 in Currency)
-            selectBtnInContainer('currency-container', 1);
-            // 實體卡 (Index 1 in Method)
-            selectBtnInContainer('method-container', 1);
+            selectBtnInContainer('currency-container', 1); // Foreign
+            selectBtnInContainer('method-container', 1); // Physical
         } else {
-            // Apple Pay (Index 0 in Method)
-            selectBtnInContainer('method-container', 0);
+            selectBtnInContainer('method-container', 0); // Apple Pay
         }
     }
 
-    // --- Calculation Logic (Same as V5.0) ---
+    // --- Promo Logic (BOC 狂賞派) ---
     function calculatePromoReward(cardId, amount, category, method, currency, isRedDay) {
-        if (cardId !== 'cheers' && cardId !== 'sogo') return null;
+        // BOC Cards only (Cheers, Sogo, GO)
+        if (cardId !== 'cheers' && cardId !== 'sogo' && cardId !== 'boc_go') return null;
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
-        const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets'];
-        let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
+        const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_Travel'];
+        // GO卡商戶通常也符合 Dining/Home 等類別
+        let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel') || category === 'Home_Supermarket';
+        
         if (!isValid) return null;
-        if (currency === 'FOREIGN' && method !== 'Online') return null;
+        if (currency === 'FOREIGN' && method !== 'Online') return null; // 實體外幣不計
 
         let rate = isRedDay ? 0.05 : 0.02;
         let cap = 0;
@@ -249,7 +231,52 @@
         };
     }
 
+    // --- Card Logic ---
     const myCards = [
+        {
+            id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                // 1. 指定 GO 商戶 5% (Keeta/惠康/高鐵)
+                // 條件: 惠康(Home_Supermarket)需實體; Keeta(Dining_Online)需網上; Transport_Travel需對應
+                const isKeeta = cat === 'Dining_Online';
+                const isWellcome = cat === 'Home_Supermarket';
+                const isTravel = cat === 'Transport_Travel';
+                
+                // 模擬商戶檢查 (簡化版)
+                if ( (isKeeta || isWellcome || isTravel) ) {
+                    // 注意：惠康不包自助/網店 (這裡假設 ApplePay/實體 是櫃位)
+                    // 上限 $2000
+                    if (amt <= 2000) {
+                        let desc = 'GO商戶 5%';
+                        if (isWellcome) desc += ' (不包自助/網店)';
+                        return { val: amt * 0.05, rateText: '5.0%', desc: desc, tag: '指定商戶' };
+                    } else {
+                        // 爆Cap後
+                        return { val: (2000*0.05) + ((amt-2000)*0.004), rateText: '混合', desc: '首$2k 5% + 0.4%', warning: true };
+                    }
+                }
+
+                // 2. 內地手機支付 8% (20X)
+                // 假設 FOREIGN + Mobile Pay = 內地/海外手機支付
+                if (curr === 'FOREIGN' && meth === 'ApplePay') {
+                    // 通常 20X 有上限，假設標準 $2000-$5000 不等，這裡先顯示 8%
+                    return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機支付 (20X)', tag: '內地8%' };
+                }
+
+                // 3. 本地手機支付 4% (10X)
+                if (curr === 'HKD' && meth === 'ApplePay') {
+                    // 10X 4%
+                    return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機支付 (10X)', tag: '手機支付' };
+                }
+
+                // 4. 海外簽賬 0.8% (2X)
+                if (curr === 'FOREIGN') {
+                    return { val: amt * 0.008, rateText: '0.8%', desc: '海外簽賬 (2X)', tag: '2X積分' };
+                }
+
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本', tag: '基本' };
+            }
+        },
         { 
             id: 'cheers', name: 'BocHK Cheers VI', type: 'miles',
             logic: (amt, cat, meth, curr) => {
@@ -287,16 +314,6 @@
             }
         },
         { 
-            id: 'everymile', name: 'HSBC EveryMile', type: 'miles',
-            logic: (amt, cat, meth, curr) => {
-                const isPromo = ['Transport_Public', 'Transport_Driving', 'Dining_Coffee', 'Travel_Klook', 'Travel_Airline', 'Overseas_Physical'].includes(cat);
-                if (isPromo || curr === 'FOREIGN') {
-                    return { type: 'miles', val: Math.floor(amt/2), rateText: '$2/里', desc: '指定類別/外幣' };
-                }
-                return { type: 'miles', val: Math.floor(amt/5), rateText: '$5/里', desc: '基本' };
-            }
-        },
-        { 
             id: 'motion', name: 'CNCBI Motion', type: 'cash',
             logic: (amt, cat, meth, curr) => {
                 const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook';
@@ -306,6 +323,16 @@
                     return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
                 }
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
+        { 
+            id: 'everymile', name: 'HSBC EveryMile', type: 'miles',
+            logic: (amt, cat, meth, curr) => {
+                const isPromo = ['Transport_Public', 'Transport_Driving', 'Dining_Coffee', 'Travel_Klook', 'Travel_Airline', 'Overseas_Physical'].includes(cat);
+                if (isPromo || curr === 'FOREIGN') {
+                    return { type: 'miles', val: Math.floor(amt/2), rateText: '$2/里', desc: '指定類別/外幣' };
+                }
+                return { type: 'miles', val: Math.floor(amt/5), rateText: '$5/里', desc: '基本' };
             }
         },
         { 
@@ -342,6 +369,13 @@
                     return { val: amt * 0.06, rateText: '6.0%', desc: '網購' };
                 }
                 return { val: amt * 0.005, rateText: '0.5%', desc: '基本' };
+            }
+        },
+        { 
+            id: 'mox', name: 'Mox Credit', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                if (cat === 'Home_Supermarket') return { val: amt * 0.03, rateText: '3.0%', desc: '超市' };
+                return { val: amt * 0.02, rateText: '2.0%', desc: '無上限' };
             }
         }
     ];
@@ -436,6 +470,7 @@
                         <span class="tag tag-blue">${item.baseResult.rateText}</span>
                         ${item.promoVal > 0 ? '<span class="tag tag-orange">狂賞派</span>' : ''}
                         ${item.warning ? '<span class="tag tag-warn">注意</span>' : ''}
+                        ${item.baseResult.tag ? `<span class="tag tag-blue">${item.baseResult.tag}</span>` : ''}
                     </div>
                     <div class="card-calc">${fullDesc}</div>
                     <button class="burst-btn" onclick="toggleExhausted('${item.id}')">🔴 此卡已爆額 / 下一張</button>
