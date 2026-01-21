@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V6.4 - 現金回贈深度修正版</title>
+    <title>智能簽賬軍師 V6.5 - MTR交通修正版</title>
     <style>
-        /* V6.4 樣式表 */
+        /* V6.5 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -59,8 +59,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V6.4</h1>
-        <p class="subtitle">GO卡/Waku/SOGO 全面對決修正版</p>
+        <h1>💳 智能簽賬軍師 V6.5</h1>
+        <p class="subtitle">交通邏輯修正：MTR首選SOGO/GO</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -82,16 +82,20 @@
         <label>消費類別</label>
         <select id="categorySelect" onchange="autoSetDefaults()">
             <option value="General">-- 請選擇 --</option>
-            <optgroup label="🚕 交通 (Waku/GO/Motion)">
-                <option value="Transport_DiDi">滴滴/Uber (App: Wakuwaku 6% / GO 5%)</option>
-                <option value="Transport_HSR">高鐵櫃位/售票機 (實體: GO 5%)</option>
-                <option value="Transport_Public">公共交通 (MTR/Bus)</option>
+            <optgroup label="🚆 實體交通 (MTR/Bus)">
+                <option value="Transport_Public">公共交通 (首選: SOGO 5.4% / GO 4%)</option>
+                <option value="Transport_HSR">高鐵櫃位/售票機 (GO 5%)</option>
                 <option value="Transport_Driving">駕駛 (入油/泊車)</option>
             </optgroup>
+            <optgroup label="🚕 網上交通 (App/DiDi)">
+                <option value="Transport_DiDi">滴滴/Uber (App: Wakuwaku 6%)</option>
+            </optgroup>
+            
             <optgroup label="✨ GO卡/超市指定">
                 <option value="Dining_Online">🥡 網上餐飲: Keeta/美團 (GO 5% / Waku 6%)</option>
                 <option value="Home_Supermarket">🛒 超市: 惠康/MarketPlace (GO 5% / Mox 3%)</option>
             </optgroup>
+            
             <optgroup label="🎉 狂賞派 7大類別">
                 <option value="Dining_Local">🍽️ 實體食肆</option>
                 <option value="Travel_Klook">🎡 娛樂/門票 (Klook/Disney)</option>
@@ -114,7 +118,7 @@
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 300" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 20" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -144,8 +148,8 @@
     </div>
     
     <div class="note">
-        * V6.4 修正：滴滴/Keeta (網上) Wakuwaku 6% > GO 5% > Motion (如未滿門檻)。<br>
-        * 修正：惠康/超市 SOGO 5.4% > GO 5% > Mox 3% > Red 2%。
+        * V6.5 修正：MTR/巴士 (Apple Pay) 正確推薦 SOGO (5.4%) 或 GO (4%)。<br>
+        * Wakuwaku (6%) 僅適用於網上/App交通 (如 DiDi/Uber)。
     </div>
 </div>
 
@@ -165,6 +169,7 @@
         btn.classList.add('active');
     }
 
+    // --- Actions ---
     function setPromo(isActive, btn) {
         promoActive = isActive;
         toggleActive(btn);
@@ -184,14 +189,15 @@
 
     function autoSetDefaults() {
         const cat = document.getElementById('categorySelect').value;
-        // 包含所有網上類別的關鍵字
         if (cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi') {
             selectBtnInContainer('method-container', 2); // Online
         } else if (cat === 'Overseas_Physical') {
             selectBtnInContainer('currency-container', 1); // Foreign
             selectBtnInContainer('method-container', 0); // ApplePay (GO 8%)
+        } else if (cat === 'Home_Supermarket' || cat === 'Sogo_Supermarket' || cat === 'Transport_HSR' || cat === 'Transport_Public') {
+            selectBtnInContainer('method-container', 0); // ApplePay
         } else {
-            selectBtnInContainer('method-container', 0); // ApplePay (SOGO/GO Default)
+            selectBtnInContainer('method-container', 0); // ApplePay
         }
     }
 
@@ -200,9 +206,8 @@
         if (cardId !== 'cheers' && cardId !== 'sogo' && cardId !== 'boc_go') return null;
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
-        // 狂賞派適用類別 (超市通常不包括，除非另有推廣，這裡按嚴格7大類別執行)
         const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR'];
-        
+        // MTR/Bus (Transport_Public) 通常不計狂賞派
         let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         
         if (!isValid) return null;
@@ -229,81 +234,47 @@
 
     // --- Card Logic ---
     const myCards = [
-        { 
-            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
+        {
+            id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 定義真正的網上: 方法是Online OR 類別包含 Online/App/OTA/DiDi
-                const isRealOnline = (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi');
-                
-                if (isRealOnline) {
-                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
-                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (無門檻)', tag: '網購6%' };
+                if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
+                // Apple Pay (MTR/Bus included)
+                if (meth === 'ApplePay' && curr === 'HKD') {
+                    if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
+                    let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
+                    return { val: val, rateText: '混合', desc: '手機支付 (部分0.4%)' };
                 }
-                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
         {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 1. 指定 GO 商戶 5%
-                const isGoMerchant = (
-                    cat === 'Dining_Online' || // Keeta
-                    cat === 'Home_Supermarket' || // Wellcome
-                    cat === 'Transport_DiDi' || // DiDi
-                    cat === 'Transport_HSR' // High Speed Rail
-                );
-                
+                const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
                 if (isGoMerchant) {
-                    if (amt <= 2000) {
-                        return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
-                    } else {
-                        // 爆Cap後: 視乎是否手機支付
-                        let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
-                        return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: '首$2k 5% + 餘額', warning: true };
-                    }
+                    if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
+                    let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
+                    return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: '首$2k 5% + 餘額', warning: true };
                 }
-
-                // 2. 內地 8%
-                if (curr === 'FOREIGN' && meth === 'ApplePay') {
-                    return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
-                }
-
-                // 3. 本地手機 4%
-                if (curr === 'HKD' && meth === 'ApplePay') {
-                    return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
-                }
-
+                if (curr === 'FOREIGN' && meth === 'ApplePay') return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
+                if (curr === 'HKD' && meth === 'ApplePay') return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
                 if (curr === 'FOREIGN') return { val: amt * 0.008, rateText: '0.8%', desc: '海外', tag: '2X' };
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本', tag: '基本' };
             }
         },
         { 
-            id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
+            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
-                
-                // SOGO 5.4% (Apple Pay) - 適用於超市/一般實體
-                if (meth === 'ApplePay' && curr === 'HKD') {
-                    if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
-                    let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
-                    return { val: val, rateText: '混合', desc: '手機支付 (爆Cap)' };
+                // 強制排除實體交通
+                if (cat === 'Transport_Public' || cat === 'Transport_HSR') {
+                    return { val: amt * 0.005, rateText: '0.5%', desc: '非網上簽賬', tag: '基本' };
                 }
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
-            id: 'red', name: 'HSBC Red', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (cat.includes('Red_Promo')) return { val: amt * 0.08, rateText: '8.0%', desc: '限時優惠' };
-                // Red 定義的網上 (包含 DiDi)
-                const isOnline = (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi');
-                
-                if (isOnline) {
-                    if (amt > 10000) return { val: (10000*0.04) + ((amt-10000)*0.004), rateText: '混合', desc: '網上 (部分0.4%)', warning: true };
-                    return { val: amt * 0.04, rateText: '4.0%', desc: '網上簽賬', tag: '網購4%' };
+                // 正常網購
+                if (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi') {
+                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
+                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (無門檻)', tag: '網購6%' };
                 }
-                if (cat === 'Home_Supermarket') return { val: amt * 0.02, rateText: '2.0%', desc: '超市', tag: '超市2%' };
-                return { val: amt * 0.01, rateText: '1.0%', desc: '基本' };
+                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
             }
         },
         { 
@@ -318,34 +289,28 @@
             }
         },
         { 
+            id: 'red', name: 'HSBC Red', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                if (cat.includes('Red_Promo')) return { val: amt * 0.08, rateText: '8.0%', desc: '限時優惠' };
+                const isOnline = meth === 'Online' || cat.includes('Online') || cat === 'Travel_Klook' || cat === 'Travel_OTA' || cat === 'Transport_App' || cat === 'Transport_DiDi';
+                if (isOnline) {
+                    if (amt > 10000) return { val: (10000*0.04) + ((amt-10000)*0.004), rateText: '混合', desc: '網上 (部分0.4%)', warning: true };
+                    return { val: amt * 0.04, rateText: '4.0%', desc: '網上簽賬' };
+                }
+                if (cat === 'Home_Supermarket') return { val: amt * 0.02, rateText: '2.0%', desc: '超市' };
+                return { val: amt * 0.01, rateText: '1.0%', desc: '基本' };
+            }
+        },
+        { 
             id: 'motion', name: 'CNCBI Motion', type: 'cash',
             logic: (amt, cat, meth, curr) => {
                 const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook' || cat === 'Transport_DiDi';
                 if (isTarget && curr === 'HKD') {
-                    if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800門檻', warning: true, zeroIfFail: true };
+                    if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800無回贈', warning: true, zeroIfFail: true };
                     if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限 (僅基本)' };
                     return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
                 }
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
-            id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (curr === 'FOREIGN') return { val: amt * 0.04, rateText: '~4%', desc: '外幣' };
-                const isTarget = (meth === 'ApplePay' || meth === 'Online' || cat === 'Transport_DiDi');
-                if (isTarget) {
-                    if (amt < 5000) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k門檻', warning: true };
-                    return { val: amt * 0.054, rateText: '5.4%', desc: '網上/手機' };
-                }
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
-            id: 'mox', name: 'Mox Credit', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (cat === 'Home_Supermarket') return { val: amt * 0.03, rateText: '3.0%', desc: '超市', tag: '超市3%' };
-                return { val: amt * 0.02, rateText: '2.0%', desc: '無上限' };
             }
         },
         { 
@@ -369,6 +334,35 @@
             logic: (amt, cat, meth, curr) => {
                 if ((meth === 'ApplePay' || meth === 'Online') && curr === 'HKD') return { type: 'miles', val: Math.floor(amt/3), rateText: '$3/里', desc: '5X 積分' };
                 return { type: 'miles', val: Math.floor(amt/15), rateText: '$15/里', desc: '基本' };
+            }
+        },
+        { 
+            id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                if (curr === 'FOREIGN') return { val: amt * 0.04, rateText: '~4%', desc: '外幣' };
+                if (meth === 'ApplePay' || meth === 'Online') {
+                    if (amt < 5000) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k', warning: true };
+                    return { val: amt * 0.054, rateText: '5.4%', desc: '網上/手機' };
+                }
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
+        { 
+            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                // 已在上方特別處理交通，此處為一般邏輯備份
+                if (meth === 'Online' || cat.includes('Online')) {
+                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
+                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購' };
+                }
+                return { val: amt * 0.005, rateText: '0.5%', desc: '基本' };
+            }
+        },
+        { 
+            id: 'mox', name: 'Mox Credit', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                if (cat === 'Home_Supermarket') return { val: amt * 0.03, rateText: '3.0%', desc: '超市', tag: '超市3%' };
+                return { val: amt * 0.02, rateText: '2.0%', desc: '無上限' };
             }
         }
     ];
