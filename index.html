@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V6.2 - GO卡強勢加盟版</title>
+    <title>智能簽賬軍師 V6.3 - 邏輯修正版</title>
     <style>
-        /* V6.2 樣式表 */
+        /* V6.3 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -62,8 +62,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V6.2</h1>
-        <p class="subtitle">BOC GO卡 (手機4%/內地8%) + 狂賞派</p>
+        <h1>💳 智能簽賬軍師 V6.3</h1>
+        <p class="subtitle">BOC GO卡 + Wakuwaku 精算修正版</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -85,10 +85,15 @@
         <label>消費類別</label>
         <select id="categorySelect" onchange="autoSetDefaults()">
             <option value="General">-- 請選擇 --</option>
+            <optgroup label="🚕 交通 (Wakuwaku/GO)">
+                <option value="Transport_DiDi">滴滴/Uber (App簽賬: Wakuwaku 6%)</option>
+                <option value="Transport_HSR">高鐵櫃位/售票機 (實體: GO 5%)</option>
+                <option value="Transport_Public">公共交通 (MTR/Bus)</option>
+                <option value="Transport_Driving">駕駛 (入油/泊車)</option>
+            </optgroup>
             <optgroup label="✨ GO卡指定 (5%)">
                 <option value="Dining_Online">🥡 網上餐飲: Keeta/美團 (GO 5%)</option>
                 <option value="Home_Supermarket">🛒 超市: 惠康/MarketPlace (GO 5%)</option>
-                <option value="Transport_Travel">🚄 旅遊交通: 高鐵/滴滴 (GO 5%)</option>
             </optgroup>
             <optgroup label="🎉 狂賞派 7大類別">
                 <option value="Dining_Local">🍽️ 實體食肆</option>
@@ -98,11 +103,6 @@
                 <option value="Shop_Jewelry">💍 珠寶 / 服飾</option>
                 <option value="Shop_Pets">🐶 寵物生活</option>
                 <option value="Home_Electronics">📱 電子產品</option>
-            </optgroup>
-            <optgroup label="🚆 交通 / 駕駛">
-                <option value="Transport_Public">公共交通 (MTR/Bus)</option>
-                <option value="Transport_Driving">駕駛 (入油/泊車)</option>
-                <option value="Transport_App">網上叫車 (Uber)</option>
             </optgroup>
             <optgroup label="🔥 其他優惠">
                 <option value="Red_Promo_Dining">紅卡8%: 壽司郎/譚仔</option>
@@ -117,7 +117,7 @@
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 800" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 400" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -131,7 +131,7 @@
     <div class="input-group">
         <label>支付方式</label>
         <div class="toggle-container" id="method-container">
-            <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付 (Apple/BoC Pay)</button>
+            <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付</button>
             <button class="toggle-btn" onclick="setMethod('Physical', this)">實體卡</button>
             <button class="toggle-btn" onclick="setMethod('Online', this)">網上支付</button>
         </div>
@@ -147,8 +147,9 @@
     </div>
     
     <div class="note">
-        * V6.2 更新：BOC GO 卡 (內地8% / 本地4% / 指定5%)。<br>
-        * GO卡 5% 上限 $2,000；惠康超市不包括自助及網店。
+        * V6.3 修正：滴滴 (網上) Wakuwaku 6% > GO 5% (如< $500)。<br>
+        * 高鐵 (櫃位) GO 5% > Wakuwaku 0.5%。<br>
+        * GO商戶 5% 僅限首 $2,000。
     </div>
 </div>
 
@@ -189,12 +190,12 @@
 
     function autoSetDefaults() {
         const cat = document.getElementById('categorySelect').value;
-        if (cat.includes('Online') || cat.includes('App') || cat.includes('OTA')) {
+        if (cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi') {
             selectBtnInContainer('method-container', 2); // Online
         } else if (cat === 'Overseas_Physical') {
             selectBtnInContainer('currency-container', 1); // Foreign
             selectBtnInContainer('method-container', 0); // ApplePay (GO 8%)
-        } else if (cat === 'Home_Supermarket' || cat === 'Sogo_Supermarket') {
+        } else if (cat === 'Home_Supermarket' || cat === 'Sogo_Supermarket' || cat === 'Transport_HSR') {
             selectBtnInContainer('method-container', 0); // ApplePay
         } else {
             selectBtnInContainer('method-container', 0); // ApplePay
@@ -203,12 +204,11 @@
 
     // --- Promo Logic (BOC 狂賞派) ---
     function calculatePromoReward(cardId, amount, category, method, currency, isRedDay) {
-        // BOC Cards only (Cheers, Sogo, GO)
         if (cardId !== 'cheers' && cardId !== 'sogo' && cardId !== 'boc_go') return null;
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
-        const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_Travel'];
-        // 注意：Home_Supermarket 一般不計狂賞派 (除非條款更新)，這裡暫不包括
+        const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR'];
+        
         let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         
         if (!isValid) return null;
@@ -238,43 +238,47 @@
         {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 1. 指定 GO 商戶 5% (Keeta/惠康/高鐵/DiDi)
-                // Keeta(Dining_Online), Wellcome(Home_Supermarket), HighSpeed/DiDi(Transport_Travel)
-                const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_Travel');
+                // 1. 指定 GO 商戶 5%
+                const isGoMerchant = (
+                    cat === 'Dining_Online' || // Keeta
+                    cat === 'Home_Supermarket' || // Wellcome
+                    cat === 'Transport_DiDi' || // DiDi
+                    cat === 'Transport_HSR' // High Speed Rail
+                );
                 
                 if (isGoMerchant) {
                     if (amt <= 2000) {
-                        let desc = 'GO商戶 5%';
-                        if (cat === 'Home_Supermarket') desc += ' (限實體/非自助)';
-                        return { val: amt * 0.05, rateText: '5.0%', desc: desc, tag: '指定商戶' };
+                        return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
                     } else {
-                        // 爆Cap後混合計算
-                        // 假設爆Cap後，如果是本地手機支付有4%，否則0.4%
+                        // 爆Cap後
                         let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
-                        let tailDesc = (tailRate === 0.04) ? '4%' : '0.4%';
-                        
-                        return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: `首$2k 5% + 餘額${tailDesc}`, warning: true };
+                        return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: `首$2k 5% + 餘額${tailRate*100}%`, warning: true };
                     }
                 }
 
-                // 2. 內地/海外 手機支付 8% (20X)
+                // 2. 內地手機 8%
                 if (curr === 'FOREIGN' && meth === 'ApplePay') {
-                    // 注意：20X 積分通常有月上限 (例如 25000分 或 額外積分上限)
-                    // 這裡假設一般額度內
-                    return { val: amt * 0.08, rateText: '8.0%', desc: '內地/海外手機支付', tag: '內地8%' };
+                    return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
                 }
 
-                // 3. 本地手機支付 4% (10X)
+                // 3. 本地手機 4%
                 if (curr === 'HKD' && meth === 'ApplePay') {
-                    return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機支付 (10X)', tag: '手機4%' };
+                    return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
                 }
 
-                // 4. 海外簽賬 0.8% (2X)
-                if (curr === 'FOREIGN') {
-                    return { val: amt * 0.008, rateText: '0.8%', desc: '海外簽賬 (免手續費)', tag: '2X積分' };
-                }
-
+                if (curr === 'FOREIGN') return { val: amt * 0.008, rateText: '0.8%', desc: '海外 (免手續費)', tag: '2X' };
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本', tag: '基本' };
+            }
+        },
+        { 
+            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                // 網上 6% (包括 DiDi/Keeta)
+                if (meth === 'Online' || cat.includes('Online') || cat.includes('App')) {
+                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
+                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (含App)', tag: '網購6%' };
+                }
+                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
             }
         },
         { 
@@ -316,7 +320,7 @@
         { 
             id: 'motion', name: 'CNCBI Motion', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook';
+                const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook' || cat === 'Transport_App' || cat === 'Transport_DiDi';
                 if (isTarget && curr === 'HKD') {
                     if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800無回贈', warning: true, zeroIfFail: true };
                     if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限 (僅基本)' };
@@ -359,16 +363,6 @@
                     return { val: amt * 0.054, rateText: '5.4%', desc: '網上/手機' };
                 }
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
-            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (meth === 'Online' || cat.includes('Online')) {
-                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
-                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購' };
-                }
-                return { val: amt * 0.005, rateText: '0.5%', desc: '基本' };
             }
         },
         { 
