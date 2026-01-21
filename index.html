@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V9.1 - 電子產品終極修正版</title>
+    <title>智能簽賬軍師 V9.2 - 網上/實體嚴格分流版</title>
     <style>
-        /* V9.1 樣式表 */
+        /* V9.2 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -25,7 +25,6 @@
         .promo-btn.active { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
 
         .analyze-btn { width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-        
         .results-area { margin-top: 30px; display: none; }
         .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 5px; border-bottom: 2px solid #eee; }
         .section-title { font-size: 16px; font-weight: 700; }
@@ -60,8 +59,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V9.1</h1>
-        <p class="subtitle">修正版：實體電子 GO 4% / SOGO 5.4% 優先</p>
+        <h1>💳 智能簽賬軍師 V9.2</h1>
+        <p class="subtitle">實體電子 (GO 4%) vs 網上電子 (MM 5%)</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -93,8 +92,8 @@
             <option value="General">-- 請選擇 --</option>
             
             <optgroup label="📱 電子產品 / 網購">
-                <option value="Elec_Online">📱 網上電子 (Apple/豐澤網店)</option>
-                <option value="Elec_Physical">🔌 實體電子 (豐澤/百老匯)</option>
+                <option value="Elec_Online">💻 網上電子 (Apple/豐澤網店)</option>
+                <option value="Elec_Physical">🔌 實體電子 (豐澤/百老匯/Apple)</option>
                 <option value="Online_General">🛍️ 一般網購 (Amazon/Taobao)</option>
             </optgroup>
 
@@ -157,8 +156,9 @@
     </div>
     
     <div class="note">
-        * V9.1 修正：實體電子產品 (Apple Pay) -> GO (4%) > SOGO (混合率) > MMPOWER (1%)。<br>
-        * 網上簽賬則維持 MMPOWER (5%) 或 Red (4%) 優先。
+        * V9.2 修正：<br>
+        * 實體電子 (Apple Pay) -> GO (4%) > SOGO (混合)。MMPOWER 僅 1%。<br>
+        * 網上電子 -> MMPOWER (5%) > Red (4%) > Wakuwaku (6% 小額)。
     </div>
 </div>
 
@@ -216,10 +216,11 @@
         if (cardId !== 'cheers' && cardId !== 'sogo' && cardId !== 'boc_go') return null;
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
+        // Elec_Online = Online Electronics (OK)
+        // Elec_Physical = Physical Electronics (OK)
         const validCats = ['Elec_Online', 'Elec_Physical', 'Dining_Cheers_Eligible', 'Dining_General', 'Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR', 'Dining_McDonalds', 'Dining_Starbucks', 'Entertainment_Movie'];
         
-        let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel') || category.includes('Elec');
-        
+        let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         if (!isValid) return null;
         if (currency === 'FOREIGN' && method !== 'Online') return null;
 
@@ -241,58 +242,33 @@
         { 
             id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
             logic: (amt, cat, meth, curr) => {
+                // 1. Threshold
                 if (!thresholdMet && amt < 5000) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k門檻', warning: true };
 
+                // 2. Foreign
                 if (curr === 'FOREIGN') {
                     let rate = 0.06; let cap = 8929;
                     if (amt > cap) return { val: (cap*rate) + ((amt-cap)*0.004), rateText: '混合', desc: '外幣 (爆Cap)', warning: true };
                     return { val: amt * rate, rateText: '6.0%', desc: '外幣簽賬', tag: '外幣6%' };
                 }
 
-                if (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi') {
+                // 3. Online (Strictly Online Category)
+                // Exclude Physical Apple Pay even if Elec
+                const isOnlineCat = cat === 'Elec_Online' || cat === 'Online_General' || cat === 'Travel_OTA' || cat === 'Dining_Online' || cat === 'Transport_DiDi';
+                if ((meth === 'Online' || isOnlineCat) && cat !== 'Elec_Physical') {
                     let rate = 0.05; let cap = 10870;
-                    if (amt > cap) return { val: (cap*rate) + ((amt-cap)*0.004), rateText: '混合', desc: '網上 (爆Cap)', warning: true };
+                    if (amt > cap) return { val: (cap*rate) + ((amt - cap) * 0.004), rateText: '混合', desc: '網上 (爆Cap)', warning: true };
                     return { val: amt * rate, rateText: '5.0%', desc: '網上簽賬', tag: '網購5%' };
                 }
                 
-                // Electronics (Physical/ApplePay) -> 1% (Selected)
-                // Dining -> 1% (Selected)
+                // 4. Physical (Selected Category: Dining/Elec) -> 1%
                 let isDining = cat.includes('Dining') && cat !== 'Dining_McDonalds';
-                let isElec = cat === 'Elec_Physical';
+                let isElecPhysical = cat === 'Elec_Physical' || cat === 'Home_Electronics';
                 
-                if (isDining || isElec) {
-                    return { val: amt * 0.01, rateText: '1.0%', desc: '自選: 電子/餐飲', tag: '自選1%' };
+                if (isDining || isElecPhysical) {
+                    return { val: amt * 0.01, rateText: '1.0%', desc: '自選: 實體電子/餐飲', tag: '自選1%' };
                 }
 
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        {
-            id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
-                if (isGoMerchant) {
-                    if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
-                    let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
-                    return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: '首$2k 5%', warning: true };
-                }
-                // Local Mobile Pay = 4%
-                if (curr === 'HKD' && meth === 'ApplePay') return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
-                if (curr === 'FOREIGN' && meth === 'ApplePay') return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
-                if (curr === 'FOREIGN') return { val: amt * 0.008, rateText: '0.8%', desc: '海外', tag: '2X' };
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本', tag: '基本' };
-            }
-        },
-        {
-            id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
-                if (meth === 'ApplePay' && curr === 'HKD') {
-                    if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
-                    let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
-                    let blendedRate = (val/amt*100).toFixed(1) + '%';
-                    return { val: val, rateText: blendedRate, desc: `首$2k 5.4%`, warning: true };
-                }
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
@@ -300,13 +276,53 @@
             id: 'red', name: 'HSBC Red', type: 'cash',
             logic: (amt, cat, meth, curr) => {
                 if (cat.includes('Red_Promo')) return { val: amt * 0.08, rateText: '8.0%', desc: '限時優惠' };
-                const isOnline = meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat === 'Transport_DiDi' || cat === 'Elec_Online';
+                // Red covers ALL Online
+                const isOnline = meth === 'Online' || cat === 'Elec_Online' || cat === 'Online_General' || cat.includes('App') || cat === 'Transport_DiDi';
+                
                 if (isOnline) {
                     if (amt > 10000) return { val: (10000*0.04) + ((amt-10000)*0.004), rateText: '混合', desc: '網上 (部分0.4%)', warning: true };
                     return { val: amt * 0.04, rateText: '4.0%', desc: '網上簽賬', tag: '網購4%' };
                 }
-                if (cat === 'Home_Supermarket') return { val: amt * 0.02, rateText: '2.0%', desc: '超市', tag: '超市2%' };
+                if (cat === 'Home_Supermarket' || cat === 'Shop_CitySuper') return { val: amt * 0.02, rateText: '2.0%', desc: '超市', tag: '超市2%' };
                 return { val: amt * 0.01, rateText: '1.0%', desc: '基本' };
+            }
+        },
+        {
+            id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                // GO Logic: High Priority for Physical Apple Pay, Low for Online
+                const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
+                if (isGoMerchant) {
+                    if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
+                    let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
+                    return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: '首$2k 5%', warning: true };
+                }
+                
+                // Physical Apple Pay: 4%
+                if (curr === 'HKD' && meth === 'ApplePay' && cat !== 'Elec_Online' && cat !== 'Online_General') {
+                    return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
+                }
+                
+                // Foreign
+                if (curr === 'FOREIGN' && meth === 'ApplePay') return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
+                if (curr === 'FOREIGN') return { val: amt * 0.008, rateText: '0.8%', desc: '海外', tag: '2X' };
+                
+                // General Online (Non-GO merchant) -> 0.4%
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
+        {
+            id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
+                // SOGO 5.4% (Apple Pay)
+                if (meth === 'ApplePay' && curr === 'HKD' && cat !== 'Elec_Online' && cat !== 'Online_General') {
+                    if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
+                    let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
+                    let blendedRate = (val/amt*100).toFixed(1) + '%';
+                    return { val: val, rateText: blendedRate, desc: `首$2k 5.4%`, warning: true };
+                }
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
         { 
@@ -326,26 +342,29 @@
                 return { type: 'miles', val: miles, rateText: '$15/里', desc: desc, warning: (isEligibleCat && !thresholdMet) };
             }
         },
-        {
-            id: 'citi_club', name: 'Citi The Club', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                let isTarget = false;
-                if (meth === 'Online' && (cat === 'Dining_Online' || cat === 'Travel_Klook' || cat === 'Shop_Fashion_Online')) isTarget = true;
-                if ((meth === 'Physical' || meth === 'ApplePay') && (cat === 'Shop_CitySuper' || cat === 'Shop_CircleK')) isTarget = true;
-                if (cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie') isTarget = true;
-                if (isTarget) return { val: amt * 0.04, rateText: '4.0%', desc: '指定商戶', tag: 'Club 4%' };
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
         { 
             id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                if (cat === 'Transport_Public' || cat === 'Transport_HSR') return { val: amt * 0.005, rateText: '0.5%', desc: '非網上', tag: '基本' };
-                if (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie' || cat === 'Elec_Online') {
+                // Strictly Online Categories
+                const isOnline = meth === 'Online' || cat === 'Elec_Online' || cat === 'Online_General' || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi';
+                
+                if (isOnline) {
                     if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
                     return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (含App)', tag: '網購6%' };
                 }
                 return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
+            }
+        },
+        // ... (Citi, Motion, VS, Eye, Mox unchanged) ...
+        {
+            id: 'citi_club', name: 'Citi The Club', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                let isTarget = false;
+                if (meth === 'Online' && (cat === 'Dining_Online' || cat === 'Travel_Klook')) isTarget = true;
+                if ((meth === 'Physical' || meth === 'ApplePay') && (cat === 'Shop_CitySuper' || cat === 'Shop_CircleK')) isTarget = true;
+                if (cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie') isTarget = true;
+                if (isTarget) return { val: amt * 0.04, rateText: '4.0%', desc: '指定商戶', tag: 'Club 4%' };
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
         { 
@@ -360,7 +379,6 @@
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
-        // ... (EveryMile, VS, Eye, Mox unchanged) ...
         { 
             id: 'everymile', name: 'HSBC EveryMile', type: 'miles',
             logic: (amt, cat, meth, curr) => {
@@ -426,6 +444,9 @@
             // Penalty Logic for Ranking
             if (card.id === 'cheers' && base.type === 'miles') totalScore *= 0.9;
             if (card.id === 'motion' && base.warning && amount < 3800) totalScore *= 0.1;
+            
+            // Severe Penalty for MMPOWER on Physical Apple Pay (Electronics)
+            if (card.id === 'mmpower' && method === 'ApplePay' && category === 'Elec_Physical') totalScore *= 0.1; 
 
             let isExhausted = exhaustedCards.includes(card.id);
             
