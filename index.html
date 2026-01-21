@@ -3,34 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 - 專屬版</title>
+    <title>智能簽賬軍師 V3.0 - 生活全覆蓋版</title>
     <style>
-        /* 樣式保持不變，為節省篇幅直接沿用 V2.0 的 CSS */
+        /* V3.0 樣式表 - 保持簡潔美觀 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
         header { text-align: center; margin-bottom: 30px; }
-        h1 { margin: 0; font-size: 26px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
-        p.subtitle { margin: 8px 0 0; color: var(--text-sub); font-size: 15px; }
+        h1 { margin: 0; font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
+        p.subtitle { margin: 8px 0 0; color: var(--text-sub); font-size: 14px; }
         .reset-link { display: inline-block; margin-top: 10px; font-size: 12px; color: #0066cc; text-decoration: underline; cursor: pointer; }
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #444; }
-        input[type="number"], select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #fff; -webkit-appearance: none; }
+        
+        /* Dropdown Styling */
+        select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; background: #fff; -webkit-appearance: none; color: #333; }
+        optgroup { font-weight: bold; color: #004a99; }
+        
+        input[type="number"] { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; background: #fff; -webkit-appearance: none; }
         .toggle-container { display: flex; gap: 8px; background: #f0f2f5; padding: 4px; border-radius: 10px; }
-        .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; text-align: center; font-size: 14px; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
+        .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
         .toggle-btn.active { background-color: #fff; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .analyze-btn { width: 100%; padding: 16px; background: #1a1a1a; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        
         .results-area { margin-top: 35px; display: none; }
         .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #eee; }
         .section-title { font-size: 18px; font-weight: 700; }
         .miles-header { color: var(--primary-miles); border-color: rgba(0,74,153,0.1); }
         .cash-header { color: var(--primary-cash); border-color: rgba(217,29,43,0.1); margin-top: 30px; }
+        
         .card-box { background: #fff; border: 1px solid #edf2f7; border-radius: 12px; padding: 16px; margin-bottom: 12px; position: relative; }
         .card-box.miles-card { background: linear-gradient(to right, #f8fbff, #ffffff); border-left: 5px solid var(--primary-miles); }
         .card-box.cash-card { background: linear-gradient(to right, #fff5f5, #ffffff); border-left: 5px solid var(--primary-cash); }
         .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .card-name { font-weight: 700; font-size: 16px; color: #333; }
-        .card-rate { font-weight: 800; font-size: 18px; }
+        .card-name { font-weight: 700; font-size: 15px; color: #333; }
+        .card-rate { font-weight: 800; font-size: 16px; }
         .miles-text { color: var(--primary-miles); }
         .cash-text { color: var(--primary-cash); }
         .card-calc { font-size: 13px; color: #666; margin-bottom: 8px; line-height: 1.4; }
@@ -48,30 +55,47 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V2.1</h1>
-        <p class="subtitle">14 張信用卡深度運算 (Mox/SC修正版)</p>
+        <h1>💳 智能簽賬軍師 V3.0</h1>
+        <p class="subtitle">涵蓋交通、超市、電訊、家居等生活場景</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置所有爆額狀態</span>
     </header>
 
     <div class="input-group">
-        <label>消費類別 / 商戶</label>
+        <label>消費類別 / 商戶例子</label>
         <select id="categorySelect" onchange="autoSetDefaults()">
             <option value="General">-- 請選擇 --</option>
-            <option value="Home_Broadway">百老匯 / 豐澤 / 電器 (實體)</option>
-            <option value="Home_Mannings">萬寧 / 屈臣氏 / 超市</option>
-            <option value="Travel_OTA">Trip.com / Agoda / Klook (網上)</option>
-            <option value="Travel_Airline">航空公司直購 (CX/UO)</option>
-            <option value="Dining_Online">Keeta / Deliveroo / Foodpanda</option>
-            <option value="Dining_Local">餐廳食肆 (實體)</option>
-            <option value="Sogo">SOGO 崇光百貨</option>
-            <option value="Online_General">一般網購 (Apple/Amazon/Taobao)</option>
-            <option value="Overseas_Physical">海外實體店簽賬 (外幣)</option>
+            
+            <optgroup label="🏠 家居 / 電器 / 電訊">
+                <option value="Home_Electronics">電器: 百老匯, 豐澤, YOHO, Apple, Dyson</option>
+                <option value="Home_Furniture">家居: 日本城, IKEA, at.home, KeyChain Pay</option>
+                <option value="Home_Telecom">電訊: 1010, CSL, Smartone, NowTV, 網上行</option>
+            </optgroup>
+
+            <optgroup label="🛒 超市 / 購物">
+                <option value="Home_Supermarket">超市: 百佳, 759, Donki, 萬寧, 大生</option>
+                <option value="Sogo">百貨: SOGO 崇光 (主場優惠)</option>
+                <option value="Online_General">網購: Amazon, Taobao, 一般網店</option>
+            </optgroup>
+
+            <optgroup label="🚆 交通 / 外賣 / 寵物">
+                <option value="Transport_App">叫車: Uber, 高德, 的士App</option>
+                <option value="Transport_Public">公共交通: 港鐵, 巴士, 小巴 (ApplePay)</option>
+                <option value="Dining_Online">外賣: Keeta, Deliveroo, Foodpanda</option>
+                <option value="Dining_Local">餐廳: 一般食肆 (實體)</option>
+                <option value="Pets">寵物: Q-Pets, Petmium, 獸醫</option>
+            </optgroup>
+
+            <optgroup label="✈️ 旅遊 / 外幣">
+                <option value="Travel_OTA">網上訂房: Trip.com, Agoda, Klook</option>
+                <option value="Travel_Airline">航空直購: Cathay, UO, Airlines</option>
+                <option value="Overseas_Physical">海外實體: 日本/歐洲/外地簽賬</option>
+            </optgroup>
         </select>
     </div>
 
     <div class="input-group">
-        <label>消費金額 (HKD / 等值)</label>
-        <input type="number" id="amount" placeholder="例如: 4500" inputmode="numeric">
+        <label>消費金額 (HKD)</label>
+        <input type="number" id="amount" placeholder="例如: 80" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -101,7 +125,7 @@
     </div>
     
     <div class="note">
-        * 更新日誌：Mox 修正為現金回贈；SC Cathay 修正為標準卡($4/$6)。
+        * V3.0 更新：加入 Uber/高德、超市、電訊台費及寵物等場景運算。
     </div>
 </div>
 
@@ -110,20 +134,35 @@
     let method = 'ApplePay';
     let exhaustedCards = JSON.parse(localStorage.getItem('exhaustedCards')) || [];
 
+    // --- 智能預設 (Auto-fill) ---
     function autoSetDefaults() {
         const cat = document.getElementById('categorySelect').value;
         const methodBtns = document.querySelectorAll('.toggle-container:nth-of-type(2) .toggle-btn');
-        if (cat === 'Travel_OTA' || cat === 'Dining_Online' || cat === 'Online_General') setMethod('Online', methodBtns[2]);
-        else if (cat === 'Overseas_Physical') { setCurrency('FOREIGN', document.querySelectorAll('.toggle-container:nth-of-type(1) .toggle-btn')[1]); setMethod('Physical', methodBtns[1]); }
-        else if (cat === 'Home_Broadway' || cat === 'Home_Mannings' || cat === 'Sogo') setMethod('ApplePay', methodBtns[0]);
+        const currBtns = document.querySelectorAll('.toggle-container:nth-of-type(1) .toggle-btn');
+        
+        // 網上類別自動切換
+        if (['Travel_OTA', 'Dining_Online', 'Online_General', 'Transport_App', 'Home_Telecom'].includes(cat) || cat.includes('KeyChain')) {
+            setMethod('Online', methodBtns[2]);
+        } 
+        // 實體 ApplePay 類別
+        else if (['Home_Supermarket', 'Home_Broadway', 'Transport_Public', 'Sogo', 'Pets'].includes(cat)) {
+            setMethod('ApplePay', methodBtns[0]);
+        }
+        // 海外
+        else if (cat === 'Overseas_Physical') {
+            setCurrency('FOREIGN', currBtns[1]);
+            setMethod('Physical', methodBtns[1]);
+        }
     }
 
-    // --- 信用卡數據庫 V2.1 ---
+    // --- 信用卡邏輯核心 V3.0 ---
     const myCards = [
         { 
             id: 'eye', name: 'CCB Eye 信用卡', type: 'miles', 
             logic: (amt, cat, meth, curr) => {
-                if ((meth === 'ApplePay' || meth === 'Online' || cat.includes('Online')) && curr === 'HKD') {
+                // Eye: Apple Pay or Online = 5X ($3/mile)
+                // 涵蓋: 網購, Uber, 寵物(ApplePay), 電訊(網上繳費)
+                if ((meth === 'ApplePay' || meth === 'Online' || cat.includes('Online') || cat === 'Transport_App') && curr === 'HKD') {
                     return { rate: 33.3, text: '$3.00 / 里', desc: '5X 積分 (Apple Pay/網上)', tag: '里數王' };
                 }
                 return { rate: 6.6, text: '$15.00 / 里', desc: '基本積分', tag: '基本' };
@@ -132,16 +171,19 @@
         { 
             id: 'vs', name: 'HSBC Visa Signature', type: 'miles',
             logic: (amt, cat, meth, curr) => {
-                if ((cat === 'Home_Broadway' || cat === 'Home_Mannings') && curr === 'HKD') {
+                // 賞家居定義: 超市, 傢俬, 電器, 電訊
+                const isHome = ['Home_Electronics', 'Home_Furniture', 'Home_Telecom', 'Home_Supermarket'].includes(cat);
+                
+                if (isHome && curr === 'HKD') {
                     return { rate: 36, text: '$2.78 / 里', desc: '賞家居 (最紅自主 5X)', tag: '賞家居' };
                 }
-                return { rate: 16, text: '$6.25 / 里', desc: '一般簽賬 1.6%', tag: '基本' };
+                return { rate: 16, text: '$6.25 / 里', desc: '一般簽賬', tag: '基本' };
             }
         },
         { 
             id: 'everymile', name: 'HSBC EveryMile', type: 'miles',
             logic: (amt, cat, meth, curr) => {
-                if (cat === 'Overseas_Physical' || (curr === 'FOREIGN') || cat === 'Travel_Airline') {
+                if (cat === 'Overseas_Physical' || curr === 'FOREIGN' || cat === 'Travel_Airline') {
                     return { rate: 50, text: '$2.00 / 里', desc: '指定旅遊/外幣簽賬', tag: '旅遊神卡' };
                 }
                 return { rate: 20, text: '$5.00 / 里', desc: '一般網上/本地簽賬', tag: '無上限' };
@@ -150,8 +192,8 @@
         { 
             id: 'sc_cathay', name: 'SC Cathay (普卡)', type: 'miles',
             logic: (amt, cat, meth, curr) => {
-                // 修正：標準卡食肆/網上/外幣 $4/里；其他 $6/里
-                if (cat.includes('Dining') || cat.includes('Online') || cat === 'Travel_OTA' || curr === 'FOREIGN') {
+                // 食肆 / 網上 / 外幣 = $4/里
+                if (cat.includes('Dining') || cat.includes('Online') || cat === 'Travel_OTA' || cat === 'Transport_App' || curr === 'FOREIGN') {
                     return { rate: 25, text: '$4.00 / 里', desc: '食肆/網上/外幣', tag: '標準$4' };
                 }
                 return { rate: 16.6, text: '$6.00 / 里', desc: '一般本地簽賬', tag: '標準$6' };
@@ -161,7 +203,11 @@
             id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
             logic: (amt, cat, meth, curr) => {
                 if (curr === 'FOREIGN') return { rate: 40.5, text: '約 4% 淨回贈', desc: '6% 回贈 - 1.95% 手續費', tag: '外幣現金' };
-                if (meth === 'ApplePay' || meth === 'Online' || cat.includes('Online')) {
+                
+                // 網上 (Uber/Taobao) OR 手機支付 (MTR/ApplePay)
+                const isEligible = meth === 'ApplePay' || meth === 'Online' || cat.includes('Online') || cat.includes('Transport');
+                
+                if (isEligible) {
                     if (amt < 5000 && amt > 0) return { rate: 4, text: '⚠️ 僅 0.4%', desc: '未達 $5k 門檻', tag: '小心門檻', warning: true };
                     return { rate: 54, text: '5.4% (+FUN)', desc: '網上/手機支付 5.4%', tag: '最高回贈' };
                 }
@@ -171,7 +217,10 @@
         { 
             id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                if (meth === 'Online' || cat.includes('Online') || cat === 'Travel_OTA') {
+                // 網上 (包括 Uber, KeyChain Pay, 網購)
+                const isOnline = meth === 'Online' || cat.includes('Online') || cat === 'Travel_OTA' || cat === 'Transport_App' || cat === 'Home_Telecom';
+                
+                if (isOnline) {
                     if (amt > 3636) return { rate: 20, text: '⚠️ 爆 Cap', desc: '簽賬超 $3,636 被溝淡', tag: '注意上限', warning: true };
                     return { rate: 60, text: '6.0% 現金', desc: '網上簽賬 6%', tag: '網購王' };
                 }
@@ -181,18 +230,23 @@
         { 
             id: 'red', name: 'HSBC Red', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                if (meth === 'Online' || cat.includes('Online')) {
+                // 網上 (Uber, Telecom, Taobao) - 超市 1%
+                const isOnline = meth === 'Online' || cat.includes('Online') || cat === 'Transport_App' || cat === 'Home_Telecom';
+                
+                if (isOnline) {
                      if (amt > 10000) return { rate: 10, text: '⚠️ 部份 0.4%', desc: '超過 $10,000 上限', tag: '爆額' };
                      return { rate: 40, text: '4.0% 獎賞錢', desc: '網上簽賬 (首$10k)', tag: '無腦網購' };
                 }
-                return { rate: 10, text: '1.0%', desc: '超市/其他', tag: '基本' };
+                // 超市獎賞錢 (通常 1%, 部分有額外但 Red 主要賣點是網上)
+                if (cat === 'Home_Supermarket') return { rate: 20, text: '2.0% 獎賞錢', desc: '超市簽賬 (需登記/推廣)', tag: '超市' }; // 假設有推廣，否則 1%
+                return { rate: 10, text: '1.0%', desc: '一般簽賬', tag: '基本' };
             }
         },
         { 
             id: 'mox', name: 'Mox Credit', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 修正：純 Cash。超市 3%，一般 2% (假設有存款)，否則 1%。這裡設為 2% 作為競爭力參考。
-                if (cat === 'Home_Mannings') return { rate: 30, text: '3.0% 現金', desc: '超市/萬寧 (需符合條件)', tag: '超市' };
+                // 超市 3% (常見商戶: 百佳, 759, Donki, 萬寧)
+                if (cat === 'Home_Supermarket') return { rate: 30, text: '3.0% 現金', desc: '超市/萬寧 (需符合條件)', tag: '超市' };
                 return { rate: 20, text: '2.0% 現金', desc: '無上限 (需$75k結餘)', tag: '無上限' };
             }
         },
@@ -206,13 +260,13 @@
         }
     ];
 
+    // --- 基礎功能 ---
     function setCurrency(curr, btn) { currency = curr; updateToggles(0, btn); }
     function setMethod(met, btn) { method = met; updateToggles(1, btn); }
     function updateToggles(idx, btn) {
         document.querySelectorAll('.toggle-container')[idx].querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
-    
     function toggleExhausted(cardId) {
         exhaustedCards.includes(cardId) ? exhaustedCards = exhaustedCards.filter(id => id !== cardId) : exhaustedCards.push(cardId);
         localStorage.setItem('exhaustedCards', JSON.stringify(exhaustedCards));
