@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V12.0 - GO卡極限Cap修正版</title>
+    <title>智能簽賬軍師 V13.0 - SOGO手機支付稱霸版</title>
     <style>
-        /* V12.0 樣式表 */
+        /* V13.0 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -59,8 +59,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V12.0</h1>
-        <p class="subtitle">GO卡 (額外積分$100封頂) + MMPOWER 分流</p>
+        <h1>💳 智能簽賬軍師 V13.0</h1>
+        <p class="subtitle">SOGO 手機支付(5.4%) 王者歸位</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -92,8 +92,8 @@
             <option value="General">-- 請選擇 --</option>
             
             <optgroup label="📱 電子產品 / 網購">
-                <option value="Elec_Physical">🔌 實體電子 (Apple Store/豐澤/百老匯)</option>
-                <option value="Elec_Online">💻 網上電子 (Apple/豐澤網店)</option>
+                <option value="Elec_Physical">🔌 實體電子 (SOGO 5.4% / GO 4%)</option>
+                <option value="Elec_Online">💻 網上電子 (MM 5% / Red 4%)</option>
                 <option value="Online_General">🛍️ 一般網購 (Amazon/Taobao)</option>
             </optgroup>
 
@@ -126,7 +126,7 @@
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 3000" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 1500" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -156,9 +156,9 @@
     </div>
     
     <div class="note">
-        * V12.0 修正：BOC GO 卡每月額外回贈上限 $100 (25,000分)。<br>
-        * 本地手機 > $2,777 爆Cap；內地手機 > $1,315 爆Cap。<br>
-        * 實體電子 + ApplePay：GO/SOGO 優先，MMPOWER (1%) 淘汰。
+        * V13.0 修正：本地手機支付 (實體電子/食肆)，SOGO 5.4% 永遠是首選。<br>
+        * 次選：BOC GO 4% (上限較高)。<br>
+        * MMPOWER 實體/手機支付僅 1% (淘汰)。
     </div>
 </div>
 
@@ -239,38 +239,45 @@
     // --- Card Logic ---
     const myCards = [
         {
+            id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
+                // SOGO 5.4% (Apple Pay)
+                if (meth === 'ApplePay' && curr === 'HKD' && cat !== 'Elec_Online' && cat !== 'Online_General') {
+                    if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
+                    // Blended: (2000*0.054) + ((Amt-2000)*0.004)
+                    let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
+                    let blendedRate = (val/amt*100).toFixed(1) + '%';
+                    return { val: val, rateText: blendedRate, desc: `首$2k 5.4%`, warning: true };
+                }
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
+        {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 1. GO Merchant (5%, Assuming $2000 Cap logic based on typical BOC)
+                // GO Merchant
                 const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
                 if (isGoMerchant) {
                     if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
-                    // Blended if > 2000
                     let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
-                    // BUT need to check if tailRate also bursts the general mobile cap?
-                    // For simplicity, assuming Merchant Promo is separate quota. 
-                    // If > 2000, fallback is 0.4% to be safe, or 4% if quota allows. 
-                    // Let's assume fallback to Mobile Cap logic below:
-                    // (2000 * 5%) + (Mobile Logic for Remainder) - Simplification:
-                    let blendedVal = (2000 * 0.05) + ((amt - 2000) * 0.004); 
-                    return { val: blendedVal, rateText: '混合', desc: '首$2k 5%', warning: true };
+                    let val = (2000*0.05) + ((amt-2000)*tailRate);
+                    return { val: val, rateText: '混合', desc: '首$2k 5%', warning: true };
                 }
                 
-                // 2. Local Mobile (4% = 10X). Extra Cap 25000 pts ($100).
-                // Extra is 9X. 25000 / 9 = ~2777 HKD.
+                // Local Mobile (4%). Cap $100 (~$2777 spending)
                 if (curr === 'HKD' && meth === 'ApplePay' && cat !== 'Elec_Online' && cat !== 'Online_General') {
                     if (amt <= 2777) {
                         return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
                     } else {
-                        // Cap Formula: (2777 * 0.04) + ((Amt - 2777) * 0.004)
+                        // Blended: (2777 * 0.04) + remainder
                         let val = (2777 * 0.04) + ((amt - 2777) * 0.004);
                         let blendedRate = (val/amt*100).toFixed(1) + '%';
                         return { val: val, rateText: blendedRate, desc: `首$2777 4% (Cap $100)`, warning: true };
                     }
                 }
                 
-                // 3. Mainland/Foreign Mobile (8% = 20X). Extra Cap 25000 pts ($100).
-                // Extra is 19X. 25000 / 19 = ~1315 HKD.
+                // Foreign Mobile (8%). Cap $100 (~$1315 spending)
                 if (curr === 'FOREIGN' && meth === 'ApplePay') {
                     if (amt <= 1315) {
                         return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
@@ -313,6 +320,7 @@
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
+        // ... (Red, Citi, Waku, etc. preserved) ...
         { 
             id: 'red', name: 'HSBC Red', type: 'cash',
             logic: (amt, cat, meth, curr) => {
@@ -322,24 +330,10 @@
                     if (amt > 10000) return { val: (10000*0.04) + ((amt-10000)*0.004), rateText: '混合', desc: '網上 (部分0.4%)', warning: true };
                     return { val: amt * 0.04, rateText: '4.0%', desc: '網上簽賬', tag: '網購4%' };
                 }
-                if (cat === 'Home_Supermarket' || cat === 'Shop_CitySuper') return { val: amt * 0.02, rateText: '2.0%', desc: '超市', tag: '超市2%' };
+                if (cat === 'Home_Supermarket') return { val: amt * 0.02, rateText: '2.0%', desc: '超市', tag: '超市2%' };
                 return { val: amt * 0.01, rateText: '1.0%', desc: '基本' };
             }
         },
-        {
-            id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
-                if (meth === 'ApplePay' && curr === 'HKD' && cat !== 'Elec_Online' && cat !== 'Online_General') {
-                    if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
-                    let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
-                    let blendedRate = (val/amt*100).toFixed(1) + '%';
-                    return { val: val, rateText: blendedRate, desc: `首$2k 5.4%`, warning: true };
-                }
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        // ... (Others unchanged) ...
         {
             id: 'citi_club', name: 'Citi The Club', type: 'cash',
             logic: (amt, cat, meth, curr) => {
@@ -448,7 +442,7 @@
                 }
             }
 
-            // Scoring
+            // Scoring: Pure Value
             let milesCashEquiv = (base.type === 'miles' ? base.val * 0.1 : 0);
             let cashVal = (base.type === 'cash' ? base.val : 0);
             let totalScore = milesCashEquiv + cashVal + promoVal;
@@ -469,7 +463,7 @@
             };
         });
 
-        // Sorting
+        // 🔥 CRITICAL SORTING FIX 🔥
         results.sort((a, b) => {
             if (a.baseResult.isTrap && !b.baseResult.isTrap) return 1; 
             if (!a.baseResult.isTrap && b.baseResult.isTrap) return -1; 
