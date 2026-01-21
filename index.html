@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V14.0 - Mox超市無上限版</title>
+    <title>智能簽賬軍師 V15.0 - Wakuwaku/Mox 雙強版</title>
     <style>
-        /* V14.0 樣式表 */
+        /* V15.0 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -59,8 +59,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V14.0</h1>
-        <p class="subtitle">Mox 3% 無上限 vs SOGO/GO 爆額戰</p>
+        <h1>💳 智能簽賬軍師 V15.0</h1>
+        <p class="subtitle">Wakuwaku (網6%/日3%) + Mox (超市3%)</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -91,41 +91,41 @@
         <select id="categorySelect" onchange="autoSetDefaults()">
             <option value="General">-- 請選擇 --</option>
             
-            <optgroup label="🛒 超市 / 護理 / 雜貨 (重點)">
+            <optgroup label="📱 電子產品 / 網購">
+                <option value="Online_General">🛍️ 網購/淘寶 (Waku 6% / MM 5%)</option>
+                <option value="Elec_Online">💻 網上電子 (Apple/豐澤網店)</option>
+                <option value="Elec_Physical">🔌 實體電子 (SOGO 5.4% / GO 4%)</option>
+            </optgroup>
+
+            <optgroup label="🛒 超市 / 雜貨 / 護理">
                 <option value="Shop_Wellcome">🛒 惠康系 (GO 5% / Mox 3%)</option>
                 <option value="Shop_PNS">🛒 百佳/AEON/一田 (Mox 3%)</option>
                 <option value="Shop_PersonalCare">💄 萬寧/屈臣氏 (Mox 3%)</option>
                 <option value="Shop_Donki">🐧 Donki/759/優品360 (Mox 3%)</option>
             </optgroup>
 
-            <optgroup label="📱 電子產品 / 網購">
-                <option value="Elec_Physical">🔌 實體電子 (SOGO 5.4% / GO 4%)</option>
-                <option value="Elec_Online">💻 網上電子 (MM 5% / Red 4%)</option>
-                <option value="Online_General">🛍️ 一般網購/HKTVmall (MM 5%)</option>
-            </optgroup>
-
             <optgroup label="🍽️ 餐飲食肆">
-                <option value="Dining_Local">🍽️ 一般食肆</option>
+                <option value="Dining_Local">🍽️ 一般食肆 (實體)</option>
                 <option value="Dining_Cheers_Eligible">🥂 食肆 (Cheers 10X 達標)</option>
                 <option value="Dining_Online">🥡 網上餐飲 (Keeta/Foodpanda)</option>
                 <option value="Dining_McDonalds">🍔 麥當勞</option>
             </optgroup>
 
             <optgroup label="✨ 交通 / 其他">
-                <option value="Transport_DiDi">🚕 滴滴/Uber</option>
+                <option value="Transport_DiDi">🚕 滴滴/Uber (Waku 6%)</option>
                 <option value="Transport_Public">🚆 公共交通 (MTR/Bus)</option>
-                <option value="Travel_Klook">🎡 Klook/Disney</option>
+                <option value="Travel_Klook">🎡 Klook/Disney (Waku 6%)</option>
             </optgroup>
 
             <optgroup label="🌍 海外">
-                <option value="Overseas_Physical">海外實體店 (外幣)</option>
+                <option value="Overseas_Physical">海外實體 (外幣)</option>
             </optgroup>
         </select>
     </div>
 
     <div class="input-group">
         <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 3500" inputmode="numeric">
+        <input type="number" id="amount" placeholder="例如: 3000" inputmode="numeric">
     </div>
 
     <div class="input-group">
@@ -155,8 +155,9 @@
     </div>
     
     <div class="note">
-        * V14.0 更新：加入 Mox 全港超市 3% 無上限邏輯。<br>
-        * 大額超市 (>$4000) Mox 3% 將反超 SOGO/GO 成為首選。
+        * V15.0 更新：AEON Wakuwaku 網上 6% (首$3,571)；日本 3% (外幣)；餐飲 1%。<br>
+        * 網購小額 (Waku 6%) > 網購大額 (MM 5%)。<br>
+        * 超市大額 (Mox 3%) > SOGO/GO。
     </div>
 </div>
 
@@ -236,20 +237,44 @@
 
     // --- Card Logic ---
     const myCards = [
+        { 
+            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                // 1. Online: 6% (Cap at $3571 spending)
+                const isOnline = meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi';
+                if (isOnline) {
+                    if (amt > 3571) {
+                        // Cap formula: (3571 * 6%) + ((Amt - 3571) * 0.5%)
+                        let val = (3571 * 0.06) + ((amt - 3571) * 0.005);
+                        let blendedRate = (val/amt*100).toFixed(1) + '%';
+                        return { val: val, rateText: '混合', desc: `網購: 首$3571 6%`, warning: true };
+                    }
+                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (6%)', tag: '網購6%' };
+                }
+
+                // 2. Japan: 3% (Foreign Currency)
+                if (curr === 'FOREIGN') {
+                    // Assuming Foreign = Japan for this card's highlight
+                    return { val: amt * 0.03, rateText: '3.0%', desc: '外幣 (日本3%)', tag: '日本3%' };
+                }
+
+                // 3. Dining (Local): 1%
+                if (cat.includes('Dining') && curr === 'HKD') {
+                    return { val: amt * 0.01, rateText: '1.0%', desc: '本地餐飲', tag: '餐飲1%' };
+                }
+
+                // 4. Base
+                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
+            }
+        },
         {
             id: 'mox', name: 'Mox Credit', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // Mox 3% Categories (Unlimited)
-                // Supermarkets, Groceries, Personal Care, HKTVmall
+                // Mox 3% (Unlimited) Categories
                 const is3Percent = cat.includes('Shop_') || cat === 'Online_General' || cat === 'Home_Supermarket';
-                
-                // Specific Merchant Check for "Shop_" prefixes from my list
-                // Includes: Wellcome, PNS, PersonalCare, Donki
                 if (is3Percent) {
                     return { val: amt * 0.03, rateText: '3.0%', desc: '超市/雜貨 (無上限)', tag: '無上限3%' };
                 }
-                
-                // Base 1%
                 return { val: amt * 0.01, rateText: '1.0%', desc: '無上限 (1%)', tag: '基本1%' };
             }
         },
@@ -258,7 +283,6 @@
             logic: (amt, cat, meth, curr) => {
                 if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
                 // SOGO 5.4% (Apple Pay)
-                // Exclude Online types
                 if (meth === 'ApplePay' && curr === 'HKD' && cat !== 'Elec_Online' && cat !== 'Online_General') {
                     if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
                     let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
@@ -271,7 +295,7 @@
         {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // GO Merchant: Only Wellcome Group
+                // GO Merchant
                 const isGoMerchant = (cat === 'Dining_Online' || cat === 'Shop_Wellcome' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
                 if (isGoMerchant) {
                     if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
@@ -332,7 +356,7 @@
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
-        // ... (Red, Citi, Waku, etc. preserved) ...
+        // ... (Red, Citi, etc. preserved) ...
         { 
             id: 'red', name: 'HSBC Red', type: 'cash',
             logic: (amt, cat, meth, curr) => {
@@ -342,7 +366,6 @@
                     if (amt > 10000) return { val: (10000*0.04) + ((amt-10000)*0.004), rateText: '混合', desc: '網上 (部分0.4%)', warning: true };
                     return { val: amt * 0.04, rateText: '4.0%', desc: '網上簽賬', tag: '網購4%' };
                 }
-                // Supermarket 2% (Wellcome/PNS)
                 if (cat.includes('Shop_')) return { val: amt * 0.02, rateText: '2.0%', desc: '超市', tag: '超市2%' };
                 return { val: amt * 0.01, rateText: '1.0%', desc: '基本' };
             }
@@ -356,17 +379,6 @@
                 if (cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie') isTarget = true;
                 if (isTarget) return { val: amt * 0.04, rateText: '4.0%', desc: '指定商戶', tag: 'Club 4%' };
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
-            id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (cat === 'Transport_Public' || cat === 'Transport_HSR') return { val: amt * 0.005, rateText: '0.5%', desc: '非網上', tag: '基本' };
-                if (meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Elec_Online') {
-                    if (amt > 3636) return { val: 200 + ((amt-3636)*0.005), rateText: '混合', desc: '爆Cap後0.5%', warning: true };
-                    return { val: amt * 0.06, rateText: '6.0%', desc: '網購 (含App)', tag: '網購6%' };
-                }
-                return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
             }
         },
         { 
@@ -448,15 +460,13 @@
                 }
             }
 
-            // Scoring: Pure Value
+            // Scoring
             let milesCashEquiv = (base.type === 'miles' ? base.val * 0.1 : 0);
             let cashVal = (base.type === 'cash' ? base.val : 0);
             let totalScore = milesCashEquiv + cashVal + promoVal;
 
             if (card.id === 'cheers' && base.type === 'miles') totalScore *= 0.9;
             if (card.id === 'motion' && base.warning && amount < 3800) totalScore *= 0.1;
-            
-            // Penalty for MMPOWER 1% (Low Rate)
             if (card.id === 'mmpower' && base.rateText === '1.0%') totalScore *= 0.01;
 
             let isExhausted = exhaustedCards.includes(card.id);
@@ -472,14 +482,13 @@
             };
         });
 
-        // Sorting Logic
+        // Sorting
         results.sort((a, b) => {
             if (a.baseResult.isTrap && !b.baseResult.isTrap) return 1; 
             if (!a.baseResult.isTrap && b.baseResult.isTrap) return -1; 
             
-            // Local Apple Pay: SOGO beats GO if close
+            // Local Apple Pay Priority: SOGO > GO
             if (method === 'ApplePay' && currency === 'HKD') {
-                // If SOGO is not exhausted and has high score, rank above GO
                 if (a.id === 'sogo' && b.id === 'boc_go' && a.totalScore >= b.totalScore) return -1;
             }
 
