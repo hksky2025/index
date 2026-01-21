@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V7.3 - 食肆排序優化版</title>
+    <title>智能簽賬軍師 V7.4 - 門檻精算版</title>
     <style>
-        /* V7.3 樣式表 */
+        /* V7.4 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -61,10 +61,18 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V7.3</h1>
-        <p class="subtitle">食肆優化：SOGO 5.4% > Motion 6% (如有門檻)</p>
+        <h1>💳 智能簽賬軍師 V7.4</h1>
+        <p class="subtitle">Cheers 門檻精算 + SOGO/GO 無門檻優勢</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
+
+    <div class="input-group">
+        <label>本月累積簽賬進度 (影響 Cheers/MMPOWER)</label>
+        <div class="toggle-container" id="threshold-container">
+            <button class="toggle-btn active" onclick="setThreshold(false, this)">未滿 $5,000</button>
+            <button class="toggle-btn" onclick="setThreshold(true, this)">已滿 $5,000 👑</button>
+        </div>
+    </div>
 
     <div class="input-group">
         <label>推廣優惠 (BOC 狂賞派至 6/2026)</label>
@@ -87,7 +95,6 @@
             
             <optgroup label="🍽️ 餐飲食肆">
                 <option value="Dining_Local">🍽️ 一般食肆 (實體/ApplePay)</option>
-                <option value="Dining_Cheers_Eligible">🥂 食肆 (Cheers 10X 達標)</option>
                 <option value="Dining_Online">🥡 網上餐飲 (Keeta/Foodpanda)</option>
                 <option value="Dining_McDonalds">🍔 麥當勞 (App/實體)</option>
                 <option value="Dining_Starbucks">☕ Starbucks</option>
@@ -151,8 +158,8 @@
     </div>
     
     <div class="note">
-        * V7.3 修正：食肆 (Apple Pay) 若未達 Motion 門檻，SOGO 5.4% 會排第一。<br>
-        * 邏輯：SOGO (5.4% 無門檻) > Motion (6% 有門檻) > GO (4%) > Citi (4%)。
+        * V7.4 更新：新增「本月累積簽賬」開關。<br>
+        * Cheers VI (10X) 及 MMPOWER (5.4%) 必須月簽滿 $5,000 才生效，否則SOGO/GO優先。
     </div>
 </div>
 
@@ -161,6 +168,7 @@
     let currency = 'HKD';
     let method = 'ApplePay';
     let promoActive = false;
+    let thresholdMet = false; // New state: Spending >= 5000
     let dayType = 'Weekday';
     let exhaustedCards = JSON.parse(localStorage.getItem('exhaustedCards')) || [];
 
@@ -172,6 +180,10 @@
         btn.classList.add('active');
     }
 
+    function setThreshold(met, btn) {
+        thresholdMet = met;
+        toggleActive(btn);
+    }
     function setPromo(isActive, btn) {
         promoActive = isActive;
         toggleActive(btn);
@@ -196,8 +208,8 @@
         } else if (cat === 'Overseas_Physical') {
             selectBtnInContainer('currency-container', 1); // Foreign
             selectBtnInContainer('method-container', 0); // ApplePay
-        } else if (cat.includes('Supermarket') || cat.includes('Public') || cat.includes('McDonalds') || cat.includes('Starbucks') || cat.includes('Local') || cat.includes('Eligible')) {
-            selectBtnInContainer('method-container', 0); // ApplePay (Preferred for SOGO/GO)
+        } else if (cat.includes('Supermarket') || cat.includes('Public') || cat.includes('McDonalds') || cat.includes('Starbucks') || cat.includes('Local')) {
+            selectBtnInContainer('method-container', 0); // ApplePay
         } else {
             selectBtnInContainer('method-container', 0); // ApplePay
         }
@@ -208,7 +220,7 @@
         if (cardId !== 'cheers' && cardId !== 'sogo' && cardId !== 'boc_go') return null;
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
-        const validCats = ['Dining_Cheers_Eligible', 'Dining_General', 'Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR', 'Dining_McDonalds', 'Dining_Starbucks', 'Entertainment_Movie'];
+        const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR', 'Dining_McDonalds', 'Dining_Starbucks', 'Entertainment_Movie'];
         
         let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         
@@ -228,13 +240,13 @@
         return { val: promoVal, rateText: (rate * 100).toFixed(0) + '%', desc: `+ 狂賞派 $${promoVal.toFixed(0)}` };
     }
 
-    // --- Card Logic ---
+    // --- Card Logic (V7.4 Threshold Aware) ---
     const myCards = [
         {
             id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
             logic: (amt, cat, meth, curr) => {
+                // SOGO: No Floor Limit. Perfect for small dining.
                 if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
-                // SOGO 5.4% (Apple Pay)
                 if (meth === 'ApplePay' && curr === 'HKD') {
                     if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
                     let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
@@ -246,6 +258,7 @@
         {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
+                // GO: No Floor Limit.
                 const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
                 if (isGoMerchant) {
                     if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
@@ -261,47 +274,72 @@
         {
             id: 'citi_club', name: 'Citi The Club', type: 'cash',
             logic: (amt, cat, meth, curr) => {
+                // Citi Club: No Floor Limit.
                 let isTarget = false;
                 if (meth === 'Online' && (cat === 'Dining_Online' || cat === 'Travel_Klook' || cat === 'Shop_Fashion_Online')) isTarget = true;
                 if ((meth === 'Physical' || meth === 'ApplePay') && (cat === 'Shop_CitySuper' || cat === 'Shop_CircleK')) isTarget = true;
                 if (cat === 'Dining_McDonalds' || cat === 'Dining_Starbucks' || cat === 'Entertainment_Movie') isTarget = true;
 
-                if (isTarget) return { val: amt * 0.04, rateText: '4.0%', desc: '指定商戶', tag: 'Club 4%' };
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
-            id: 'motion', name: 'CNCBI Motion', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook' || cat === 'Transport_DiDi';
-                if (isTarget && curr === 'HKD') {
-                    if (amt < 3800) return { val: amt * 0.06, rateText: '6.0%', desc: '⚠️ 未滿$3800門檻', warning: true, zeroIfFail: true };
-                    if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限', warning: true };
-                    return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
-                }
+                if (isTarget) return { val: amt * 0.04, rateText: '4.0%', desc: '指定商戶 (無門檻)', tag: 'Club 4%' };
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
             }
         },
         { 
             id: 'cheers', name: 'BocHK Cheers VI', type: 'miles',
             logic: (amt, cat, meth, curr) => {
-                // Logic: Must be eligible dining or foreign
-                let isDining = cat.includes('Dining');
-                // Dining_General means "NOT eligible" for 10X
-                let isEligible10X = (cat === 'Dining_Cheers_Eligible' || (isDining && cat !== 'Dining_General')) || curr === 'FOREIGN';
-                
-                // Specific override
-                if (cat === 'Dining_General') isEligible10X = false;
+                // Logic: Must Hit $5000 Total Monthly Spend
+                let isEligibleCat = cat.includes('Dining') || curr === 'FOREIGN';
+                // User toggle 'thresholdMet' OR current single transaction >= 5000
+                let isEligible10X = isEligibleCat && (thresholdMet || amt >= 5000);
 
                 if (isEligible10X) {
                     let miles = Math.floor(amt / 1.5);
-                    return { type: 'miles', val: miles, rateText: '$1.5/里', desc: '餐飲/外幣 10X' };
+                    return { type: 'miles', val: miles, rateText: '$1.5/里', desc: '餐飲/外幣 10X (滿$5k)' };
                 }
+                
                 let miles = Math.floor(amt / 15);
-                return { type: 'miles', val: miles, rateText: '$15/里', desc: '基本積分' };
+                let desc = '基本積分';
+                if (isEligibleCat && !thresholdMet) desc = '⚠️ 未滿$5k門檻 (僅1X)';
+                
+                return { type: 'miles', val: miles, rateText: '$15/里', desc: desc, warning: (isEligibleCat && !thresholdMet) };
             }
         },
-        // ... (Waku, Red, EveryMile, VS, Eye, MMPower, Mox - kept same) ...
+        { 
+            id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                // Logic: Must Hit $5000 Total Monthly Spend
+                if (curr === 'FOREIGN') return { val: amt * 0.04, rateText: '~4%', desc: '外幣' };
+                
+                if (meth === 'ApplePay' || meth === 'Online') {
+                    // Check threshold
+                    if (thresholdMet || amt >= 5000) {
+                        return { val: amt * 0.054, rateText: '5.4%', desc: '網上/手機 (滿$5k)' };
+                    } else {
+                        return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k門檻', warning: true };
+                    }
+                }
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
+        { 
+            id: 'motion', name: 'CNCBI Motion', type: 'cash',
+            logic: (amt, cat, meth, curr) => {
+                // Logic: Must Hit $3800. Motion uses lower threshold than others (3800 vs 5000).
+                // If user selects "Over 5000", they definitely cover 3800.
+                // If "Under 5000", we check if amt >= 3800.
+                const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook' || cat === 'Transport_DiDi';
+                
+                if (isTarget && curr === 'HKD') {
+                    if (thresholdMet || amt >= 3800) {
+                        if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限', warning: true };
+                        return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
+                    } else {
+                        return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$3800', warning: true, zeroIfFail: true };
+                    }
+                }
+                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            }
+        },
         { 
             id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
             logic: (amt, cat, meth, curr) => {
@@ -350,17 +388,6 @@
             }
         },
         { 
-            id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
-            logic: (amt, cat, meth, curr) => {
-                if (curr === 'FOREIGN') return { val: amt * 0.04, rateText: '~4%', desc: '外幣' };
-                if (meth === 'ApplePay' || meth === 'Online') {
-                    if (amt < 5000) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k', warning: true };
-                    return { val: amt * 0.054, rateText: '5.4%', desc: '網上/手機' };
-                }
-                return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-            }
-        },
-        { 
             id: 'mox', name: 'Mox Credit', type: 'cash',
             logic: (amt, cat, meth, curr) => {
                 if (cat === 'Home_Supermarket' || cat === 'Shop_CitySuper') return { val: amt * 0.03, rateText: '3.0%', desc: '超市', tag: '超市3%' };
@@ -382,7 +409,7 @@
         
         let results = myCards.map(card => {
             let base = card.logic(amount, category, method, currency);
-            if (base.zeroIfFail && amount < 3800) base.val = 0;
+            if (base.zeroIfFail && base.warning) base.val = 0; // Fail Motion
 
             let promoDesc = '';
             let promoVal = 0;
@@ -394,20 +421,10 @@
                 }
             }
 
-            // Scoring for sorting
+            // Scoring
             let milesCashEquiv = (base.type === 'miles' ? base.val * 0.1 : 0);
             let cashVal = (base.type === 'cash' ? base.val : 0);
             let totalScore = milesCashEquiv + cashVal + promoVal;
-
-            // Penalty Logic for Ranking only (to favor Safer cards)
-            // 1. Cheers Mile Penalty (so Cash cards like SOGO can rank higher if user prefers cash)
-            if (card.id === 'cheers' && base.type === 'miles') totalScore *= 0.9;
-            
-            // 2. Motion Threshold Penalty (if amount is small and warning exists)
-            // This ensures SOGO (5.4%) ranks above Motion (6% with warning) for small amounts
-            if (card.id === 'motion' && base.warning && amount < 3800) {
-                totalScore *= 0.8; // Reduce effective score so SOGO wins
-            }
 
             let isExhausted = exhaustedCards.includes(card.id);
             
