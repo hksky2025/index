@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V6.0 - GO卡強勢加盟</title>
+    <title>智能簽賬軍師 V6.2 - GO卡強勢加盟版</title>
     <style>
-        /* V6.0 樣式表 */
+        /* V6.2 樣式表 */
         :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
@@ -62,8 +62,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V6.0</h1>
-        <p class="subtitle">BOC GO卡加盟：內地8% / Keeta&超市5%</p>
+        <h1>💳 智能簽賬軍師 V6.2</h1>
+        <p class="subtitle">BOC GO卡 (手機4%/內地8%) + 狂賞派</p>
         <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
     </header>
 
@@ -86,9 +86,9 @@
         <select id="categorySelect" onchange="autoSetDefaults()">
             <option value="General">-- 請選擇 --</option>
             <optgroup label="✨ GO卡指定 (5%)">
-                <option value="Dining_Online">🥡 網上餐飲: Keeta/美團 (GO卡 5%)</option>
-                <option value="Home_Supermarket">🛒 超市: 惠康/MarketPlace (GO卡 5%)</option>
-                <option value="Transport_Travel">🚄 旅遊交通: 高鐵/滴滴 (GO卡 5%)</option>
+                <option value="Dining_Online">🥡 網上餐飲: Keeta/美團 (GO 5%)</option>
+                <option value="Home_Supermarket">🛒 超市: 惠康/MarketPlace (GO 5%)</option>
+                <option value="Transport_Travel">🚄 旅遊交通: 高鐵/滴滴 (GO 5%)</option>
             </optgroup>
             <optgroup label="🎉 狂賞派 7大類別">
                 <option value="Dining_Local">🍽️ 實體食肆</option>
@@ -147,8 +147,8 @@
     </div>
     
     <div class="note">
-        * V6.0 更新：加入 BOC GO 卡 (內地手機支付8% / Keeta&惠康5%)。<br>
-        * GO卡 5% 僅限每月首 $2,000 簽賬；超市不包括自助及網店。
+        * V6.2 更新：BOC GO 卡 (內地8% / 本地4% / 指定5%)。<br>
+        * GO卡 5% 上限 $2,000；惠康超市不包括自助及網店。
     </div>
 </div>
 
@@ -193,9 +193,11 @@
             selectBtnInContainer('method-container', 2); // Online
         } else if (cat === 'Overseas_Physical') {
             selectBtnInContainer('currency-container', 1); // Foreign
-            selectBtnInContainer('method-container', 1); // Physical
+            selectBtnInContainer('method-container', 0); // ApplePay (GO 8%)
+        } else if (cat === 'Home_Supermarket' || cat === 'Sogo_Supermarket') {
+            selectBtnInContainer('method-container', 0); // ApplePay
         } else {
-            selectBtnInContainer('method-container', 0); // Apple Pay
+            selectBtnInContainer('method-container', 0); // ApplePay
         }
     }
 
@@ -206,11 +208,11 @@
         if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
 
         const validCats = ['Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_Travel'];
-        // GO卡商戶通常也符合 Dining/Home 等類別
-        let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel') || category === 'Home_Supermarket';
+        // 注意：Home_Supermarket 一般不計狂賞派 (除非條款更新)，這裡暫不包括
+        let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel');
         
         if (!isValid) return null;
-        if (currency === 'FOREIGN' && method !== 'Online') return null; // 實體外幣不計
+        if (currency === 'FOREIGN' && method !== 'Online') return null;
 
         let rate = isRedDay ? 0.05 : 0.02;
         let cap = 0;
@@ -236,42 +238,40 @@
         {
             id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
             logic: (amt, cat, meth, curr) => {
-                // 1. 指定 GO 商戶 5% (Keeta/惠康/高鐵)
-                // 條件: 惠康(Home_Supermarket)需實體; Keeta(Dining_Online)需網上; Transport_Travel需對應
-                const isKeeta = cat === 'Dining_Online';
-                const isWellcome = cat === 'Home_Supermarket';
-                const isTravel = cat === 'Transport_Travel';
+                // 1. 指定 GO 商戶 5% (Keeta/惠康/高鐵/DiDi)
+                // Keeta(Dining_Online), Wellcome(Home_Supermarket), HighSpeed/DiDi(Transport_Travel)
+                const isGoMerchant = (cat === 'Dining_Online' || cat === 'Home_Supermarket' || cat === 'Transport_Travel');
                 
-                // 模擬商戶檢查 (簡化版)
-                if ( (isKeeta || isWellcome || isTravel) ) {
-                    // 注意：惠康不包自助/網店 (這裡假設 ApplePay/實體 是櫃位)
-                    // 上限 $2000
+                if (isGoMerchant) {
                     if (amt <= 2000) {
                         let desc = 'GO商戶 5%';
-                        if (isWellcome) desc += ' (不包自助/網店)';
+                        if (cat === 'Home_Supermarket') desc += ' (限實體/非自助)';
                         return { val: amt * 0.05, rateText: '5.0%', desc: desc, tag: '指定商戶' };
                     } else {
-                        // 爆Cap後
-                        return { val: (2000*0.05) + ((amt-2000)*0.004), rateText: '混合', desc: '首$2k 5% + 0.4%', warning: true };
+                        // 爆Cap後混合計算
+                        // 假設爆Cap後，如果是本地手機支付有4%，否則0.4%
+                        let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
+                        let tailDesc = (tailRate === 0.04) ? '4%' : '0.4%';
+                        
+                        return { val: (2000*0.05) + ((amt-2000)*tailRate), rateText: '混合', desc: `首$2k 5% + 餘額${tailDesc}`, warning: true };
                     }
                 }
 
-                // 2. 內地手機支付 8% (20X)
-                // 假設 FOREIGN + Mobile Pay = 內地/海外手機支付
+                // 2. 內地/海外 手機支付 8% (20X)
                 if (curr === 'FOREIGN' && meth === 'ApplePay') {
-                    // 通常 20X 有上限，假設標準 $2000-$5000 不等，這裡先顯示 8%
-                    return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機支付 (20X)', tag: '內地8%' };
+                    // 注意：20X 積分通常有月上限 (例如 25000分 或 額外積分上限)
+                    // 這裡假設一般額度內
+                    return { val: amt * 0.08, rateText: '8.0%', desc: '內地/海外手機支付', tag: '內地8%' };
                 }
 
                 // 3. 本地手機支付 4% (10X)
                 if (curr === 'HKD' && meth === 'ApplePay') {
-                    // 10X 4%
-                    return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機支付 (10X)', tag: '手機支付' };
+                    return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機支付 (10X)', tag: '手機4%' };
                 }
 
                 // 4. 海外簽賬 0.8% (2X)
                 if (curr === 'FOREIGN') {
-                    return { val: amt * 0.008, rateText: '0.8%', desc: '海外簽賬 (2X)', tag: '2X積分' };
+                    return { val: amt * 0.008, rateText: '0.8%', desc: '海外簽賬 (免手續費)', tag: '2X積分' };
                 }
 
                 return { val: amt * 0.004, rateText: '0.4%', desc: '基本', tag: '基本' };
