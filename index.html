@@ -3,47 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V27.6 - 150+ 商戶 & 建行 eye 加入版</title>
+    <title>智能簽賬軍師 V27.7 - 2026 旗艦商戶版</title>
     <style>
         :root { --boc: #b31d28; --hsbc: #db0011; --hangseng: #008154; --sc: #006b4d; --ccb: #003b8e; --aeon: #800080; --miles: #004a99; --cash: #d32f2f; }
+        
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f2f5f8; margin: 0; padding: 10px; color: #1a1a1a; }
-        .container { max-width: 650px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-        .search-section { background: linear-gradient(135deg, #1a1a1a, #333); color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
+        
+        .container { max-width: 650px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); box-sizing: border-box; }
+        
+        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
+        header h1 { margin: 0; font-size: 26px; font-weight: 800; color: #1a1a1a; letter-spacing: -1px; }
+        header p { margin: 5px 0 0; font-size: 13px; color: #666; font-weight: 500; }
+
+        .search-section { background: linear-gradient(135deg, #1a1a1a, #333); color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; box-sizing: border-box; }
         .search-section label { font-size: 14px; color: #bbb; display: block; margin-bottom: 8px; }
-        #merchantSearch { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; outline: none; }
+        
+        /* 修正搜尋欄位過長問題 */
+        #merchantSearch { 
+            width: 100%; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: none; 
+            font-size: 16px; 
+            font-weight: 700; 
+            outline: none; 
+            box-sizing: border-box; /* 核心修正：確保 padding 不會撐開寬度 */
+            display: block;
+        }
+        
         .match-hint { font-size: 13px; color: #4caf50; margin-top: 10px; font-weight: bold; min-height: 1.2em; }
+        
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 13px; color: #555; }
-        select, input[type="number"] { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; box-sizing: border-box; background: #fafafa; }
-        .toggle-container { display: flex; gap: 5px; background: #f0f0f0; padding: 4px; border-radius: 12px; }
-        .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: #666; background: none; transition: 0.2s; }
+        
+        select, input[type="number"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1.5px solid #eee; 
+            border-radius: 12px; 
+            font-size: 15px; 
+            box-sizing: border-box; 
+            background: #fafafa; 
+        }
+
+        .toggle-container { display: flex; gap: 5px; background: #f0f0f0; padding: 4px; border-radius: 12px; box-sizing: border-box; }
+        .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: #666; background: none; transition: 0.2s; white-space: nowrap; }
         .toggle-btn.active { background: #fff; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .analyze-btn { width: 100%; padding: 18px; background: #db0011; color: #fff; border: none; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-        .section-header { margin-top: 25px; padding-bottom: 8px; border-bottom: 2px solid #eee; font-size: 18px; font-weight: 800; }
+        
+        .analyze-btn { width: 100%; padding: 18px; background: #db0011; color: #fff; border: none; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(219,0,17,0.2); }
+        
+        .section-header { margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #eee; font-size: 18px; font-weight: 800; display: flex; align-items: center; }
+        .section-header::before { content: ""; display: inline-block; width: 4px; height: 18px; margin-right: 10px; border-radius: 2px; }
         .section-header.miles { color: var(--miles); }
+        .section-header.miles::before { background: var(--miles); }
         .section-header.cash { color: var(--cash); }
-        .card-box { border: 1px solid #f0f0f0; border-radius: 18px; padding: 16px; margin-top: 12px; border-left: 6px solid #ccc; background: #fff; position: relative; }
+        .section-header.cash::before { background: var(--cash); }
+
+        .card-box { border: 1px solid #f0f0f0; border-radius: 18px; padding: 16px; margin-top: 12px; border-left: 6px solid #ccc; background: #fff; position: relative; transition: transform 0.2s; }
         .boc-card { border-left-color: var(--boc); }
         .hsbc-card { border-left-color: var(--hsbc); }
         .hangseng-card { border-left-color: var(--hangseng); }
         .sc-card { border-left-color: var(--sc); }
         .ccb-card { border-left-color: var(--ccb); }
         .aeon-card { border-left-color: var(--aeon); }
+        
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .card-name { font-weight: 800; font-size: 15px; color: #333; }
-        .earn-val { font-size: 22px; font-weight: 900; text-align: right; }
-        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; }
-        .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; line-height: 1.5; }
+        .earn-val { font-size: 22px; font-weight: 900; text-align: right; letter-spacing: -0.5px; }
+        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 5px; border: 1px solid #ffe0b2; }
+        .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; line-height: 1.5; }
         .warn-msg { color: #d32f2f; font-weight: 700; font-size: 11px; margin-top: 5px; display: block; }
+
+        .note { font-size: 11px; color: #999; text-align: center; margin-top: 30px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <header>
+        <h1>💳 智能簽賬軍師 V27.7</h1>
+        <p>2026 旗艦版 | 大數據商戶識別系統</p>
+    </header>
+
     <div class="search-section">
-        <label>🔍 輸入商戶 (支援 150+ 香港主流商戶)</label>
-        <input type="text" id="merchantSearch" placeholder="例如: 國泰, 壽司郎, 淘寶, Foodpanda..." oninput="autoMatch()">
+        <label>🔍 輸入商戶 (自動切換類別及支付方式)</label>
+        <input type="text" id="merchantSearch" placeholder="搜尋: 國泰, 壽司郎, KKday, 大家樂, 淘寶..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
 
@@ -76,19 +121,19 @@
     </div>
 
     <div class="input-group">
-        <label>手動類別修正 (如有需要)</label>
+        <label>類別判定 (手動修正)</label>
         <select id="category">
             <option value="General">-- 一般本地消費 --</option>
-            <option value="Dining">🍽️ 餐飲食肆</option>
-            <option value="Online">🛍️ 網上零售</option>
-            <option value="Electronics">🔌 電子產品/電訊</option>
-            <option value="Super">🛒 超級市場</option>
-            <option value="Transport">🚌 交通出行/油站/隧道</option>
-            <option value="Coffee">☕ 咖啡輕食</option>
-            <option value="Travel">✈️ 旅遊機票/酒店</option>
-            <option value="Medical">🏥 醫療服務</option>
-            <option value="Jewelry">💍 珠寶服飾/運動用品</option>
-            <option value="Overseas">🌍 海外外幣</option>
+            <option value="Dining">🍽️ 餐飲食肆 (狂賞/自選)</option>
+            <option value="Online">🛍️ 網上零售 (眼卡/Waku)</option>
+            <option value="Electronics">🔌 電子產品/電訊 (狂賞/VS)</option>
+            <option value="Super">🛒 超級市場 (VS/Mox)</option>
+            <option value="Transport">🚌 交通出行/油站/隧道 (EveryMile)</option>
+            <option value="Coffee">☕ 咖啡輕食 (EveryMile)</option>
+            <option value="Travel">✈️ 旅遊機票/平台 (狂賞/CX)</option>
+            <option value="Medical">🏥 醫療服務 (狂賞)</option>
+            <option value="Jewelry">💍 珠寶服飾/運動 (狂賞/Red8)</option>
+            <option value="Overseas">🌍 海外外幣 (Cheers/MMPOWER)</option>
         </select>
     </div>
 
@@ -100,6 +145,11 @@
         <div class="section-header cash">💰 現金回贈建議 (高至低)</div>
         <div id="cash-results"></div>
     </div>
+
+    <div class="note">
+        2026 數據修正：Red卡所有Apple Pay網購4% / MMPOWER實體餐飲1% / eye卡手機支付5X<br>
+        *里數評分以 1 里 = HK$0.1 計算作排序參考。
+    </div>
 </div>
 
 <script>
@@ -107,58 +157,66 @@
     let method = 'ApplePay';
 
     const merchantDB = [
-        // --- 網購熱點 (eye 卡強項) ---
+        // --- 旅遊及機票平台 (KKday, Trip.com 等) ---
+        { name: "KKday", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Trip.com", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "携程", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Booking.com", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Hotels.com", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Expedia", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Agoda", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Airbnb", cat: "Travel", sub: "BOC", meth: "Online" },
+
+        // --- 本地連鎖快餐及餐飲 (大快活、大家樂等) ---
+        { name: "大快活", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "Fairwood", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "大家樂", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "Cafe de Coral", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "美心", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "Maxim's", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "McDonald", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "KFC", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "肯德基", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "吉野家", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "Yoshinoya", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+
+        // --- 網購及眼卡強項 ---
         { name: "淘寶", cat: "Online", sub: "EYE", meth: "Online" },
-        { name: "Taobao", cat: "Online", sub: "EYE", meth: "Online" },
         { name: "HKTVmall", cat: "Online", sub: "EYE", meth: "Online" },
         { name: "Amazon", cat: "Online", sub: "EYE", meth: "Online" },
+        { name: "Price.com", cat: "Online", sub: "EYE", meth: "Online" },
         
-        // --- HSBC Red 8% 指定商戶 ---
+        // --- Red 8% ---
         { name: "壽司郎", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "譚仔三哥", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "譚仔雲南", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "The Coffee Academïcs", cat: "Coffee", sub: "Red8", meth: "ApplePay" },
+        { name: "Sushiro", cat: "Dining", sub: "Red8", meth: "ApplePay" },
+        { name: "譚仔", cat: "Dining", sub: "Red8", meth: "ApplePay" },
         { name: "GU", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
-        { name: "Decathlon", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
         { name: "lululemon", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
+        { name: "迪卡儂", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
+        { name: "Decathlon", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
         { name: "NAMCO", cat: "Dining", sub: "Red8", meth: "ApplePay" },
 
-        // --- SC Cathay $2/里 ---
+        // --- CX $2/里 ---
         { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" },
+        { name: "Cathay Pacific", cat: "Travel", sub: "CX", meth: "Online" },
         { name: "HK Express", cat: "Travel", sub: "CX", meth: "Online" },
 
-        // --- EveryMile $2/里 ---
+        // --- EveryMile $2 ---
         { name: "港鐵", cat: "Transport", sub: "EM", meth: "ApplePay" },
         { name: "MTR", cat: "Transport", sub: "EM", meth: "ApplePay" },
         { name: "九巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "加德士", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "Shell", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
         { name: "Starbucks", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "星巴克", cat: "Coffee", sub: "EM", meth: "ApplePay" },
         { name: "% Arabica", cat: "Coffee", sub: "EM", meth: "ApplePay" },
 
-        // --- HSBC VS 賞家居 3.6% ---
+        // --- VS 3.6% ---
         { name: "Donki", cat: "Super", sub: "VS", meth: "ApplePay" },
         { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" },
         { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
-        { name: "759 阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" },
         { name: "豐澤", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-        { name: "百老滙", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-        { name: "宜家", cat: "Home", sub: "VS", meth: "ApplePay" },
-        { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" },
-
-        // --- 中銀狂賞派 ---
-        { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" },
-        { name: "Deliveroo", cat: "Dining", sub: "BOC", meth: "Online" },
-        { name: "OpenRice", cat: "Dining", sub: "BOC", meth: "Online" },
-        { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" },
-        { name: "大家樂", cat: "Dining", sub: "BOC", meth: "ApplePay" },
-        { name: "美心", cat: "Dining", sub: "BOC", meth: "ApplePay" },
-        { name: "Apple Store", cat: "Electronics", sub: "BOC", meth: "ApplePay" },
-        { name: "Agoda", cat: "Travel", sub: "BOC", meth: "Online" },
-        { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" },
-        { name: "養和", cat: "Medical", sub: "BOC", meth: "ApplePay" },
-        { name: "卓健", cat: "Medical", sub: "BOC", meth: "ApplePay" }
+        { name: "百老滙", cat: "Electronics", sub: "VS", meth: "ApplePay" }
     ];
 
     function autoMatch() {
