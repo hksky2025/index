@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V27.5 - 150+ 商戶大數據版</title>
+    <title>智能簽賬軍師 V27.6 - 150+ 商戶 & 建行 eye 加入版</title>
     <style>
-        :root { --boc: #b31d28; --hsbc: #db0011; --hangseng: #008154; --sc: #006b4d; --aeon: #800080; --miles: #004a99; --cash: #d32f2f; }
+        :root { --boc: #b31d28; --hsbc: #db0011; --hangseng: #008154; --sc: #006b4d; --ccb: #003b8e; --aeon: #800080; --miles: #004a99; --cash: #d32f2f; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f2f5f8; margin: 0; padding: 10px; color: #1a1a1a; }
         .container { max-width: 650px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
         .search-section { background: linear-gradient(135deg, #1a1a1a, #333); color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
@@ -28,6 +28,7 @@
         .hsbc-card { border-left-color: var(--hsbc); }
         .hangseng-card { border-left-color: var(--hangseng); }
         .sc-card { border-left-color: var(--sc); }
+        .ccb-card { border-left-color: var(--ccb); }
         .aeon-card { border-left-color: var(--aeon); }
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .card-name { font-weight: 800; font-size: 15px; color: #333; }
@@ -42,7 +43,7 @@
 <div class="container">
     <div class="search-section">
         <label>🔍 輸入商戶 (支援 150+ 香港主流商戶)</label>
-        <input type="text" id="merchantSearch" placeholder="例如: 國泰, 壽司郎, 豐澤, Donki, 星巴克..." oninput="autoMatch()">
+        <input type="text" id="merchantSearch" placeholder="例如: 國泰, 壽司郎, 淘寶, Foodpanda..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
 
@@ -94,9 +95,9 @@
     <button class="analyze-btn" onclick="analyze()">精確運算最優組合</button>
 
     <div id="results" style="display:none;">
-        <div class="section-header miles">✈️ 里數優先建議</div>
+        <div class="section-header miles">✈️ 里數優先建議 (高至低)</div>
         <div id="miles-results"></div>
-        <div class="section-header cash">💰 現金回贈建議</div>
+        <div class="section-header cash">💰 現金回贈建議 (高至低)</div>
         <div id="cash-results"></div>
     </div>
 </div>
@@ -106,102 +107,58 @@
     let method = 'ApplePay';
 
     const merchantDB = [
+        // --- 網購熱點 (eye 卡強項) ---
+        { name: "淘寶", cat: "Online", sub: "EYE", meth: "Online" },
+        { name: "Taobao", cat: "Online", sub: "EYE", meth: "Online" },
+        { name: "HKTVmall", cat: "Online", sub: "EYE", meth: "Online" },
+        { name: "Amazon", cat: "Online", sub: "EYE", meth: "Online" },
+        
         // --- HSBC Red 8% 指定商戶 ---
         { name: "壽司郎", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "Sushiro", cat: "Dining", sub: "Red8", meth: "ApplePay" },
         { name: "譚仔三哥", cat: "Dining", sub: "Red8", meth: "ApplePay" },
         { name: "譚仔雲南", cat: "Dining", sub: "Red8", meth: "ApplePay" },
         { name: "The Coffee Academïcs", cat: "Coffee", sub: "Red8", meth: "ApplePay" },
         { name: "GU", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
         { name: "Decathlon", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
-        { name: "迪卡儂", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
         { name: "lululemon", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
         { name: "NAMCO", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "TAITO STATION", cat: "Dining", sub: "Red8", meth: "ApplePay" },
 
         // --- SC Cathay $2/里 ---
         { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" },
-        { name: "Cathay Pacific", cat: "Travel", sub: "CX", meth: "Online" },
         { name: "HK Express", cat: "Travel", sub: "CX", meth: "Online" },
-        { name: "香港快運", cat: "Travel", sub: "CX", meth: "Online" },
 
-        // --- EveryMile $2/里 (交通) ---
+        // --- EveryMile $2/里 ---
         { name: "港鐵", cat: "Transport", sub: "EM", meth: "ApplePay" },
         { name: "MTR", cat: "Transport", sub: "EM", meth: "ApplePay" },
         { name: "九巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "KMB", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "城巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "Citybus", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "龍運", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "Tesla Supercharger", cat: "Transport", sub: "EM", meth: "Online" },
         { name: "加德士", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "Caltex", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "Esso", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "埃索", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "蜆殼", cat: "Transport", sub: "EM", meth: "ApplePay" },
         { name: "Shell", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "中國石油", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "中石化", cat: "Transport", sub: "EM", meth: "ApplePay" },
-        { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
-
-        // --- EveryMile $2/里 (咖啡) ---
         { name: "Starbucks", cat: "Coffee", sub: "EM", meth: "ApplePay" },
         { name: "星巴克", cat: "Coffee", sub: "EM", meth: "ApplePay" },
         { name: "% Arabica", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "天仁茗茶", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "TenRen", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "Lady M", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "NOC", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "Pacific Coffee", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "Pret A Manager", cat: "Coffee", sub: "EM", meth: "ApplePay" },
-        { name: "Cupping Room", cat: "Coffee", sub: "EM", meth: "ApplePay" },
 
         // --- HSBC VS 賞家居 3.6% ---
-        { name: "Don Don Donki", cat: "Super", sub: "VS", meth: "ApplePay" },
+        { name: "Donki", cat: "Super", sub: "VS", meth: "ApplePay" },
         { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" },
-        { name: "ParknShop", cat: "Super", sub: "VS", meth: "ApplePay" },
         { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
         { name: "759 阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" },
-        { name: "阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" },
         { name: "豐澤", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-        { name: "Fortress", cat: "Electronics", sub: "VS", meth: "ApplePay" },
         { name: "百老滙", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-        { name: "Broadway", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-        { name: "友和", cat: "Electronics", sub: "VS", meth: "Online" },
-        { name: "YOHO", cat: "Electronics", sub: "VS", meth: "Online" },
         { name: "宜家", cat: "Home", sub: "VS", meth: "ApplePay" },
-        { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" },
-        { name: "實惠", cat: "Home", sub: "VS", meth: "ApplePay" },
-        { name: "Pricerite", cat: "Home", sub: "VS", meth: "ApplePay" },
         { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" },
-        { name: "JHC", cat: "Home", sub: "VS", meth: "ApplePay" },
-        { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-        { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-        { name: "3香港", cat: "Electronics", sub: "VS", meth: "ApplePay" },
 
-        // --- 中銀狂賞派 7 大類別主要商戶 ---
+        // --- 中銀狂賞派 ---
         { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" },
         { name: "Deliveroo", cat: "Dining", sub: "BOC", meth: "Online" },
         { name: "OpenRice", cat: "Dining", sub: "BOC", meth: "Online" },
         { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" },
-        { name: "McDonald", cat: "Dining", sub: "BOC", meth: "ApplePay" },
         { name: "大家樂", cat: "Dining", sub: "BOC", meth: "ApplePay" },
         { name: "美心", cat: "Dining", sub: "BOC", meth: "ApplePay" },
         { name: "Apple Store", cat: "Electronics", sub: "BOC", meth: "ApplePay" },
-        { name: "蘇寧", cat: "Electronics", sub: "BOC", meth: "ApplePay" },
-        { name: "衛訊", cat: "Electronics", sub: "BOC", meth: "ApplePay" },
         { name: "Agoda", cat: "Travel", sub: "BOC", meth: "Online" },
-        { name: "Expedia", cat: "Travel", sub: "BOC", meth: "Online" },
         { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" },
-        { name: "Trip.com", cat: "Travel", sub: "BOC", meth: "Online" },
         { name: "養和", cat: "Medical", sub: "BOC", meth: "ApplePay" },
-        { name: "卓健", cat: "Medical", sub: "BOC", meth: "ApplePay" },
-        { name: "迪士尼", cat: "Travel", sub: "BOC", meth: "ApplePay" },
-        { name: "海洋公園", cat: "Travel", sub: "BOC", meth: "ApplePay" },
-        { name: "Nike", cat: "Jewelry", sub: "BOC", meth: "ApplePay" },
-        { name: "Adidas", cat: "Jewelry", sub: "BOC", meth: "ApplePay" },
-        { name: "周生生", cat: "Jewelry", sub: "BOC", meth: "ApplePay" },
-        { name: "Q-Pets", cat: "Medical", sub: "BOC", meth: "ApplePay" }
+        { name: "卓健", cat: "Medical", sub: "BOC", meth: "ApplePay" }
     ];
 
     function autoMatch() {
@@ -233,6 +190,11 @@
     }
 
     const cards = [
+        { id: 'ccb_eye', name: '建銀亞洲 eye 卡', bank: 'ccb', type: 'miles', logic: (amt, cat, meth) => {
+            let isBonus = (meth === 'Online' || meth === 'ApplePay');
+            let miles = Math.floor(amt / (isBonus ? 3 : 15));
+            return { val: miles * 0.1, miles: miles, rate: isBonus ? '$3/里' : '$15/里', desc: '網購/手機支付 5X 積分' };
+        }},
         { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
             let r = (sub === "CX") ? 2 : (['Dining', 'Travel', 'Overseas'].includes(cat) ? 4 : 6);
             return { val: amt * (0.1/r), miles: Math.floor(amt/r), rate: `$${r}/里` };
