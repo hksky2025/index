@@ -3,73 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V25.1 - 極速體驗版</title>
+    <title>智能簽賬軍師 V26.0 - 2026 全能版</title>
     <style>
-        /* V25.1 樣式表 */
-        :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
+        :root { --primary-miles: #004a99; --primary-cash: #d91d2b; --promo-color: #e65100; --bg-color: #f4f6f9; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #65676b; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; color: var(--text-main); -webkit-font-smoothing: antialiased; }
-        .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-        header { text-align: center; margin-bottom: 20px; }
-        h1 { margin: 0; font-size: 22px; font-weight: 800; color: #1a1a1a; }
+        .container { max-width: 600px; margin: 0 auto; background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        header { text-align: center; margin-bottom: 25px; }
+        h1 { margin: 0; font-size: 24px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; }
         p.subtitle { margin: 5px 0 0; color: var(--text-sub); font-size: 13px; }
-        .reset-link { display: inline-block; margin-top: 10px; font-size: 12px; color: #0066cc; text-decoration: underline; cursor: pointer; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #444; }
-        select, input[type="number"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; background: #fff; -webkit-appearance: none; box-sizing: border-box; }
-        optgroup { font-weight: bold; color: #d91d2b; }
         
-        .toggle-container { display: flex; gap: 8px; background: #f0f2f5; padding: 4px; border-radius: 10px; }
-        .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-sub); transition: all 0.2s; }
-        .toggle-btn.active { background-color: #fff; color: #000; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid transparent; }
-        .red-day-btn.active { background-color: #ffebee; color: #d32f2f; border: 1px solid #ffcdd2; }
-        .promo-btn.active { background-color: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
+        .input-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px; color: #333; }
+        select, input[type="number"] { width: 100%; padding: 14px; border: 1.5px solid #e0e0e0; border-radius: 12px; font-size: 16px; background: #fff; box-sizing: border-box; transition: border-color 0.2s; }
+        select:focus, input:focus { border-color: #0066cc; outline: none; }
 
-        .analyze-btn { width: 100%; padding: 15px; background: #1a1a1a; color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
-        .analyze-btn:active { transform: scale(0.98); }
+        .toggle-container { display: flex; gap: 8px; background: #ebeef2; padding: 4px; border-radius: 12px; }
+        .toggle-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; text-align: center; font-size: 13px; font-weight: 700; color: var(--text-sub); transition: all 0.2s; }
+        .toggle-btn.active { background-color: #fff; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .promo-btn.active { background-color: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+
+        .analyze-btn { width: 100%; padding: 16px; background: #1a1a1a; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .analyze-btn:hover { background: #333; }
+
         .results-area { margin-top: 30px; display: none; }
-        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 5px; border-bottom: 2px solid #eee; }
-        .section-title { font-size: 16px; font-weight: 700; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #eee; }
+        .section-title { font-size: 17px; font-weight: 800; }
         .miles-header { color: var(--primary-miles); }
-        .cash-header { color: var(--primary-cash); margin-top: 25px; }
+        .cash-header { color: var(--primary-cash); margin-top: 30px; }
         
-        .card-box { background: #fff; border: 1px solid #edf2f7; border-radius: 12px; padding: 15px; margin-bottom: 10px; position: relative; transition: all 0.3s ease; }
-        .card-box.miles-card { background: linear-gradient(to right, #f8fbff, #ffffff); border-left: 5px solid var(--primary-miles); }
-        .card-box.cash-card { background: linear-gradient(to right, #fff5f5, #ffffff); border-left: 5px solid var(--primary-cash); }
-        .card-box.combo-card { background: linear-gradient(to right, #fff8e1, #ffffff); border-left: 5px solid #ff9800; }
+        .card-box { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 18px; margin-bottom: 15px; position: relative; border-left: 6px solid #ccc; }
+        .card-box.miles-card { border-left-color: var(--primary-miles); background: linear-gradient(to right, #f0f7ff, #fff); }
+        .card-box.cash-card { border-left-color: var(--primary-cash); background: linear-gradient(to right, #fff5f5, #fff); }
+        .card-box.combo-card { border-left-color: #ff9800; background: linear-gradient(to right, #fffaf0, #fff); }
 
-        .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
-        .card-name { font-weight: 700; font-size: 15px; color: #333; }
-        .earn-value { font-size: 18px; font-weight: 800; display: block; text-align: right; }
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-name { font-weight: 800; font-size: 16px; color: #1a1a1a; }
+        .earn-value { font-size: 20px; font-weight: 900; text-align: right; }
         .miles-text { color: var(--primary-miles); }
         .cash-text { color: var(--primary-cash); }
-        .combo-text { color: var(--promo-color); }
         
-        .card-calc { font-size: 12px; color: #666; margin-top: 5px; line-height: 1.4; border-top: 1px dashed #eee; padding-top: 5px; }
-        .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
-        .tag { font-size: 10px; padding: 3px 6px; border-radius: 4px; font-weight: 600; }
+        .card-calc { font-size: 12.5px; color: #555; margin-top: 10px; line-height: 1.5; padding-top: 8px; border-top: 1px dashed #ddd; }
+        .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .tag { font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: 700; }
         .tag-blue { background: #e3f2fd; color: #1565c0; }
-        .tag-orange { background: #fff3e0; color: #ef6c00; }
-        .tag-warn { background: #fff3cd; color: #856404; }
+        .tag-orange { background: #fff3e0; color: #e65100; }
+        .tag-warn { background: #ffebee; color: #c62828; }
         
-        .burst-btn { width: 100%; background: #fff; border: 1px solid #ff4444; color: #ff4444; padding: 6px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
-        .burst-btn:hover { background: #fff5f5; }
-        /* Optimization 1: Burst State */
-        .burst-btn.is-burst { background: #f5f5f5; color: #999; border-color: #ddd; cursor: not-allowed; }
-        
-        .note { font-size: 11px; color: #888; text-align: center; margin-top: 20px; }
+        .note { font-size: 12px; color: #888; text-align: center; margin-top: 30px; line-height: 1.6; }
+        .reset-link { cursor: pointer; color: #0066cc; text-decoration: underline; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V25.1</h1>
-        <p class="subtitle">極速體驗：Enter即算 / 里數顯現值</p>
-        <span class="reset-link" onclick="resetAllData()">↺ 重置爆額狀態</span>
+        <h1>💳 智能簽賬軍師 V26.0</h1>
+        <p class="subtitle">2026 最新版：Mox 1% / BoC 狂賞派 / $3里 Eye 卡</p>
+        <span class="reset-link" onclick="location.reload()">↺ 重置所有數據</span>
     </header>
 
     <div class="input-group">
-        <label>本月累積簽賬 (MMPOWER/Cheers 需滿$5k)</label>
+        <label>當月累積簽賬狀態</label>
         <div class="toggle-container" id="threshold-container">
             <button class="toggle-btn active" onclick="setThreshold(false, this)">未滿 $5,000</button>
             <button class="toggle-btn" onclick="setThreshold(true, this)">已滿 $5,000 👑</button>
@@ -77,448 +71,239 @@
     </div>
 
     <div class="input-group">
-        <label>推廣優惠 (BOC 狂賞派至 6/2026)</label>
+        <label>推廣優惠 (BoC 狂賞派 2026)</label>
         <div class="toggle-container" id="promo-container">
-            <button class="toggle-btn active" onclick="setPromo(false, this)">一般簽賬 (無狂賞)</button>
+            <button class="toggle-btn active" onclick="setPromo(false, this)">一般消費</button>
             <button class="toggle-btn promo-btn" onclick="setPromo(true, this)">🔥 疊加狂賞派</button>
         </div>
-        <div id="day-selector" style="display:none; margin-top:8px;">
-            <div class="toggle-container" id="day-container">
+        <div id="day-selector" style="display:none; margin-top:10px;">
+            <div class="toggle-container">
                 <button class="toggle-btn active" onclick="setDay('Weekday', this)">平日 (+2%)</button>
-                <button class="toggle-btn red-day-btn" onclick="setDay('RedDay', this)">紅日 (+5%)</button>
+                <button class="toggle-btn" onclick="setDay('RedDay', this)" style="color:red;">驚喜紅日 (+5%)</button>
             </div>
         </div>
     </div>
 
     <div class="input-group">
         <label>消費類別</label>
-        <select id="categorySelect" onchange="autoSetDefaults()">
-            <option value="General">-- 請選擇 --</option>
-            
-            <optgroup label="📱 電子產品 / 網購">
-                <option value="Online_General">🛍️ 一般網購/淘寶 (Waku/MM/Red)</option>
-                <option value="Elec_Online">💻 網上電子 (Apple/豐澤網店)</option>
-                <option value="Elec_Physical">🔌 實體電子 (SOGO 5.4% / GO 4%)</option>
+        <select id="categorySelect" onchange="autoSetMethod()">
+            <option value="General">-- 一般本地消費 --</option>
+            <optgroup label="🛍️ 網購 / 電子產品">
+                <option value="Online_General">網上購物 (淘寶/HKTV/Amazon)</option>
+                <option value="Elec_Online">網上電子產品 (Apple/豐澤網店)</option>
+                <option value="Elec_Physical">實體電子產品 (豐澤/百老匯)</option>
             </optgroup>
-
-            <optgroup label="🛒 超市 / 雜貨 / 護理">
-                <option value="Shop_Wellcome">🛒 惠康系 (GO 5% / Mox 3%)</option>
-                <option value="Shop_PNS">🛒 百佳/AEON/一田 (Mox 3%)</option>
-                <option value="Shop_PersonalCare">💄 萬寧/屈臣氏 (Mox 3%)</option>
-                <option value="Shop_Donki">🐧 Donki/759 (Mox 3%)</option>
-            </optgroup>
-
             <optgroup label="🍽️ 餐飲食肆">
-                <option value="Dining_Local">🍽️ 一般食肆 (實體)</option>
-                <option value="Dining_Cheers_Eligible">🥂 食肆 (Cheers 10X 達標)</option>
-                <option value="Dining_Online">🥡 網上餐飲 (Keeta/Foodpanda)</option>
-                <option value="Dining_McDonalds">🍔 麥當勞</option>
+                <option value="Dining_Local">本地餐廳實體店</option>
+                <option value="Dining_Online">網上外賣 (Keeta/Foodpanda)</option>
             </optgroup>
-
-            <optgroup label="✨ 交通 / 其他">
-                <option value="Transport_DiDi">🚕 滴滴/Uber (Waku 6%)</option>
-                <option value="Transport_Public">🚆 公共交通 (MTR/Bus)</option>
-                <option value="Travel_Klook">🎡 Klook/Disney (Waku 6%)</option>
+            <optgroup label="🛒 超市 / 護理">
+                <option value="Shop_Supermarket">超市 (惠康/百佳/M&S)</option>
+                <option value="Shop_PersonalCare">護理 (萬寧/屈臣氏)</option>
             </optgroup>
-
-            <optgroup label="✈️ 旅遊 / 機票">
-                <option value="Travel_Airline">✈️ 國泰/UO 官網 (SC $2/里)</option>
-                <option value="Travel_OTA">🏨 OTA/酒店 (Trip/Agoda)</option>
-            </optgroup>
-
-            <optgroup label="🌍 海外">
-                <option value="Overseas_Physical">海外實體店 (外幣)</option>
+            <optgroup label="✈️ 旅遊 / 外幣">
+                <option value="Overseas_Physical">海外實體店 (外幣簽賬)</option>
+                <option value="Travel_Airline">航空公司官網 (國泰/UO)</option>
+                <option value="Travel_OTA">酒店平台 (Trip.com/Agoda)</option>
             </optgroup>
         </select>
     </div>
 
     <div class="input-group">
-        <label>消費金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="例如: 3000" inputmode="numeric">
-    </div>
-
-    <div class="input-group">
-        <label>貨幣種類</label>
-        <div class="toggle-container" id="currency-container">
-            <button class="toggle-btn active" onclick="setCurrency('HKD', this)">HKD 港幣</button>
-            <button class="toggle-btn" onclick="setCurrency('FOREIGN', this)">外幣 (海外/內地)</button>
-        </div>
+        <label>簽賬金額 (HKD)</label>
+        <input type="number" id="amount" placeholder="輸入金額" inputmode="numeric">
     </div>
 
     <div class="input-group">
         <label>支付方式</label>
         <div class="toggle-container" id="method-container">
-            <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付 (Apple/BoC)</button>
-            <button class="toggle-btn" onclick="setMethod('Physical', this)">實體卡</button>
-            <button class="toggle-btn" onclick="setMethod('Online', this)">網上支付</button>
+            <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付 (Apple/Google)</button>
+            <button class="toggle-btn" onclick="setMethod('Online', this)">網上輸入卡號</button>
+            <button class="toggle-btn" onclick="setMethod('Physical', this)">實體插卡</button>
         </div>
     </div>
 
-    <button class="analyze-btn" onclick="analyze()">立即計算實際回報</button>
+    <button class="analyze-btn" onclick="analyze()">立即計算最佳回報</button>
 
     <div id="results" class="results-area">
-        <div class="section-header miles-header"><div class="section-title">✈️ 里數優先 ($0.06/里)</div></div>
+        <div class="section-header miles-header"><div class="section-title">✈️ 里數優先 (折算價值)</div></div>
         <div id="miles-list"></div>
-        <div class="section-header cash-header"><div class="section-title">💰 現金/安全</div></div>
+        <div class="section-header cash-header"><div class="section-title">💰 現金回贈 / 安全之選</div></div>
         <div id="cash-list"></div>
     </div>
     
     <div class="note">
-        * 提示：輸入金額後按 Enter 即可計算。<br>
-        * 里數價值以 HK$0.06/里 估算，方便與現金回贈比較。
+        * 註：里數價值按 $0.06/里 估算。<br>
+        * Mox 回贈以「基本客戶」1% 計算。中銀狂賞派需單筆滿 $500 及當月滿 $5,000。
     </div>
 </div>
 
 <script>
-    // --- State ---
-    let currency = 'HKD';
-    let method = 'ApplePay';
-    let promoActive = false;
     let thresholdMet = false;
+    let promoActive = false;
     let dayType = 'Weekday';
-    let exhaustedCards = JSON.parse(localStorage.getItem('exhaustedCards')) || [];
+    let method = 'ApplePay';
+    let currency = 'HKD';
 
-    // --- UI Helper ---
+    function setThreshold(val, btn) { thresholdMet = val; toggleActive(btn); }
+    function setPromo(val, btn) { 
+        promoActive = val; 
+        toggleActive(btn); 
+        document.getElementById('day-selector').style.display = val ? 'block' : 'none';
+    }
+    function setDay(val, btn) { dayType = val; toggleActive(btn); }
+    function setMethod(val, btn) { method = val; toggleActive(btn); }
+
     function toggleActive(btn) {
         const container = btn.closest('.toggle-container');
-        if (!container) return;
         container.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    function setThreshold(met, btn) { thresholdMet = met; toggleActive(btn); }
-    function setPromo(isActive, btn) {
-        promoActive = isActive;
-        toggleActive(btn);
-        document.getElementById('day-selector').style.display = isActive ? 'block' : 'none';
-    }
-    function setDay(d, btn) { dayType = d; toggleActive(btn); }
-    function setCurrency(c, btn) { currency = c; toggleActive(btn); }
-    function setMethod(m, btn) { method = m; toggleActive(btn); }
-
-    // --- Auto Defaults & UX Optimization 3 ---
-    function selectBtnInContainer(containerId, btnIndex) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        const btns = container.querySelectorAll('.toggle-btn');
-        if (btns[btnIndex]) btns[btnIndex].click();
-    }
-
-    function autoSetDefaults() {
+    function autoSetMethod() {
         const cat = document.getElementById('categorySelect').value;
-        const amtInput = document.getElementById('amount');
-        
-        // Auto Amounts
-        if (cat === 'Elec_Online') amtInput.value = '5000';
-        if (cat.includes('Shop_')) amtInput.value = '2000';
-
-        // Auto Method
-        if (cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Travel_Airline') {
-            selectBtnInContainer('method-container', 2); // Online
-        } else if (cat === 'Overseas_Physical') {
-            selectBtnInContainer('currency-container', 1); // Foreign
-            selectBtnInContainer('method-container', 0); // ApplePay
-        } else if (cat.includes('Shop_') || cat.includes('McDonalds') || cat.includes('Starbucks') || cat.includes('Local') || cat.includes('Eligible')) {
-            selectBtnInContainer('method-container', 0); // ApplePay
-        } else {
-            selectBtnInContainer('method-container', 0); // ApplePay
+        const btns = document.querySelectorAll('#method-container .toggle-btn');
+        if (cat.includes('Online') || cat.includes('OTA') || cat === 'Travel_Airline') {
+            btns[1].click(); // 自動選網上
+        } else if (cat === 'Overseas_Physical' || cat.includes('Dining') || cat.includes('Shop')) {
+            btns[0].click(); // 自動選手機支付
         }
     }
 
-    // --- Promo Logic ---
-    function calculatePromoReward(cardId, amount, category, method, currency, isRedDay) {
-        if (cardId !== 'cheers' && cardId !== 'sogo' && cardId !== 'boc_go') return null;
-        if (amount < 500) return { val: 0, desc: '(未滿$500 無狂賞派)' };
-
-        const validCats = ['Elec_Online', 'Elec_Physical', 'Dining_Cheers_Eligible', 'Dining_General', 'Dining_Local', 'Dining_Online', 'Dining_Coffee', 'Travel_Klook', 'Travel_OTA', 'Travel_Airline', 'Home_Electronics', 'Medical', 'Shop_Jewelry', 'Red_Promo_Shop', 'Shop_Pets', 'Transport_DiDi', 'Transport_HSR', 'Dining_McDonalds', 'Dining_Starbucks', 'Entertainment_Movie'];
-        
-        let isValid = validCats.includes(category) || category.includes('Dining') || category.includes('Travel') || category.includes('Elec');
-        
-        if (!isValid) return null;
-        if (currency === 'FOREIGN' && method !== 'Online') return null;
-
-        let rate = isRedDay ? 0.05 : 0.02;
-        let cap = 0;
-        
-        if (method === 'Physical' || method === 'ApplePay') {
-            cap = isRedDay ? 300 : 120;
-        } else if (method === 'Online') {
-            cap = isRedDay ? 200 : 60;
-        }
-
-        let promoVal = Math.min(amount * rate, cap);
-        return { val: promoVal, rateText: (rate * 100).toFixed(0) + '%', desc: `+ 狂賞派 $${promoVal.toFixed(0)}` };
-    }
-
-    // --- Card Logic ---
     const myCards = [
         { id: 'waku', name: 'Aeon Wakuwaku', type: 'cash',
-          logic: (amt, cat, meth, curr) => {
-            const isOnline = meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat.includes('OTA') || cat === 'Transport_DiDi' || cat === 'Elec_Online' || cat === 'Travel_Airline';
-            if (isOnline) {
-              if (amt > 3571) {
-                let val = 214.26 + ((amt - 3571) * 0.005);
-                let blendedRate = ((val/amt)*100).toFixed(1) + '%';
-                return { val: val, rateText: blendedRate, desc: '🔴爆頂!首3571得6%,後0.5%', warning: true, tag: '已爆3571' };
-              }
-              return { val: amt * 0.06, rateText: '6.0%', desc: '網購6% (上限3571)', tag: '👑網購首選' };
+          logic: (amt, cat, meth) => {
+            if (meth === 'Online' || cat.includes('Online')) {
+                const limit = 5000; // 2026 網購上限
+                if (amt > limit) return { val: (limit * 0.06) + (amt - limit) * 0.005, rateText: '混合', desc: '首$5000享6%, 後0.5%', warning: true };
+                return { val: amt * 0.06, rateText: '6.0%', desc: '網購無門檻 6%', tag: '網購首選' };
             }
-            if (curr === 'FOREIGN') return { val: amt * 0.03, rateText: '3.0%', desc: '外幣 (日本3%)', tag: '日本3%' };
-            if (cat.includes('Dining') && curr === 'HKD') return { val: amt * 0.01, rateText: '1.0%', desc: '本地餐飲', tag: '餐飲1%' };
-            return { val: amt * 0.005, rateText: '0.5%', desc: '基本', tag: '基本' };
+            return { val: amt * 0.005, rateText: '0.5%', desc: '基本 0.5%' };
           }
         },
-        { id: 'eye', name: 'CCB Eye', type: 'miles', 
-          logic: (amt, cat, meth, curr) => {
-            if ((meth === 'ApplePay' || meth === 'Online') && curr === 'HKD') {
-              let miles = Math.floor((amt * 5) / 250); 
-              return { type: 'miles', val: miles, rateText: '$50/里 (2%)', desc: '5X積分換里(扣手續)', tag: '無腦2%' };
+        { id: 'mmpower', name: '恒生 MMPOWER', type: 'cash',
+          logic: (amt, cat, meth) => {
+            if (!thresholdMet) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k總簽賬門檻', warning: true };
+            const isTarget = meth === 'Online' || cat.includes('Online') || cat === 'Overseas_Physical';
+            if (isTarget) {
+                const limit = 10870;
+                if (amt > limit) return { val: (limit * 0.05) + (amt - limit) * 0.004, rateText: '5%爆額', desc: '首$10870享5%', warning: true };
+                return { val: amt * 0.05, rateText: '5.0%', desc: '網購/外幣 5%' };
             }
-            return { type: 'miles', val: Math.floor(amt / 50), rateText: '$50/里', desc: '基本1X' };
-          }
-        },
-        { id: 'mmpower', name: 'HASE MMPOWER', type: 'cash',
-          logic: (amt, cat, meth, curr) => {
-            if (!thresholdMet && amt < 5000) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$5k門檻', warning: true };
-            if (curr === 'FOREIGN') {
-                let rate = 0.06; let cap = 8929;
-                if (amt > cap) return { val: (cap*rate) + ((amt-cap)*0.004), rateText: '混合', desc: '外幣 (爆Cap)', warning: true };
-                return { val: amt * rate, rateText: '6.0%', desc: '外幣 (滿$5k)', tag: '外幣6%' };
-            }
-            const isOnlineCategory = cat === 'Elec_Online' || cat === 'Online_General' || cat === 'Travel_OTA' || cat === 'Dining_Online' || cat === 'Transport_DiDi' || cat === 'Travel_Airline';
-            if ((meth === 'Online' || isOnlineCategory) && cat !== 'Elec_Physical' && meth !== 'ApplePay') {
-                let rate = 0.05; let cap = 10870;
-                if (amt > cap) return { val: (cap*rate) + ((amt-cap)*0.004), rateText: '混合', desc: '網上 (爆Cap)', warning: true };
-                return { val: amt * rate, rateText: '5.0%', desc: '網上 (滿$5k)', tag: '網購5%' };
-            }
-            let isDining = cat.includes('Dining') && cat !== 'Dining_McDonalds';
-            let isElecPhysical = cat === 'Elec_Physical' || cat === 'Home_Electronics';
-            if (isDining || isElecPhysical) return { val: amt * 0.01, rateText: '1.0%', desc: '實體/手機 (1%)', tag: '僅1%', isTrap: true };
-            return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            return { val: amt * 0.01, rateText: '1.0%', desc: '自選類別/基本' };
           }
         },
         { id: 'red', name: 'HSBC Red', type: 'cash',
-          logic: (amt, cat, meth, curr) => {
-            if (cat.includes('Red_Promo')) return { val: amt * 0.08, rateText: '8.0%', desc: '限時優惠' };
-            const isOnline = meth === 'Online' || cat.includes('Online') || cat.includes('App') || cat === 'Transport_DiDi' || cat === 'Elec_Online' || cat === 'Travel_Airline';
-            if (isOnline) {
-                if (amt > 10000) { 
-                    let val = (10000 * 0.04) + ((amt-10000)*0.004);
-                    let blendedRate = ((val/amt)*100).toFixed(1) + '%';
-                    return { val: val, rateText: blendedRate, desc: '網上 (爆Cap >$10k)', warning: true };
-                }
-                return { val: amt * 0.04, rateText: '4.0%', desc: '網上 (無門檻)', tag: '網購4%' };
+          logic: (amt, cat, meth) => {
+            if (meth === 'Online' || cat.includes('Online')) {
+                if (amt > 10000) return { val: (10000 * 0.04) + (amt - 10000) * 0.01, rateText: '4%爆額', desc: '首萬4%, 後1%', warning: true };
+                return { val: amt * 0.04, rateText: '4.0%', desc: '網購無門檻 4%' };
             }
-            if (cat.includes('Shop_')) return { val: amt * 0.02, rateText: '2.0%', desc: '超市', tag: '超市2%' };
-            return { val: amt * 0.01, rateText: '1.0%', desc: '基本' };
-          }
-        },
-        { id: 'everymile', name: 'HSBC EveryMile', type: 'miles',
-          logic: (amt, cat, meth, curr) => {
-            if (curr === 'FOREIGN' || cat === 'Travel_Airline') return { type: 'miles', val: Math.floor(amt/2), rateText: '$2/里', desc: '外幣/航空官網', tag: '最優$2' };
-            const isPromo = ['Transport_Public', 'Transport_Driving', 'Dining_Coffee', 'Dining_Starbucks', 'Travel_Klook', 'Travel_OTA'].includes(cat);
-            if (isPromo) return { type: 'miles', val: Math.floor(amt/5), rateText: '$5/里', desc: '指定商戶 (Trip/Agoda)', tag: '指定$5' };
-            return { type: 'miles', val: Math.floor(amt/5), rateText: '$5/里', desc: '基本', tag: '注意$5' };
-          }
-        },
-        { id: 'motion', name: 'CNCBI Motion', type: 'cash',
-          logic: (amt, cat, meth, curr) => {
-            const isTarget = cat.includes('Dining') || cat.includes('Online') || meth === 'Online' || cat === 'Travel_OTA' || cat === 'Travel_Klook' || cat === 'Transport_DiDi';
-            if (isTarget && curr === 'HKD') {
-                if (amt < 3800) return { val: amt * 0.004, rateText: '0.4%', desc: '⚠️ 未滿$3800 (僅基本)', warning: true };
-                if (amt > 3600) return { val: 218 + ((amt-3636)*0.004), rateText: '爆Cap', desc: '已爆上限', warning: true };
-                return { val: amt * 0.06, rateText: '6.0%', desc: '食肆/網上' };
-            }
-            return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-          }
-        },
-        { id: 'sogo', name: 'BocHK Sogo Visa', type: 'cash',
-          logic: (amt, cat, meth, curr) => {
-            if (cat === 'Sogo_Supermarket') return { val: amt * 0.05, rateText: '95折+5%', desc: 'SOGO超市' };
-            if (meth === 'ApplePay' && curr === 'HKD' && cat !== 'Elec_Online' && cat !== 'Online_General') {
-                if (amt <= 2000) return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 (首$2k)', tag: '手機5.4%' };
-                let val = (2000 * 0.054) + ((amt - 2000) * 0.004);
-                let blendedRate = ((val/amt)*100).toFixed(1) + '%';
-                return { val: val, rateText: blendedRate, desc: `首$2k 5.4%`, warning: true };
-            }
-            return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
-          }
-        },
-        { id: 'boc_go', name: 'BocHK GO Diamond', type: 'cash',
-          logic: (amt, cat, meth, curr) => {
-            const isGoMerchant = (cat === 'Dining_Online' || cat === 'Shop_Wellcome' || cat === 'Transport_DiDi' || cat === 'Transport_HSR');
-            if (isGoMerchant) {
-                if (amt <= 2000) return { val: amt * 0.05, rateText: '5.0%', desc: 'GO商戶 5%', tag: '指定商戶' };
-                let tailRate = (curr === 'HKD' && meth === 'ApplePay') ? 0.04 : 0.004;
-                let val = (2000*0.05) + ((amt-2000)*tailRate);
-                return { val: val, rateText: '混合', desc: '首$2k 5%', warning: true };
-            }
-            if (curr === 'HKD' && meth === 'ApplePay' && cat !== 'Elec_Online' && cat !== 'Online_General') {
-                if (amt <= 2777) return { val: amt * 0.04, rateText: '4.0%', desc: '本地手機 (10X)', tag: '手機4%' };
-                let val = (2777 * 0.04) + ((amt - 2777) * 0.004);
-                let blendedRate = ((val/amt)*100).toFixed(1) + '%';
-                return { val: val, rateText: blendedRate, desc: `首$2777 4%`, warning: true };
-            }
-            if (curr === 'FOREIGN' && meth === 'ApplePay') {
-                if (amt <= 1315) return { val: amt * 0.08, rateText: '8.0%', desc: '內地手機 (20X)', tag: '內地8%' };
-                let val = (1315 * 0.08) + ((amt - 1315) * 0.004);
-                return { val: val, rateText: '混合', desc: `首$1315 8%`, warning: true };
-            }
-            if (curr === 'FOREIGN') return { val: amt * 0.008, rateText: '0.8%', desc: '海外', tag: '2X' };
-            return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
+            return { val: amt * 0.01, rateText: '1.0%', desc: '超市/基本 1%' };
           }
         },
         { id: 'mox', name: 'Mox Credit', type: 'cash',
-          logic: (amt, cat, meth, curr) => {
-            const is3Percent = cat.includes('Shop_') || cat === 'Home_Supermarket';
-            if (is3Percent) return { val: amt * 0.03, rateText: '3.0%', desc: '超市/雜貨 (無上限)', tag: '無上限3%' };
-            return { val: amt * 0.01, rateText: '1.0%', desc: '無上限 (1%)', tag: '基本1%' };
+          logic: (amt, cat, meth) => {
+            const is3Percent = cat.includes('Shop_');
+            if (is3Percent) {
+                const capLimit = 2500; // 額外2%上限$50
+                if (amt > capLimit) return { val: (capLimit * 0.03) + (amt - capLimit) * 0.01, rateText: '3%爆額', desc: '首$2500享3%, 後1%', warning: true };
+                return { val: amt * 0.03, rateText: '3.0%', desc: '指定超市/護理 3%' };
+            }
+            return { val: amt * 0.01, rateText: '1.0%', desc: '基本 1% (基本客戶)', tag: '基本1%' };
           }
         },
-        { id: 'sccx', name: 'SC Cathay Mastercard', type: 'miles',
-          logic: (amt, cat, meth, curr) => {
-            if (cat === 'Travel_Airline') return { type: 'miles', val: Math.floor(amt / 2), rateText: '$2/里', desc: '國泰/UO官網', tag: '官網$2' };
-            if (cat.includes('Dining') || cat === 'Travel_OTA' || curr === 'FOREIGN') return { type: 'miles', val: Math.floor(amt / 4), rateText: '$4/里', desc: '食肆/外幣/酒店', tag: '食肆$4' };
-            return { type: 'miles', val: Math.floor(amt / 6), rateText: '$6/里', desc: '基本', tag: '基本$6' };
+        { id: 'eye', name: 'CCB Eye', type: 'miles', 
+          logic: (amt, cat, meth) => {
+            if (meth === 'ApplePay' || meth === 'Online') {
+                return { type: 'miles', val: Math.floor((amt * 5) / 15), rateText: '$3/里', desc: '網購/手機 5X (約2%回贈)', tag: '網購手機' };
+            }
+            return { type: 'miles', val: Math.floor(amt / 15), rateText: '$15/里', desc: '基本 1X' };
           }
         },
-        { id: 'cheers', name: 'BocHK Cheers VI', type: 'miles',
-          logic: (amt, cat, meth, curr) => {
-            let isEligibleCat = cat.includes('Dining') || curr === 'FOREIGN';
-            if (cat === 'Dining_General') isEligibleCat = false; 
-            let isEligible10X = isEligibleCat && (thresholdMet || amt >= 5000);
-            if (isEligible10X) return { type: 'miles', val: Math.floor(amt / 1.5), rateText: '$1.5/里', desc: '餐飲/外幣 10X' };
-            let miles = Math.floor(amt / 15);
-            let desc = '基本積分';
-            if (isEligibleCat && !thresholdMet) desc = '⚠️ 未滿$5k門檻';
-            return { type: 'miles', val: miles, rateText: '$15/里', desc: desc, warning: (isEligibleCat && !thresholdMet) };
+        { id: 'cheers', name: '中銀 Cheers VI', type: 'miles',
+          logic: (amt, cat, meth) => {
+            const isEligible = cat.includes('Dining') || cat === 'Overseas_Physical';
+            if (isEligible && thresholdMet) {
+                return { type: 'miles', val: Math.floor(amt / 1.5), rateText: '$1.5/里', desc: '餐飲/外幣 10X (約4%回贈)', tag: '神卡' };
+            }
+            return { type: 'miles', val: Math.floor(amt / 15), rateText: '$15/里', desc: thresholdMet ? '基本' : '⚠️ 總簽賬未滿$5k' };
           }
         },
-        { id: 'vs', name: 'HSBC VS', type: 'miles',
-          logic: (amt, cat, meth, curr) => {
-            const isHome = ['Home_Electronics', 'Home_Telecom', 'Home_Supermarket', 'Shop_CitySuper', 'Elec_Physical'].includes(cat);
-            let rate = (isHome && curr === 'HKD') ? 2.78 : 6.25;
-            return { type: 'miles', val: Math.floor(amt/rate), rateText: `$${rate}/里`, desc: isHome?'賞家居':'基本' };
+        { id: 'sogo', name: '中銀 Sogo Visa', type: 'cash',
+          logic: (amt, cat, meth) => {
+            if (meth === 'ApplePay') {
+                if (amt > 2000) return { val: (2000 * 0.054) + (amt-2000) * 0.004, rateText: '5.4%爆額', desc: '首$2k手機支付 5.4%', warning: true };
+                return { val: amt * 0.054, rateText: '5.4%', desc: '手機支付 5.4%', tag: '最快回贈' };
+            }
+            return { val: amt * 0.004, rateText: '0.4%', desc: '基本' };
           }
         }
     ];
 
-    // Optimization 1: Burst Button Logic (State Only)
-    function toggleExhausted(cardId) {
-        exhaustedCards.includes(cardId) ? exhaustedCards = exhaustedCards.filter(id => id !== cardId) : exhaustedCards.push(cardId);
-        localStorage.setItem('exhaustedCards', JSON.stringify(exhaustedCards));
-        analyze(); // Re-render to show next card
+    function calculatePromoReward(cardId, amount) {
+        if (!promoActive || !thresholdMet || amount < 500) return 0;
+        const bocCards = ['cheers', 'sogo', 'boc_go'];
+        if (bocCards.includes(cardId)) {
+            const rate = dayType === 'RedDay' ? 0.05 : 0.02;
+            return amount * rate;
+        }
+        return 0;
     }
-    
-    function resetAllData() { if(confirm('重置所有狀態？')) { exhaustedCards = []; localStorage.setItem('exhaustedCards', '[]'); analyze(); } }
 
     function analyze() {
-        const amount = parseFloat(document.getElementById('amount').value) || 0;
+        const amount = parseFloat(document.getElementById('amount').value);
         const category = document.getElementById('categorySelect').value;
-        
+        if (!amount) return alert('請輸入簽賬金額');
+
         let results = myCards.map(card => {
-            let base = card.logic(amount, category, method, currency);
+            const base = card.logic(amount, category, method);
+            const promoVal = calculatePromoReward(card.id, amount);
             
-            // Motion Special Fallback logic double check
-            if (card.id === 'motion' && amount < 3800 && base.warning) {
-                base.val = amount * 0.004;
-            }
-
-            let promoDesc = '';
-            let promoVal = 0;
-            if (promoActive) {
-                let promo = calculatePromoReward(card.id, amount, category, method, currency, dayType === 'RedDay');
-                if (promo) {
-                    promoVal = promo.val;
-                    promoDesc = promo.desc;
-                }
-            }
-
-            // Scoring: Miles = 0.06 HKD
             let milesCashEquiv = (base.type === 'miles' ? base.val * 0.06 : 0);
             let cashVal = (base.type === 'cash' ? base.val : 0);
             let totalScore = milesCashEquiv + cashVal + promoVal;
 
-            if (card.id === 'mmpower' && base.rateText === '1.0%') totalScore *= 0.01;
-
-            let isExhausted = exhaustedCards.includes(card.id);
-            
-            return {
-                ...card,
-                baseResult: base,
-                promoVal: promoVal,
-                promoDesc: promoDesc,
-                totalScore: isExhausted ? -99999 : totalScore,
-                isExhausted: isExhausted,
-                warning: base.warning
-            };
+            return { ...card, baseResult: base, promoVal, totalScore };
         });
 
-        // Optimization 3: Pure Sorting
         results.sort((a, b) => b.totalScore - a.totalScore);
-
-        renderList('miles-list', results.filter(c => c.type === 'miles'));
-        renderList('cash-list', results.filter(c => c.type === 'cash'));
-        document.getElementById('results').style.display = 'block';
+        render(results);
     }
 
-    function renderList(elemId, results) {
-        const container = document.getElementById(elemId);
-        container.innerHTML = '';
-        let activeCards = results.filter(c => !c.isExhausted).slice(0, 2);
-        
-        if (activeCards.length === 0) { container.innerHTML = '<div class="card-box" style="color:#999;text-align:center">沒有推薦</div>'; return; }
+    function render(results) {
+        const milesList = document.getElementById('miles-list');
+        const cashList = document.getElementById('cash-list');
+        milesList.innerHTML = ''; cashList.innerHTML = '';
 
-        activeCards.forEach((item, index) => {
-            let rankIcon = index === 0 ? '👑 首選' : '🥈 次選';
-            let styleClass = item.type === 'miles' ? 'miles-card' : 'cash-card';
-            let rateClass = item.type === 'miles' ? 'miles-text' : 'cash-text';
-            
-            let earnText = '';
-            // Optimization 2: Miles to Cash Equivalent
-            if (item.baseResult.type === 'miles') {
-                let equivHKD = (item.baseResult.val * 0.06).toFixed(1);
-                earnText = `賺取: ${item.baseResult.val} 里 ($${equivHKD})`;
-                if (item.promoVal > 0) {
-                    earnText += ` + $${item.promoVal.toFixed(0)}`;
-                    styleClass = 'combo-card';
-                    rateClass = 'combo-text';
-                }
-            } else {
-                let totalCash = item.baseResult.val + item.promoVal;
-                earnText = `賺取: $${totalCash.toFixed(1)}`;
-                if (item.promoVal > 0) {
-                    styleClass = 'combo-card';
-                    rateClass = 'combo-text';
-                }
-            }
+        results.forEach((item) => {
+            const isCombo = item.promoVal > 0;
+            const cardClass = isCombo ? 'combo-card' : (item.type === 'miles' ? 'miles-card' : 'cash-card');
+            const totalDisplay = item.type === 'miles' 
+                ? `${item.baseResult.val} 里 ${isCombo ? '+ $'+item.promoVal.toFixed(0) : ''}`
+                : `$${(item.baseResult.val + item.promoVal).toFixed(1)}`;
 
-            let fullDesc = item.baseResult.desc;
-            if (item.promoDesc) fullDesc += `<br><span style="color:#e65100;font-weight:bold">${item.promoDesc}</span>`;
-
-            container.innerHTML += `
-                <div class="card-box ${styleClass}">
+            const html = `
+                <div class="card-box ${cardClass}">
                     <div class="card-top">
-                        <span class="card-name">${rankIcon} ${item.name}</span>
-                        <div class="earn-value ${rateClass}">${earnText}</div>
+                        <span class="card-name">${item.name}</span>
+                        <div class="earn-value ${item.type === 'miles' ? 'miles-text' : 'cash-text'}">${totalDisplay}</div>
                     </div>
                     <div class="tags">
                         <span class="tag tag-blue">${item.baseResult.rateText}</span>
-                        ${item.promoVal > 0 ? '<span class="tag tag-orange">狂賞派</span>' : ''}
-                        ${item.warning ? '<span class="tag tag-warn">注意</span>' : ''}
+                        ${isCombo ? '<span class="tag tag-orange">2026 狂賞派中</span>' : ''}
+                        ${item.baseResult.warning ? '<span class="tag tag-warn">注意上限</span>' : ''}
                         ${item.baseResult.tag ? `<span class="tag tag-blue">${item.baseResult.tag}</span>` : ''}
                     </div>
-                    <div class="card-calc">${fullDesc}</div>
-                    <button class="burst-btn" onclick="toggleExhausted('${item.id}')">🔴 此卡已爆額 / 下一張</button>
+                    <div class="card-calc">${item.baseResult.desc}${isCombo ? '<br><b>+ 狂賞派額外獎賞</b>' : ''}</div>
                 </div>`;
+            
+            if (item.type === 'miles') milesList.innerHTML += html;
+            else cashList.innerHTML += html;
         });
+
+        document.getElementById('results').style.display = 'block';
     }
-    
-    // Optimization 3: Auto Focus & Enter Key
-    document.getElementById('amount').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') analyze();
-    });
-    document.getElementById('amount').focus();
 </script>
 
 </body>
