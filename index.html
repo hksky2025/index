@@ -3,94 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能簽賬軍師 V27.4 - 2026 修正版</title>
+    <title>智能簽賬軍師 V27.5 - 150+ 商戶大數據版</title>
     <style>
-        :root { --boc: #b31d28; --hsbc: #db0011; --hangseng: #008154; --sc: #006b4d; --miles: #004a99; --cash: #d32f2f; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; color: #1a1a1a; }
-        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
-        .search-group { background: #1a1a1a; color: #fff; padding: 20px; border-radius: 18px; margin-bottom: 20px; }
-        #merchantSearch { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; margin-top: 10px; }
-        .match-hint { font-size: 13px; color: #4caf50; margin-top: 8px; font-weight: bold; min-height: 18px; }
+        :root { --boc: #b31d28; --hsbc: #db0011; --hangseng: #008154; --sc: #006b4d; --aeon: #800080; --miles: #004a99; --cash: #d32f2f; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f2f5f8; margin: 0; padding: 10px; color: #1a1a1a; }
+        .container { max-width: 650px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+        .search-section { background: linear-gradient(135deg, #1a1a1a, #333); color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
+        .search-section label { font-size: 14px; color: #bbb; display: block; margin-bottom: 8px; }
+        #merchantSearch { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; outline: none; }
+        .match-hint { font-size: 13px; color: #4caf50; margin-top: 10px; font-weight: bold; min-height: 1.2em; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .input-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 13px; color: #555; }
-        select, input[type="number"] { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; box-sizing: border-box; }
+        select, input[type="number"] { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; box-sizing: border-box; background: #fafafa; }
         .toggle-container { display: flex; gap: 5px; background: #f0f0f0; padding: 4px; border-radius: 12px; }
-        .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: #666; background: none; }
+        .toggle-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: #666; background: none; transition: 0.2s; }
         .toggle-btn.active { background: #fff; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .analyze-btn { width: 100%; padding: 18px; background: #000; color: #fff; border: none; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-        .section-header { margin-top: 25px; padding-bottom: 8px; border-bottom: 2px solid #eee; font-size: 17px; font-weight: 800; }
+        .analyze-btn { width: 100%; padding: 18px; background: #db0011; color: #fff; border: none; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        .section-header { margin-top: 25px; padding-bottom: 8px; border-bottom: 2px solid #eee; font-size: 18px; font-weight: 800; }
         .section-header.miles { color: var(--miles); }
         .section-header.cash { color: var(--cash); }
-        .card-box { border: 1px solid #f0f0f0; border-radius: 18px; padding: 15px; margin-top: 12px; border-left: 6px solid #ccc; background: #fff; }
+        .card-box { border: 1px solid #f0f0f0; border-radius: 18px; padding: 16px; margin-top: 12px; border-left: 6px solid #ccc; background: #fff; position: relative; }
         .boc-card { border-left-color: var(--boc); }
         .hsbc-card { border-left-color: var(--hsbc); }
         .hangseng-card { border-left-color: var(--hangseng); }
         .sc-card { border-left-color: var(--sc); }
+        .aeon-card { border-left-color: var(--aeon); }
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .card-name { font-weight: 800; font-size: 15px; }
-        .earn-val { font-size: 20px; font-weight: 900; text-align: right; }
+        .card-name { font-weight: 800; font-size: 15px; color: #333; }
+        .earn-val { font-size: 22px; font-weight: 900; text-align: right; }
         .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; }
-        .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; line-height: 1.4; }
+        .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; line-height: 1.5; }
         .warn-msg { color: #d32f2f; font-weight: 700; font-size: 11px; margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="search-group">
-        <label>📍 輸入商戶名稱 (自動識別 8% 或 $2/里)</label>
-        <input type="text" id="merchantSearch" placeholder="搜尋: 國泰, 壽司郎, 百佳, 港鐵..." oninput="autoMatchMerchant()">
+    <div class="search-section">
+        <label>🔍 輸入商戶 (支援 150+ 香港主流商戶)</label>
+        <input type="text" id="merchantSearch" placeholder="例如: 國泰, 壽司郎, 豐澤, Donki, 星巴克..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
 
-    <div class="input-group">
-        <label>當月已簽總額 (決定 5,000 門檻)</label>
-        <input type="number" id="currentSpent" value="0">
+    <div class="input-row">
+        <div class="input-group">
+            <label>當月已簽總額 (決定門檻)</label>
+            <input type="number" id="currentSpent" value="0">
+        </div>
+        <div class="input-group">
+            <label>本次簽賬金額 (HKD)</label>
+            <input type="number" id="amount" placeholder="金額" inputmode="numeric">
+        </div>
     </div>
 
-    <div class="input-group">
-        <label>本次簽賬金額 (HKD)</label>
-        <input type="number" id="amount" placeholder="輸入金額" inputmode="numeric">
-    </div>
-
-    <div class="input-group">
-        <label>時段 (中銀狂賞派用)</label>
-        <div class="toggle-container">
-            <button class="toggle-btn active" onclick="setDay(false, this)">平日</button>
-            <button class="toggle-btn" onclick="setDay(true, this)" style="color:#d32f2f">紅日/週末</button>
+    <div class="input-row">
+        <div class="input-group">
+            <label>日期時段</label>
+            <div class="toggle-container">
+                <button class="toggle-btn active" onclick="setDay(false, this)">平日</button>
+                <button class="toggle-btn" onclick="setDay(true, this)" style="color:#d32f2f">紅日/週末</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>支付方式</label>
+            <div class="toggle-container" id="methodToggles">
+                <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付</button>
+                <button class="toggle-btn" onclick="setMethod('Online', this)">網上/App</button>
+            </div>
         </div>
     </div>
 
     <div class="input-group">
-        <label>支付方式</label>
-        <div class="toggle-container" id="methodToggles">
-            <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付(實體)</button>
-            <button class="toggle-btn" onclick="setMethod('Online', this)">網上/App內</button>
-            <button class="toggle-btn" onclick="setMethod('Physical', this)">實體插卡/銀聯</button>
-        </div>
-    </div>
-
-    <div class="input-group">
-        <label>手動修正類別 (選填)</label>
+        <label>手動類別修正 (如有需要)</label>
         <select id="category">
             <option value="General">-- 一般本地消費 --</option>
             <option value="Dining">🍽️ 餐飲食肆</option>
             <option value="Online">🛍️ 網上零售</option>
             <option value="Electronics">🔌 電子產品/電訊</option>
             <option value="Super">🛒 超級市場</option>
-            <option value="Transport">🚌 交通/隧道/油站</option>
+            <option value="Transport">🚌 交通出行/油站/隧道</option>
             <option value="Coffee">☕ 咖啡輕食</option>
             <option value="Travel">✈️ 旅遊機票/酒店</option>
+            <option value="Medical">🏥 醫療服務</option>
+            <option value="Jewelry">💍 珠寶服飾/運動用品</option>
             <option value="Overseas">🌍 海外外幣</option>
         </select>
     </div>
 
-    <button class="analyze-btn" onclick="analyze()">精確運算最優勝組合</button>
+    <button class="analyze-btn" onclick="analyze()">精確運算最優組合</button>
 
     <div id="results" style="display:none;">
-        <div class="section-header miles">✈️ 里數優先建議 (高至低)</div>
+        <div class="section-header miles">✈️ 里數優先建議</div>
         <div id="miles-results"></div>
-        <div class="section-header cash">💰 現金回贈建議 (高至低)</div>
+        <div class="section-header cash">💰 現金回贈建議</div>
         <div id="cash-results"></div>
     </div>
 </div>
@@ -100,39 +106,110 @@
     let method = 'ApplePay';
 
     const merchantDB = [
+        // --- HSBC Red 8% 指定商戶 ---
+        { name: "壽司郎", cat: "Dining", sub: "Red8", meth: "ApplePay" },
+        { name: "Sushiro", cat: "Dining", sub: "Red8", meth: "ApplePay" },
+        { name: "譚仔三哥", cat: "Dining", sub: "Red8", meth: "ApplePay" },
+        { name: "譚仔雲南", cat: "Dining", sub: "Red8", meth: "ApplePay" },
+        { name: "The Coffee Academïcs", cat: "Coffee", sub: "Red8", meth: "ApplePay" },
+        { name: "GU", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
+        { name: "Decathlon", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
+        { name: "迪卡儂", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
+        { name: "lululemon", cat: "Jewelry", sub: "Red8", meth: "ApplePay" },
+        { name: "NAMCO", cat: "Dining", sub: "Red8", meth: "ApplePay" },
+        { name: "TAITO STATION", cat: "Dining", sub: "Red8", meth: "ApplePay" },
+
+        // --- SC Cathay $2/里 ---
         { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" },
         { name: "Cathay Pacific", cat: "Travel", sub: "CX", meth: "Online" },
         { name: "HK Express", cat: "Travel", sub: "CX", meth: "Online" },
-        { name: "壽司郎", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "譚仔", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "GU", cat: "Online", sub: "Red8", meth: "ApplePay" },
-        { name: "lululemon", cat: "Online", sub: "Red8", meth: "ApplePay" },
-        { name: "Decathlon", cat: "Online", sub: "Red8", meth: "ApplePay" },
-        { name: "NAMCO", cat: "Dining", sub: "Red8", meth: "ApplePay" },
-        { name: "港鐵", cat: "Transport", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "九巴", cat: "Transport", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "城巴", cat: "Transport", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "加德士", cat: "Transport", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "Shell", cat: "Transport", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "Starbucks", cat: "Coffee", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "星巴克", cat: "Coffee", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "% Arabica", cat: "Coffee", sub: "EM_Bonus", meth: "ApplePay" },
-        { name: "Donki", cat: "Super", sub: "VS_Home", meth: "ApplePay" },
-        { name: "百佳", cat: "Super", sub: "VS_Home", meth: "ApplePay" },
-        { name: "惠康", cat: "Super", sub: "VS_Home", meth: "ApplePay" },
-        { name: "豐澤", cat: "Electronics", sub: "VS_Home", meth: "ApplePay" },
-        { name: "Apple", cat: "Electronics", sub: "CRAZY", meth: "ApplePay" },
-        { name: "csl", cat: "Electronics", sub: "VS_Home", meth: "ApplePay" },
-        { name: "Uber", cat: "Transport", sub: "EM_Bonus", meth: "Online" },
-        { name: "Foodpanda", cat: "Dining", sub: "CRAZY", meth: "Online" },
-        { name: "OpenRice", cat: "Dining", sub: "CRAZY", meth: "Online" }
+        { name: "香港快運", cat: "Travel", sub: "CX", meth: "Online" },
+
+        // --- EveryMile $2/里 (交通) ---
+        { name: "港鐵", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "MTR", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "九巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "KMB", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "城巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "Citybus", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "龍運", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "Tesla Supercharger", cat: "Transport", sub: "EM", meth: "Online" },
+        { name: "加德士", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "Caltex", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "Esso", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "埃索", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "蜆殼", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "Shell", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "中國石油", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "中石化", cat: "Transport", sub: "EM", meth: "ApplePay" },
+        { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
+
+        // --- EveryMile $2/里 (咖啡) ---
+        { name: "Starbucks", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "星巴克", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "% Arabica", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "天仁茗茶", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "TenRen", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "Lady M", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "NOC", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "Pacific Coffee", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "Pret A Manager", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+        { name: "Cupping Room", cat: "Coffee", sub: "EM", meth: "ApplePay" },
+
+        // --- HSBC VS 賞家居 3.6% ---
+        { name: "Don Don Donki", cat: "Super", sub: "VS", meth: "ApplePay" },
+        { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" },
+        { name: "ParknShop", cat: "Super", sub: "VS", meth: "ApplePay" },
+        { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
+        { name: "759 阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" },
+        { name: "阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" },
+        { name: "豐澤", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+        { name: "Fortress", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+        { name: "百老滙", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+        { name: "Broadway", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+        { name: "友和", cat: "Electronics", sub: "VS", meth: "Online" },
+        { name: "YOHO", cat: "Electronics", sub: "VS", meth: "Online" },
+        { name: "宜家", cat: "Home", sub: "VS", meth: "ApplePay" },
+        { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" },
+        { name: "實惠", cat: "Home", sub: "VS", meth: "ApplePay" },
+        { name: "Pricerite", cat: "Home", sub: "VS", meth: "ApplePay" },
+        { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" },
+        { name: "JHC", cat: "Home", sub: "VS", meth: "ApplePay" },
+        { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+        { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+        { name: "3香港", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+
+        // --- 中銀狂賞派 7 大類別主要商戶 ---
+        { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" },
+        { name: "Deliveroo", cat: "Dining", sub: "BOC", meth: "Online" },
+        { name: "OpenRice", cat: "Dining", sub: "BOC", meth: "Online" },
+        { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "McDonald", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "大家樂", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "美心", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+        { name: "Apple Store", cat: "Electronics", sub: "BOC", meth: "ApplePay" },
+        { name: "蘇寧", cat: "Electronics", sub: "BOC", meth: "ApplePay" },
+        { name: "衛訊", cat: "Electronics", sub: "BOC", meth: "ApplePay" },
+        { name: "Agoda", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Expedia", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "Trip.com", cat: "Travel", sub: "BOC", meth: "Online" },
+        { name: "養和", cat: "Medical", sub: "BOC", meth: "ApplePay" },
+        { name: "卓健", cat: "Medical", sub: "BOC", meth: "ApplePay" },
+        { name: "迪士尼", cat: "Travel", sub: "BOC", meth: "ApplePay" },
+        { name: "海洋公園", cat: "Travel", sub: "BOC", meth: "ApplePay" },
+        { name: "Nike", cat: "Jewelry", sub: "BOC", meth: "ApplePay" },
+        { name: "Adidas", cat: "Jewelry", sub: "BOC", meth: "ApplePay" },
+        { name: "周生生", cat: "Jewelry", sub: "BOC", meth: "ApplePay" },
+        { name: "Q-Pets", cat: "Medical", sub: "BOC", meth: "ApplePay" }
     ];
 
-    function autoMatchMerchant() {
+    function autoMatch() {
         const input = document.getElementById('merchantSearch').value.toLowerCase();
         const hint = document.getElementById('matchHint');
         const catSelect = document.getElementById('category');
         if (!input) { hint.innerText = ""; return; }
+
         const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
         if (match) {
             hint.innerText = `✅ 已識別: ${match.name}`;
@@ -165,7 +242,7 @@
             return { val: isBonus ? amt * 0.04 : amt * 0.004, miles: Math.floor(amt / (isBonus ? 1.5 : 15)), rate: isBonus ? '$1.5/里' : '$15/里' };
         }},
         { id: 'everymile', name: 'HSBC EveryMile', bank: 'hsbc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
-            let isBonus = ['Transport', 'Coffee', 'Overseas'].includes(cat) || sub === "EM_Bonus";
+            let isBonus = sub === "EM" || (cat === 'Overseas');
             return { val: isBonus ? amt * 0.025 : amt * 0.01, miles: isBonus ? Math.floor(amt/2) : Math.floor(amt/5), rate: isBonus ? '$2/里' : '$5/里' };
         }},
         { id: 'red', name: 'HSBC Red', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
@@ -177,16 +254,20 @@
             if (!isMet) return { val: amt * 0.004, rate: '0.4%' };
             if (cat === 'Overseas') return { val: Math.min(amt * 0.06, 500 + amt*0.004), rate: '6%' };
             if (meth === 'Online' || cat === 'Travel') return { val: Math.min(amt * 0.05, 500 + amt*0.004), rate: '5%' };
-            if (cat === 'Dining' || cat === 'Electronics') return { val: amt * 0.01, rate: '1%' };
+            if (['Dining','Electronics'].includes(cat)) return { val: amt * 0.01, rate: '1%' };
             return { val: amt * 0.004, rate: '0.4%' };
         }},
         { id: 'vs', name: 'HSBC VS (賞家居)', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
-            let isHome = ['Home','Electronics','Super'].includes(cat) || sub === "VS_Home";
+            let isHome = sub === "VS" || ['Home','Electronics','Super'].includes(cat);
             return { val: isHome ? amt * 0.036 : amt * 0.004, rate: isHome ? '3.6%' : '0.4%' };
         }},
         { id: 'sogo', name: '中銀 Sogo Visa', bank: 'boc', type: 'cash', logic: (amt, cat, meth) => {
             if (meth === 'ApplePay') return amt <= 2000 ? { val: amt * 0.054, rate: '5.4%' } : { val: 108 + (amt-2000)*0.004, rate: '5.4%封頂' };
             return { val: amt * 0.004, rate: '0.4%' };
+        }},
+        { id: 'waku', name: 'Aeon Wakuwaku', bank: 'aeon', type: 'cash', logic: (amt, cat, meth) => {
+            if (meth === 'Online') return amt <= 3571 ? { val: amt * 0.06, rate: '6%' } : { val: 214.3 + (amt-3571)*0.005, rate: '6%封頂' };
+            return { val: amt * 0.005, rate: '0.5%' };
         }}
     ];
 
@@ -203,43 +284,36 @@
 
         let processed = cards.map(c => {
             let res = c.logic(amt, cat, method, isMet, sub);
-            let promo = 0, promoDesc = "";
-            const isCrazy = (['Dining','Electronics','Medical','Travel'].includes(cat) || sub === "CRAZY" || sub === "Red8");
+            let promo = 0, pDesc = "";
+            const bocTarget = ['Dining','Electronics','Medical','Travel','Jewelry'].includes(cat) || sub === "BOC" || sub === "Red8";
             
-            if (['cheers', 'sogo'].includes(c.id) && isMet && amt >= 500 && isCrazy) {
+            if (['cheers', 'sogo'].includes(c.id) && isMet && amt >= 500 && bocTarget) {
                 const isOnline = (method === 'Online');
                 promo = isOnline ? (isRedDay ? Math.min(amt * 0.05, 200) : Math.min(amt * 0.02, 60)) 
                                 : (isRedDay ? Math.min(amt * 0.05, 300) : Math.min(amt * 0.02, 120));
-                promoDesc = `狂賞派(+${isRedDay?5:2}%)`;
+                pDesc = `狂賞派(+${isRedDay?5:2}%)`;
             }
-            return { ...c, res, promo, promoDesc };
+            return { ...c, res, promo, pDesc };
         });
 
-        const milesGroup = processed.filter(c => c.type === 'miles').sort((a,b) => b.res.miles - a.res.miles);
-        const cashGroup = processed.filter(c => c.type === 'cash').sort((a,b) => (b.res.val + b.promo) - (a.res.val + a.promo));
+        const miles = processed.filter(c => c.type === 'miles').sort((a,b) => b.res.miles - a.res.miles);
+        const cash = processed.filter(c => c.type === 'cash').sort((a,b) => (b.res.val + b.promo) - (a.res.val + a.promo));
 
         document.getElementById('results').style.display = 'block';
         const mc = document.getElementById('miles-results'); mc.innerHTML = '';
         const cc = document.getElementById('cash-results'); cc.innerHTML = '';
-
-        milesGroup.forEach(c => { mc.innerHTML += createCardHtml(c, amt, true); });
-        cashGroup.forEach(c => { cc.innerHTML += createCardHtml(c, amt, false); });
+        miles.forEach(c => mc.innerHTML += createHtml(c, amt, true));
+        cash.forEach(c => cc.innerHTML += createHtml(c, amt, false));
     }
 
-    function createCardHtml(c, amt, isMile) {
-        const totalValue = isMile ? `${c.res.miles} 里` : `$${(c.res.val + c.promo).toFixed(1)}`;
-        const bocWarn = (amt < 500 && ['cheers', 'sogo'].includes(c.id)) ? `<div class="warn-msg">! 單筆未滿$500 失去狂賞加乘</div>` : "";
+    function createHtml(c, amt, isMile) {
+        const earn = isMile ? `${c.res.miles} 里` : `$${(c.res.val + c.promo).toFixed(1)}`;
+        const bocWarn = (amt < 500 && ['cheers', 'sogo'].includes(c.id)) ? `<div class="warn-msg">! 單筆未滿$500 無狂賞加乘</div>` : "";
         return `
             <div class="card-box ${c.bank}-card">
                 <div class="card-top">
-                    <div>
-                        <div class="card-name">${c.name}</div>
-                        ${c.promo > 0 ? `<div class="promo-tag">🔥 ${c.promoDesc}</div>` : ""}
-                    </div>
-                    <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">
-                        ${totalValue}
-                        ${isMile && c.promo > 0 ? `<div style="font-size:11px;color:#e65100">+$${c.promo.toFixed(0)}</div>` : ""}
-                    </div>
+                    <div class="card-name">${c.name}${c.promo > 0 ? `<br><span class="promo-tag">🔥 ${c.pDesc}</span>` : ""}</div>
+                    <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${earn}${isMile && c.promo > 0 ? `<div style="font-size:11px;color:#e65100">+$${c.promo.toFixed(0)}</div>` : ""}</div>
                 </div>
                 <div class="card-desc">回贈率: ${c.res.rate} ${bocWarn}</div>
             </div>
