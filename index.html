@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智能簽賬軍師 V34.0</title>
+    <title>智能簽賬軍師 V35.0</title>
 
     <!-- iOS PWA 100% 繼承自 V28.1 -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/您的用戶名/您的倉庫名/main/icon.png">
@@ -21,125 +21,83 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom) 10px; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); margin: 0; 
+            padding: env(safe-area-inset-top) 10px 30px 10px; 
             color: #1a1a1a; 
         }
         
         .container { 
-            max-width: 650px; 
-            margin: 10px auto; 
-            background: #fff; 
-            padding: 20px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+            max-width: 650px; margin: 10px auto; 
+            background: #fff; padding: 20px; 
+            border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); 
             width: 100%; 
         }
         
-        header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
+        header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
         header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
         header p { margin: 5px 0 0; font-size: 13px; color: #666; }
 
-        /* 響應式搜尋欄位 */
+        /* 搜尋區域：自動精測螢幕尺寸，100% 不走位 */
         .search-section { 
             background: linear-gradient(135deg, #1a1a1a, #333); 
-            color: #fff; 
-            padding: 18px; 
-            border-radius: 20px; 
-            margin-bottom: 15px; 
-            width: 100%;
+            color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; 
+            width: 100%; display: block;
         }
-        .search-section label { font-size: 13px; color: #bbb; display: block; margin-bottom: 8px; font-weight: 600; }
+        .search-section label { font-size: 14px; color: #bbb; display: block; margin-bottom: 8px; }
         #merchantSearch { 
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 12px; 
-            border: none; 
-            font-size: 16px; 
-            font-weight: 700; 
-            outline: none; 
-            display: block;
-            background: #fff;
-            color: #000;
+            width: 100%; padding: 15px; border-radius: 12px; border: none; 
+            font-size: 16px; font-weight: 700; outline: none; display: block;
         }
         
-        .match-hint { font-size: 12px; color: #4caf50; margin-top: 8px; font-weight: bold; min-height: 1.2em; }
+        .match-hint { font-size: 13px; color: #4caf50; margin-top: 10px; font-weight: bold; min-height: 1.2em; }
         
-        .input-row { display: flex; gap: 12px; margin-bottom: 12px; width: 100%; }
+        .input-row { display: flex; gap: 12px; margin-bottom: 15px; width: 100%; }
         .input-group { flex: 1; min-width: 0; }
-        label { display: block; margin-bottom: 5px; font-weight: 700; font-size: 13px; color: #555; }
+        label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 13px; color: #555; }
         
         select, input[type="number"] { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1.5px solid #eee; 
-            border-radius: 12px; 
-            font-size: 15px; 
-            background: #fafafa;
-            outline: none;
+            width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; 
+            font-size: 15px; background: #fafafa; outline: none; display: block;
         }
 
-        /* 按鈕切換區域修正 */
+        /* 切換按鈕：強化點擊反應力 */
         .toggle-container { 
-            display: flex; 
-            gap: 4px; 
-            background: #f0f0f0; 
-            padding: 4px; 
-            border-radius: 12px; 
-            width: 100%;
+            display: flex; gap: 5px; background: #f0f0f0; padding: 4px; 
+            border-radius: 12px; width: 100%;
         }
         .toggle-btn { 
-            flex: 1; 
-            padding: 10px 5px; 
-            border: none; 
-            border-radius: 9px; 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: 700; 
-            color: #666; 
-            background: none; 
-            transition: all 0.2s;
-            white-space: nowrap;
+            flex: 1; padding: 11px 5px; border: none; border-radius: 9px; 
+            cursor: pointer; font-size: 12px; font-weight: 700; color: #666; 
+            background: none; transition: 0.2s; white-space: nowrap;
         }
         .toggle-btn.active { 
-            background: #fff; 
-            color: #000; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            background: #fff; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
         }
         
         .analyze-btn { 
-            width: 100%; 
-            padding: 18px; 
-            background: #db0011; 
-            color: #fff; 
-            border: none; 
-            border-radius: 15px; 
-            font-size: 18px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(219,0,17,0.2);
+            width: 100%; padding: 18px; background: #db0011; color: #fff; 
+            border: none; border-radius: 15px; font-size: 18px; font-weight: 800; 
+            cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(219,0,17,0.2);
         }
         
-        .section-header { margin-top: 25px; padding-bottom: 8px; border-bottom: 2px solid #eee; font-size: 17px; font-weight: 800; }
+        .section-header { margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #eee; font-size: 18px; font-weight: 800; }
         .section-header.miles { color: var(--miles); }
         .section-header.cash { color: var(--cash); }
 
-        .card-box { border: 1px solid #f0f0f0; border-radius: 18px; padding: 15px; margin-top: 12px; border-left: 6px solid #ccc; background: #fff; position: relative; }
+        .card-box { border: 1px solid #f0f0f0; border-radius: 18px; padding: 16px; margin-top: 12px; border-left: 6px solid #ccc; background: #fff; position: relative; }
         .boc-card { border-left-color: var(--boc); } .hsbc-card { border-left-color: var(--hsbc); } .hangseng-card { border-left-color: var(--hangseng); } .sc-card { border-left-color: var(--sc); } .ccb-card { border-left-color: var(--ccb); }
         
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .earn-val { font-size: 21px; font-weight: 900; text-align: right; letter-spacing: -0.5px; }
-        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; border: 1px solid #ffe0b2; }
-        .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; line-height: 1.4; }
+        .earn-val { font-size: 22px; font-weight: 900; text-align: right; letter-spacing: -0.5px; }
+        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; border: 1px solid #ffe0b2; }
+        .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; line-height: 1.5; }
         .remark-tip { font-size: 11px; color: #e65100; font-weight: 600; margin-top: 5px; padding: 4px 0; display: block; border-top: 1px solid #fff3e0; }
         .warn-msg { color: #d32f2f; font-weight: 700; font-size: 11px; margin-top: 5px; display: block; }
-        
-        @media (max-width: 380px) {
-            header h1 { font-size: 20px; }
-            .toggle-btn { font-size: 11px; padding: 8px 2px; }
+
+        @media (max-width: 400px) {
+            .input-row { flex-direction: column; gap: 15px; }
+            .toggle-btn { font-size: 11px; }
         }
     </style>
 </head>
@@ -147,53 +105,53 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V34.0</h1>
-        <p>手機自適應旗艦版 | 100% 數據保留</p>
+        <h1>💳 智能簽賬軍師 V35.0</h1>
+        <p>手機自適應 | 推廣中心 | 100% 數據保留</p>
     </header>
 
     <div class="search-section">
-        <label>🔍 搜尋商戶 (150+ 商戶: fresh, 萬寧, 港鐵, Q-Pets...)</label>
+        <label>🔍 搜尋商戶 (150+ 旗艦數據: fresh, 國泰, 萬寧, mtr...)</label>
         <input type="text" id="merchantSearch" placeholder="在此輸入商戶關鍵字..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
 
     <div class="input-row">
         <div class="input-group">
-            <label>當月累計簽賬</label>
+            <label>當月累積簽賬 (HKD)</label>
             <input type="number" id="currentSpent" value="0">
         </div>
         <div class="input-group">
-            <label>本次簽賬金額</label>
-            <input type="number" id="amount" placeholder="HK$" inputmode="numeric">
+            <label>本次金額 (HKD)</label>
+            <input type="number" id="amount" placeholder="金額" inputmode="numeric">
         </div>
     </div>
 
     <div class="input-row">
         <div class="input-group">
             <label>日期時段</label>
-            <div class="toggle-container" id="dayToggles">
-                <button class="toggle-btn active" onclick="setDay(false, this)">平日</button>
-                <button class="toggle-btn" onclick="setDay(true, this)" style="color:#d32f2f">週末(五至日)</button>
+            <div class="toggle-container">
+                <button id="day-wd" class="toggle-btn active" onclick="updateDay(false)">平日</button>
+                <button id="day-we" class="toggle-btn" onclick="updateDay(true)" style="color:#d32f2f">週末(五至日)</button>
             </div>
         </div>
         <div class="input-group">
             <label>支付方式</label>
-            <div class="toggle-container" id="methodToggles">
-                <button class="toggle-btn active" onclick="setMethod('ApplePay', this)">手機支付</button>
-                <button class="toggle-btn" onclick="setMethod('Online', this)">網上/App</button>
+            <div class="toggle-container">
+                <button id="meth-ap" class="toggle-btn active" onclick="updateMethod('ApplePay')">手機支付</button>
+                <button id="meth-on" class="toggle-btn" onclick="updateMethod('Online')">網上/App</button>
             </div>
         </div>
     </div>
 
     <div class="input-group">
-        <label>消費類別 (自動感應)</label>
+        <label>類別判定 (自動偵測後可修正)</label>
         <select id="category">
             <option value="General">-- 一般本地消費 --</option>
-            <option value="Dining">🍽️ 餐飲食肆 (狂賞/Red 8%)</option>
-            <option value="Online">🛍️ 網上零售 (eye卡/Waku/Red)</option>
+            <option value="Dining">🍽️ 餐飲食肆 (包含狂賞/Red 8%)</option>
+            <option value="Online">🛍️ 網上零售 (包含eye卡/Waku)</option>
             <option value="Electronics">🔌 電子產品/電訊 (賞家居/狂賞)</option>
             <option value="Super">🛒 超級市場 (賞家居/Mox)</option>
-            <option value="Transport">🚌 交通/叫車/油站 (EveryMile)</option>
+            <option value="Transport">🚌 交通/油站/隧道 (EveryMile)</option>
             <option value="Home">🏠 家居用品/交租 (賞家居)</option>
             <option value="Pet">🐾 寵物護理 (狂賞派)</option>
             <option value="Travel">✈️ 旅遊機票/平台 (狂賞/CX)</option>
@@ -207,26 +165,26 @@
     <button class="analyze-btn" onclick="analyze()">精確運算最佳分組排序</button>
 
     <div id="results" style="display:none;">
-        <div class="section-header miles">✈️ 里數優先建議 (由高至低)</div>
+        <div class="section-header miles">✈️ 里數優先建議 (高至低)</div>
         <div id="miles-results"></div>
-        <div class="section-header cash">💰 現金回贈建議 (由高至低)</div>
+        <div class="section-header cash">💰 現金回贈建議 (高至低)</div>
         <div id="cash-results"></div>
     </div>
 </div>
 
 <script>
 // ==========================================
-// 一、推廣活動中心 (與核心邏輯分離)
+// 一、推廣活動插件中心
 // ==========================================
 const PROMOTION_HUB = [
     {
-        id: "hsbc_mannings_2026",
+        id: "hsbc_mannings_winter",
         bank: "hsbc",
         name: "HSBC 萬寧冬日優惠",
         startDate: "2025-12-01", endDate: "2026-02-28",
         keywords: ["萬寧", "mannings"],
         minAmt: 500,
-        remarks: "⚠️ 需在 Reward+ 登記！累積簽滿$1000起計。五六日簽爆$3000有$300RC。",
+        remarks: "⚠️ 需在 Reward+ 登記！累積簽滿$1000才有5%獎賞錢。五六日再額外5% (每$3000有$150RC)。",
         bonusFunc: (amt, isWeekend) => {
             let baseExtra = Math.min(amt * 0.05, 300);
             let weekendExtra = isWeekend ? Math.min(amt * 0.05, 150) : 0;
@@ -242,42 +200,35 @@ const merchantDB = [
     // 交通
     { name: "港鐵", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "mtr", cat: "Transport", sub: "EM", meth: "ApplePay" },
     { name: "巴士", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "九巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
-    { name: "小巴", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "電車", cat: "Transport", sub: "EM", meth: "ApplePay" },
-    { name: "渡海小輪", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
+    { name: "城巴", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "小巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
+    { name: "電車", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
     { name: "高德", cat: "Transport", sub: "EM", meth: "Online" }, { name: "加德士", cat: "Transport", sub: "EM", meth: "ApplePay" },
-    { name: "Shell", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "Esso", cat: "Transport", sub: "EM", meth: "ApplePay" },
     // 超級市場
     { name: "新鮮生活(fresh)", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "fresh", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "Don Don Donki", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "donki", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "759阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "Big C", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
-    { name: "大生生活超市", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "TASTE", cat: "Super", sub: "VS", meth: "ApplePay" },
     // 家居/電訊
     { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "KeyChain Pay", cat: "Home", sub: "VS", meth: "Online" },
-    { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "實惠", cat: "Home", sub: "VS", meth: "ApplePay" },
-    { name: "at.home", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "蓆夢思", cat: "Home", sub: "VS", meth: "ApplePay" },
-    { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-    { name: "3香港", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "Now TV", cat: "Electronics", sub: "VS", meth: "Online" },
+    { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+    { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "3香港", cat: "Electronics", sub: "VS", meth: "ApplePay" },
     // 電器
     { name: "豐澤", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "百老滙", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
-    { name: "友和", cat: "Electronics", sub: "BOC_VS", meth: "Online" }, { name: "蘇寧", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
-    { name: "Apple Store", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
+    { name: "友和", cat: "Electronics", sub: "BOC_VS", meth: "Online" }, { name: "Apple Store", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
     // 寵物
-    { name: "Q-Pets", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "Petmium", cat: "Pet", sub: "BOC", meth: "ApplePay" },
-    { name: "寵寵線", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "紅蘿蔔", cat: "Pet", sub: "BOC", meth: "ApplePay" },
+    { name: "Q-Pets", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "紅蘿蔔", cat: "Pet", sub: "BOC", meth: "ApplePay" },
+    { name: "Petmium", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "Whiskers N Paws", cat: "Pet", sub: "BOC", meth: "ApplePay" },
     // 旅遊
     { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" }, { name: "HK Express", cat: "Travel", sub: "CX", meth: "Online" },
     { name: "KKday", cat: "Travel", sub: "BOC", meth: "Online" }, { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" },
-    { name: "Trip.com", cat: "Travel", sub: "BOC", meth: "Online" },
     // 餐飲/Red 8%
     { name: "壽司郎", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" }, { name: "譚仔", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" },
-    { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "大家樂", cat: "Dining", sub: "BOC", meth: "ApplePay" },
-    { name: "大快活", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" },
+    { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "大快活", cat: "Dining", sub: "BOC", meth: "ApplePay" },
     { name: "淘寶", cat: "Online", sub: "EYE", meth: "Online" }
 ];
 
 // ==========================================
-// 三、核心信用卡邏輯 (100% 繼承自 V28.1)
+// 三、信用卡邏輯 (100% 完整保留)
 // ==========================================
 const cards = [
     { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
@@ -324,10 +275,23 @@ const cards = [
 ];
 
 // ==========================================
-// 四、軍師核心大腦
+// 四、軍師修復核心
 // ==========================================
 let globalDay = false; 
 let globalMethod = 'ApplePay';
+
+// 修正：手動更新切換按鈕，徹底解決「按了沒反應」問題
+function updateDay(v) {
+    globalDay = v;
+    document.getElementById('day-wd').classList.toggle('active', !v);
+    document.getElementById('day-we').classList.toggle('active', v);
+}
+
+function updateMethod(m) {
+    globalMethod = m;
+    document.getElementById('meth-ap').classList.toggle('active', m === 'ApplePay');
+    document.getElementById('meth-on').classList.toggle('active', m === 'Online');
+}
 
 function autoMatch() {
     const input = document.getElementById('merchantSearch').value.toLowerCase();
@@ -336,24 +300,10 @@ function autoMatch() {
     if (!input) { hint.innerText = ""; return; }
     const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     if (match) {
-        hint.innerText = `✅ 自動識別: ${match.name}`;
+        hint.innerText = `✅ 已自動識別: ${match.name}`;
         catSelect.value = match.cat;
-        setMethod(match.meth, document.querySelectorAll('#methodToggles .toggle-btn')[match.meth === 'Online' ? 1 : 0]);
+        updateMethod(match.meth);
     } else { hint.innerText = ""; }
-}
-
-function setDay(v, btn) { 
-    globalDay = v; 
-    const btns = document.querySelectorAll('#dayToggles .toggle-btn');
-    btns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-function setMethod(m, btn) { 
-    globalMethod = m; 
-    const btns = document.querySelectorAll('#methodToggles .toggle-btn');
-    btns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
 }
 
 function analyze() {
@@ -427,7 +377,7 @@ function createHtml(c, amt, isMile) {
                 <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${earn}${isMile && c.extraCash > 0 ? `<div style="font-size:11px;color:orange">+$${c.extraCash.toFixed(0)}</div>` : ""}</div>
             </div>
             <div class="card-desc">
-                基礎回贈率：${c.baseRes.rate} ${bocWarn}
+                基礎率：${c.baseRes.rate} ${bocWarn}
                 ${remarkHtml}
             </div>
         </div>
