@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智能簽賬軍師 V36.0</title>
+    <title>智能簽賬軍師 V37.0</title>
 
     <!-- iOS PWA 100% 繼承自 V28.1 -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/您的用戶名/您的倉庫名/main/icon.png">
@@ -38,7 +38,6 @@
         header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
         header p { margin: 5px 0 0; font-size: 13px; color: #666; }
 
-        /* 搜尋區域：100% 寬度不走位 */
         .search-section { 
             background: linear-gradient(135deg, #1a1a1a, #333); 
             color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; 
@@ -89,7 +88,7 @@
         
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .earn-val { font-size: 22px; font-weight: 900; text-align: right; letter-spacing: -0.5px; }
-        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; border: 1px solid #ffe0b2; }
+        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; border: 1px solid #ffe0b2; }
         .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; line-height: 1.5; }
         .remark-tip { font-size: 11px; color: #e65100; font-weight: 600; margin-top: 5px; padding: 4px 0; display: block; border-top: 1px solid #fff3e0; }
         .warn-msg { color: #d32f2f; font-weight: 700; font-size: 11px; margin-top: 5px; display: block; }
@@ -104,12 +103,12 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V36.0</h1>
-        <p>100% 旗艦數據 | 現金高至低排序修正</p>
+        <h1>💳 智能簽賬軍師 V37.0</h1>
+        <p>100% 旗艦數據 | 信用卡生效管理功能</p>
     </header>
 
     <div class="search-section">
-        <label>🔍 搜尋商戶 (150+ 數據庫: fresh, 萬寧, mtr, Q-Pets...)</label>
+        <label>🔍 搜尋商戶 (150+ 旗艦數據: fresh, 萬寧, mtr, Q-Pets...)</label>
         <input type="text" id="merchantSearch" placeholder="在此輸入商戶關鍵字..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
@@ -143,7 +142,7 @@
     </div>
 
     <div class="input-group">
-        <label>類別判定 (自動偵測後可修正)</label>
+        <label>類別判定 (自動偵測)</label>
         <select id="category">
             <option value="General">-- 一般本地消費 --</option>
             <option value="Dining">🍽️ 餐飲食肆 (包含狂賞/Red 8%)</option>
@@ -173,7 +172,7 @@
 
 <script>
 // ==========================================
-// 一、推廣活動中心 (插件式數據)
+// 一、推廣活動插件中心
 // ==========================================
 const PROMOTION_HUB = [
     {
@@ -193,7 +192,7 @@ const PROMOTION_HUB = [
 ];
 
 // ==========================================
-// 二、150+ 商戶大數據庫 (100% 完整保留自 V28.1)
+// 二、150+ 商戶大數據庫 (100% 保留自 V28.1)
 // ==========================================
 const merchantDB = [
     // 交通
@@ -240,54 +239,55 @@ const merchantDB = [
 ];
 
 // ==========================================
-// 三、核心信用卡邏輯 (100% 完整保留)
+// 三、信用卡邏輯 (新增 active 屬性管理)
 // ==========================================
+// 💡 日後取消了卡片，只需將 active 改為 false
 const cards = [
-    { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', active: true, logic: (amt, cat, meth, isMet, sub) => {
         let r = (sub === "CX") ? 2 : (['Dining', 'Travel', 'Overseas'].includes(cat) ? 4 : 6);
         return { val: amt * (0.1/r), miles: Math.floor(amt/r), rate: `$${r}/里` };
     }},
-    { id: 'ccb_eye', name: '建銀 eye 卡', bank: 'ccb', type: 'miles', logic: (amt, cat, meth) => {
+    { id: 'ccb_eye', name: '建銀 eye 卡', bank: 'ccb', type: 'miles', active: true, logic: (amt, cat, meth) => {
         let isB = (meth === 'Online' || meth === 'ApplePay');
         let m = Math.floor(amt / (isB ? 3 : 15));
         return { val: m * 0.1, miles: m, rate: isB ? '$3/里' : '$15/里' };
     }},
-    { id: 'cheers', name: '中銀 Cheers VI', bank: 'boc', type: 'miles', logic: (amt, cat, meth, isMet) => {
+    { id: 'cheers', name: '中銀 Cheers VI', bank: 'boc', type: 'miles', active: true, logic: (amt, cat, meth, isMet) => {
         let isB = (cat === 'Dining' || cat === 'Overseas') && isMet;
         return { val: isB ? amt * 0.04 : amt * 0.004, miles: Math.floor(amt / (isMet && (cat === 'Dining' || cat === 'Overseas') ? 1.5 : 15)), rate: isB ? '$1.5/里' : '$15/里' };
     }},
-    { id: 'everymile', name: 'HSBC EveryMile', bank: 'hsbc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'everymile', name: 'HSBC EveryMile', bank: 'hsbc', type: 'miles', active: true, logic: (amt, cat, meth, isMet, sub) => {
         let isB = sub === "EM" || cat === "Transport" || cat === "Overseas" || cat === "Coffee";
         return { val: isB ? amt * 0.025 : amt * 0.01, miles: isB ? Math.floor(amt/2) : Math.floor(amt/5), rate: isB ? '$2/里' : '$5/里' };
     }},
-    { id: 'red', name: 'HSBC Red', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'red', name: 'HSBC Red', bank: 'hsbc', type: 'cash', active: true, logic: (amt, cat, meth, isMet, sub) => {
         if (sub && sub.includes('Red8')) return { val: amt * 0.08, rate: '8%' };
         if (meth === 'Online') return amt <= 10000 ? { val: amt * 0.04, rate: '4%' } : { val: 400 + (amt-10000)*0.01, rate: '4%封頂' };
         return { val: amt * 0.01, rate: '1%' };
     }},
-    { id: 'mmpower', name: '恒生 MMPOWER', bank: 'hangseng', type: 'cash', logic: (amt, cat, meth, isMet) => {
+    { id: 'mmpower', name: '恒生 MMPOWER', bank: 'hangseng', type: 'cash', active: true, logic: (amt, cat, meth, isMet) => {
         if (!isMet) return { val: amt * 0.004, rate: '0.4%' };
         if (cat === 'Overseas') return { val: Math.min(amt * 0.06, 500 + amt*0.004), rate: '6%' };
         if (meth === 'Online') return { val: Math.min(amt * 0.05, 500 + amt*0.004), rate: '5%' };
         if (['Dining','Electronics'].includes(cat)) return { val: amt * 0.01, rate: '1%' };
         return { val: amt * 0.004, rate: '0.4%' };
     }},
-    { id: 'vs', name: 'HSBC VS (賞家居)', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'vs', name: 'HSBC VS (賞家居)', bank: 'hsbc', type: 'cash', active: true, logic: (amt, cat, meth, isMet, sub) => {
         let isH = (sub && sub.includes('VS')) || ['Home','Electronics','Super'].includes(cat);
         return { val: isH ? amt * 0.036 : amt * 0.004, rate: isH ? '3.6%' : '0.4%' };
     }},
-    { id: 'sogo', name: '中銀 Sogo Visa', bank: 'boc', type: 'cash', logic: (amt, cat, meth) => {
+    { id: 'sogo', name: '中銀 Sogo Visa', bank: 'boc', type: 'cash', active: true, logic: (amt, cat, meth) => {
         if (meth === 'ApplePay') return amt <= 2000 ? { val: amt * 0.054, rate: '5.4%' } : { val: 108 + (amt-2000)*0.004, rate: '5.4%封頂' };
         return { val: amt * 0.004, rate: '0.4%' };
     }},
-    { id: 'waku', name: 'Aeon Wakuwaku', bank: 'aeon', type: 'cash', logic: (amt, cat, meth) => {
+    { id: 'waku', name: 'Aeon Wakuwaku', bank: 'aeon', type: 'cash', active: true, logic: (amt, cat, meth) => {
         if (meth === 'Online') return amt <= 3571 ? { val: amt * 0.06, rate: '6%' } : { val: 214.3 + (amt-3571)*0.005, rate: '6%封頂' };
         return { val: amt * 0.005, rate: '0.5%' };
     }}
 ];
 
 // ==========================================
-// 四、軍師修復核心
+// 四、軍師核心邏輯
 // ==========================================
 let globalDay = false; 
 let globalMethod = 'ApplePay';
@@ -311,7 +311,7 @@ function autoMatch() {
     if (!input) { hint.innerText = ""; return; }
     const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     if (match) {
-        hint.innerText = `✅ 自動識別: ${match.name}`;
+        hint.innerText = `✅ 已自動識別: ${match.name}`;
         catSelect.value = match.cat;
         updateMethod(match.meth);
     } else { hint.innerText = ""; }
@@ -329,7 +329,8 @@ function analyze() {
     const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     const sub = match ? match.sub : null;
 
-    let processed = cards.map(c => {
+    // 💡 核心過濾：只處理 active: true 的卡片
+    let processed = cards.filter(c => c.active).map(c => {
         let baseRes = c.logic(amt, cat, globalMethod, isMet, sub);
         let extraCash = 0;
         let activePromos = [];
@@ -371,7 +372,7 @@ function render(data, amt) {
         mc.innerHTML += createHtml(c, amt, true);
     });
 
-    // 修正現金組排序：計算「基礎值 + 插件值 + 狂賞值」之和
+    // 現金組排序 (修正總回贈計算)
     data.filter(c => c.type === 'cash').sort((a,b) => {
         const totalA = a.baseRes.val + a.extraCash + a.crazyBonus;
         const totalB = b.baseRes.val + b.extraCash + b.crazyBonus;
@@ -384,7 +385,7 @@ function render(data, amt) {
 function createHtml(c, amt, isMile) {
     const totalCashValue = (c.baseRes.val + c.extraCash + c.crazyBonus).toFixed(1);
     const earn = isMile ? `${c.baseRes.miles} 里` : `$${totalCashValue}`;
-    const bocWarn = (amt < 500 && ['cheers', 'sogo'].includes(c.id)) ? `<div class="warn-msg">! 單筆未滿$500 無狂賞派加乘</div>` : "";
+    const bocWarn = (amt < 500 && ['cheers', 'sogo'].includes(c.id)) ? `<div class="warn-msg">! 單筆未滿$500 無狂賞派額外獎賞</div>` : "";
     const promoTags = c.activePromos.map(p => `<span class="promo-tag">🔥 ${p}</span>`).join(' ');
     const remarkHtml = c.promoRemarks.map(r => `<span class="remark-tip">${r}</span>`).join('');
 
