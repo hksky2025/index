@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智能簽賬軍師 V35.0</title>
+    <title>智能簽賬軍師 V36.0</title>
 
     <!-- iOS PWA 100% 繼承自 V28.1 -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/您的用戶名/您的倉庫名/main/icon.png">
@@ -38,11 +38,11 @@
         header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
         header p { margin: 5px 0 0; font-size: 13px; color: #666; }
 
-        /* 搜尋區域：自動精測螢幕尺寸，100% 不走位 */
+        /* 搜尋區域：100% 寬度不走位 */
         .search-section { 
             background: linear-gradient(135deg, #1a1a1a, #333); 
             color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; 
-            width: 100%; display: block;
+            width: 100%;
         }
         .search-section label { font-size: 14px; color: #bbb; display: block; margin-bottom: 8px; }
         #merchantSearch { 
@@ -61,7 +61,6 @@
             font-size: 15px; background: #fafafa; outline: none; display: block;
         }
 
-        /* 切換按鈕：強化點擊反應力 */
         .toggle-container { 
             display: flex; gap: 5px; background: #f0f0f0; padding: 4px; 
             border-radius: 12px; width: 100%;
@@ -90,7 +89,7 @@
         
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .earn-val { font-size: 22px; font-weight: 900; text-align: right; letter-spacing: -0.5px; }
-        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; border: 1px solid #ffe0b2; }
+        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; border: 1px solid #ffe0b2; }
         .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; line-height: 1.5; }
         .remark-tip { font-size: 11px; color: #e65100; font-weight: 600; margin-top: 5px; padding: 4px 0; display: block; border-top: 1px solid #fff3e0; }
         .warn-msg { color: #d32f2f; font-weight: 700; font-size: 11px; margin-top: 5px; display: block; }
@@ -105,12 +104,12 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V35.0</h1>
-        <p>手機自適應 | 推廣中心 | 100% 數據保留</p>
+        <h1>💳 智能簽賬軍師 V36.0</h1>
+        <p>100% 旗艦數據 | 現金高至低排序修正</p>
     </header>
 
     <div class="search-section">
-        <label>🔍 搜尋商戶 (150+ 旗艦數據: fresh, 國泰, 萬寧, mtr...)</label>
+        <label>🔍 搜尋商戶 (150+ 數據庫: fresh, 萬寧, mtr, Q-Pets...)</label>
         <input type="text" id="merchantSearch" placeholder="在此輸入商戶關鍵字..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
@@ -174,7 +173,7 @@
 
 <script>
 // ==========================================
-// 一、推廣活動插件中心
+// 一、推廣活動中心 (插件式數據)
 // ==========================================
 const PROMOTION_HUB = [
     {
@@ -194,26 +193,35 @@ const PROMOTION_HUB = [
 ];
 
 // ==========================================
-// 二、150+ 商戶大數據庫 (100% 完整保留)
+// 二、150+ 商戶大數據庫 (100% 完整保留自 V28.1)
 // ==========================================
 const merchantDB = [
     // 交通
     { name: "港鐵", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "mtr", cat: "Transport", sub: "EM", meth: "ApplePay" },
     { name: "巴士", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "九巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
     { name: "城巴", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "小巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
-    { name: "電車", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
-    { name: "高德", cat: "Transport", sub: "EM", meth: "Online" }, { name: "加德士", cat: "Transport", sub: "EM", meth: "ApplePay" },
+    { name: "電車", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "渡海小輪", cat: "Transport", sub: "EM", meth: "ApplePay" },
+    { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" }, { name: "高德", cat: "Transport", sub: "EM", meth: "Online" },
+    { name: "加德士", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "Shell", cat: "Transport", sub: "EM", meth: "ApplePay" },
+    { name: "Esso", cat: "Transport", sub: "EM", meth: "ApplePay" },
     // 超級市場
     { name: "新鮮生活(fresh)", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "fresh", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "Don Don Donki", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "donki", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "759阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "Big C", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
+    { name: "大生生活超市", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "TASTE", cat: "Super", sub: "VS", meth: "ApplePay" },
+    { name: "GreenPrice", cat: "Super", sub: "VS", meth: "ApplePay" },
     // 家居/電訊
     { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "KeyChain Pay", cat: "Home", sub: "VS", meth: "Online" },
-    { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-    { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "3香港", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+    { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "實惠", cat: "Home", sub: "VS", meth: "ApplePay" },
+    { name: "at.home", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "生活工房", cat: "Home", sub: "VS", meth: "ApplePay" },
+    { name: "蓆夢思", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "歐化寶", cat: "Home", sub: "VS", meth: "ApplePay" },
+    { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+    { name: "3香港", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "1O1O", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+    { name: "Now TV", cat: "Electronics", sub: "VS", meth: "Online" }, { name: "網上行", cat: "Electronics", sub: "VS", meth: "Online" },
     // 電器
     { name: "豐澤", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "百老滙", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
+    { name: "蘇寧", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "衛訊", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
     { name: "友和", cat: "Electronics", sub: "BOC_VS", meth: "Online" }, { name: "Apple Store", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
     // 寵物
     { name: "Q-Pets", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "紅蘿蔔", cat: "Pet", sub: "BOC", meth: "ApplePay" },
@@ -221,14 +229,18 @@ const merchantDB = [
     // 旅遊
     { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" }, { name: "HK Express", cat: "Travel", sub: "CX", meth: "Online" },
     { name: "KKday", cat: "Travel", sub: "BOC", meth: "Online" }, { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" },
+    { name: "Trip.com", cat: "Travel", sub: "BOC", meth: "Online" }, { name: "Expedia", cat: "Travel", sub: "BOC", meth: "Online" },
     // 餐飲/Red 8%
     { name: "壽司郎", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" }, { name: "譚仔", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" },
-    { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "大快活", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+    { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "大家樂", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+    { name: "大快活", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "美心", cat: "Dining", sub: "BOC", meth: "ApplePay" },
+    { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" }, { name: "Deliveroo", cat: "Dining", sub: "BOC", meth: "Online" },
+    { name: "OpenRice", cat: "Dining", sub: "BOC", meth: "Online" },
     { name: "淘寶", cat: "Online", sub: "EYE", meth: "Online" }
 ];
 
 // ==========================================
-// 三、信用卡邏輯 (100% 完整保留)
+// 三、核心信用卡邏輯 (100% 完整保留)
 // ==========================================
 const cards = [
     { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
@@ -280,7 +292,6 @@ const cards = [
 let globalDay = false; 
 let globalMethod = 'ApplePay';
 
-// 修正：手動更新切換按鈕，徹底解決「按了沒反應」問題
 function updateDay(v) {
     globalDay = v;
     document.getElementById('day-wd').classList.toggle('active', !v);
@@ -300,7 +311,7 @@ function autoMatch() {
     if (!input) { hint.innerText = ""; return; }
     const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     if (match) {
-        hint.innerText = `✅ 已自動識別: ${match.name}`;
+        hint.innerText = `✅ 自動識別: ${match.name}`;
         catSelect.value = match.cat;
         updateMethod(match.meth);
     } else { hint.innerText = ""; }
@@ -325,12 +336,12 @@ function analyze() {
         let promoRemarks = [];
 
         // 1. 狂賞派邏輯
+        let crazyBonus = 0;
         const isCrazy = ['Dining','Electronics','Pet','Travel','Jewelry'].includes(cat) || (sub && sub.includes("BOC"));
         if (['cheers', 'sogo'].includes(c.id) && isMet && amt >= 500 && isCrazy) {
-            const crazy = (globalMethod === 'Online') ? (globalDay ? Math.min(amt * 0.05, 200) : Math.min(amt * 0.02, 60)) 
+            crazyBonus = (globalMethod === 'Online') ? (globalDay ? Math.min(amt * 0.05, 200) : Math.min(amt * 0.02, 60)) 
                                                      : (globalDay ? Math.min(amt * 0.05, 300) : Math.min(amt * 0.02, 120));
-            extraCash += crazy;
-            activePromos.push("狂賞派");
+            if (crazyBonus > 0) activePromos.push("狂賞派");
         }
 
         // 2. 推廣插件中心
@@ -344,7 +355,7 @@ function analyze() {
             }
         });
 
-        return { ...c, baseRes, extraCash, activePromos, promoRemarks };
+        return { ...c, baseRes, extraCash, crazyBonus, activePromos, promoRemarks };
     });
 
     render(processed, amt);
@@ -355,17 +366,24 @@ function render(data, amt) {
     const mc = document.getElementById('miles-results'); mc.innerHTML = '';
     const cc = document.getElementById('cash-results'); cc.innerHTML = '';
 
+    // 里數組排序 (按里數高低)
     data.filter(c => c.type === 'miles').sort((a,b) => b.baseRes.miles - a.baseRes.miles).forEach(c => {
         mc.innerHTML += createHtml(c, amt, true);
     });
-    data.filter(c => c.type === 'cash').sort((a,b) => (b.baseRes.val + b.extraCash) < (b.baseRes.val + b.extraCash) ? 1 : -1).forEach(c => {
+
+    // 修正現金組排序：計算「基礎值 + 插件值 + 狂賞值」之和
+    data.filter(c => c.type === 'cash').sort((a,b) => {
+        const totalA = a.baseRes.val + a.extraCash + a.crazyBonus;
+        const totalB = b.baseRes.val + b.extraCash + b.crazyBonus;
+        return totalB - totalA; 
+    }).forEach(c => {
         cc.innerHTML += createHtml(c, amt, false);
     });
 }
 
 function createHtml(c, amt, isMile) {
-    const totalCash = (c.baseRes.val + c.extraCash).toFixed(1);
-    const earn = isMile ? `${c.baseRes.miles} 里` : `$${totalCash}`;
+    const totalCashValue = (c.baseRes.val + c.extraCash + c.crazyBonus).toFixed(1);
+    const earn = isMile ? `${c.baseRes.miles} 里` : `$${totalCashValue}`;
     const bocWarn = (amt < 500 && ['cheers', 'sogo'].includes(c.id)) ? `<div class="warn-msg">! 單筆未滿$500 無狂賞派加乘</div>` : "";
     const promoTags = c.activePromos.map(p => `<span class="promo-tag">🔥 ${p}</span>`).join(' ');
     const remarkHtml = c.promoRemarks.map(r => `<span class="remark-tip">${r}</span>`).join('');
@@ -374,7 +392,7 @@ function createHtml(c, amt, isMile) {
         <div class="card-box ${c.bank}-card">
             <div class="card-top">
                 <div class="card-name">${c.name}${c.activePromos.length > 0 ? '<br>'+promoTags : ""}</div>
-                <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${earn}${isMile && c.extraCash > 0 ? `<div style="font-size:11px;color:orange">+$${c.extraCash.toFixed(0)}</div>` : ""}</div>
+                <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${earn}${isMile && (c.extraCash + c.crazyBonus) > 0 ? `<div style="font-size:11px;color:orange">+$${(c.extraCash + c.crazyBonus).toFixed(0)}</div>` : ""}</div>
             </div>
             <div class="card-desc">
                 基礎率：${c.baseRes.rate} ${bocWarn}
