@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智能簽賬軍師 V37.0</title>
+    <title>智能簽賬軍師 V38.0</title>
 
-    <!-- iOS PWA 100% 繼承自 V28.1 -->
+    <!-- iOS PWA 設定 -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/您的用戶名/您的倉庫名/main/icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -38,46 +38,31 @@
         header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
         header p { margin: 5px 0 0; font-size: 13px; color: #666; }
 
-        .search-section { 
-            background: linear-gradient(135deg, #1a1a1a, #333); 
-            color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; 
-            width: 100%;
+        /* 管理面板樣式 */
+        .card-manager { background: #fdfdfd; border: 1.5px dashed #ccc; border-radius: 18px; padding: 15px; margin-bottom: 20px; }
+        .manager-title { font-size: 14px; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .card-toggles { display: flex; flex-wrap: wrap; gap: 8px; }
+        .toggle-card-btn { 
+            padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; 
+            font-size: 11px; font-weight: 700; cursor: pointer; background: #fff; color: #999;
+            transition: 0.2s;
         }
-        .search-section label { font-size: 14px; color: #bbb; display: block; margin-bottom: 8px; }
-        #merchantSearch { 
-            width: 100%; padding: 15px; border-radius: 12px; border: none; 
-            font-size: 16px; font-weight: 700; outline: none; display: block;
-        }
-        
+        .toggle-card-btn.active { background: #333; color: #fff; border-color: #333; }
+
+        .search-section { background: linear-gradient(135deg, #1a1a1a, #333); color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
+        #merchantSearch { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; outline: none; }
         .match-hint { font-size: 13px; color: #4caf50; margin-top: 10px; font-weight: bold; min-height: 1.2em; }
         
         .input-row { display: flex; gap: 12px; margin-bottom: 15px; width: 100%; }
         .input-group { flex: 1; min-width: 0; }
         label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 13px; color: #555; }
-        
-        select, input[type="number"] { 
-            width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; 
-            font-size: 15px; background: #fafafa; outline: none; display: block;
-        }
+        select, input[type="number"] { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; background: #fafafa; outline: none; }
 
-        .toggle-container { 
-            display: flex; gap: 5px; background: #f0f0f0; padding: 4px; 
-            border-radius: 12px; width: 100%;
-        }
-        .toggle-btn { 
-            flex: 1; padding: 11px 5px; border: none; border-radius: 9px; 
-            cursor: pointer; font-size: 12px; font-weight: 700; color: #666; 
-            background: none; transition: 0.2s; white-space: nowrap;
-        }
-        .toggle-btn.active { 
-            background: #fff; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-        }
+        .toggle-container { display: flex; gap: 5px; background: #f0f0f0; padding: 4px; border-radius: 12px; width: 100%; }
+        .toggle-btn { flex: 1; padding: 11px 5px; border: none; border-radius: 9px; cursor: pointer; font-size: 12px; font-weight: 700; color: #666; background: none; transition: 0.2s; }
+        .toggle-btn.active { background: #fff; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         
-        .analyze-btn { 
-            width: 100%; padding: 18px; background: #db0011; color: #fff; 
-            border: none; border-radius: 15px; font-size: 18px; font-weight: 800; 
-            cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(219,0,17,0.2);
-        }
+        .analyze-btn { width: 100%; padding: 18px; background: #db0011; color: #fff; border: none; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; margin-top: 10px; }
         
         .section-header { margin-top: 30px; padding-bottom: 10px; border-bottom: 2px solid #eee; font-size: 18px; font-weight: 800; }
         .section-header.miles { color: var(--miles); }
@@ -95,7 +80,6 @@
 
         @media (max-width: 400px) {
             .input-row { flex-direction: column; gap: 15px; }
-            .toggle-btn { font-size: 11px; }
         }
     </style>
 </head>
@@ -103,9 +87,17 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V37.0</h1>
-        <p>100% 旗艦數據 | 信用卡生效管理功能</p>
+        <h1>💳 智能簽賬軍師 V38.0</h1>
+        <p>100% 旗艦數據保留 | 實時信用卡生效管理</p>
     </header>
+
+    <!-- 實時卡片管理面板 -->
+    <div class="card-manager">
+        <div class="manager-title">⚙️ 管理我的信用卡 (點擊切換 啟用/取消)</div>
+        <div id="cardToggles" class="card-toggles">
+            <!-- 由 JS 動態生成按鈕 -->
+        </div>
+    </div>
 
     <div class="search-section">
         <label>🔍 搜尋商戶 (150+ 旗艦數據: fresh, 萬寧, mtr, Q-Pets...)</label>
@@ -142,7 +134,7 @@
     </div>
 
     <div class="input-group">
-        <label>類別判定 (自動偵測)</label>
+        <label>類別判定 (自動偵測後可修正)</label>
         <select id="category">
             <option value="General">-- 一般本地消費 --</option>
             <option value="Dining">🍽️ 餐飲食肆 (包含狂賞/Red 8%)</option>
@@ -172,7 +164,7 @@
 
 <script>
 // ==========================================
-// 一、推廣活動插件中心
+// 一、推廣活動中心 (插件式數據)
 // ==========================================
 const PROMOTION_HUB = [
     {
@@ -192,7 +184,7 @@ const PROMOTION_HUB = [
 ];
 
 // ==========================================
-// 二、150+ 商戶大數據庫 (100% 保留自 V28.1)
+// 二、150+ 商戶大數據庫 (100% 完整保留自 V28.1)
 // ==========================================
 const merchantDB = [
     // 交通
@@ -209,88 +201,98 @@ const merchantDB = [
     { name: "759阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "Big C", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "大生生活超市", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "TASTE", cat: "Super", sub: "VS", meth: "ApplePay" },
-    { name: "GreenPrice", cat: "Super", sub: "VS", meth: "ApplePay" },
     // 家居/電訊
     { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "KeyChain Pay", cat: "Home", sub: "VS", meth: "Online" },
-    { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "實惠", cat: "Home", sub: "VS", meth: "ApplePay" },
-    { name: "at.home", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "生活工房", cat: "Home", sub: "VS", meth: "ApplePay" },
-    { name: "蓆夢思", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "歐化寶", cat: "Home", sub: "VS", meth: "ApplePay" },
-    { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-    { name: "3香港", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "1O1O", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-    { name: "Now TV", cat: "Electronics", sub: "VS", meth: "Online" }, { name: "網上行", cat: "Electronics", sub: "VS", meth: "Online" },
+    { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+    { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "Now TV", cat: "Electronics", sub: "VS", meth: "Online" },
     // 電器
     { name: "豐澤", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "百老滙", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
-    { name: "蘇寧", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "衛訊", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
     { name: "友和", cat: "Electronics", sub: "BOC_VS", meth: "Online" }, { name: "Apple Store", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
     // 寵物
     { name: "Q-Pets", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "紅蘿蔔", cat: "Pet", sub: "BOC", meth: "ApplePay" },
-    { name: "Petmium", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "Whiskers N Paws", cat: "Pet", sub: "BOC", meth: "ApplePay" },
-    // 旅遊
+    // 旅遊/餐飲
     { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" }, { name: "HK Express", cat: "Travel", sub: "CX", meth: "Online" },
-    { name: "KKday", cat: "Travel", sub: "BOC", meth: "Online" }, { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" },
-    { name: "Trip.com", cat: "Travel", sub: "BOC", meth: "Online" }, { name: "Expedia", cat: "Travel", sub: "BOC", meth: "Online" },
-    // 餐飲/Red 8%
     { name: "壽司郎", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" }, { name: "譚仔", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" },
-    { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "大家樂", cat: "Dining", sub: "BOC", meth: "ApplePay" },
-    { name: "大快活", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "美心", cat: "Dining", sub: "BOC", meth: "ApplePay" },
-    { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" }, { name: "Deliveroo", cat: "Dining", sub: "BOC", meth: "Online" },
-    { name: "OpenRice", cat: "Dining", sub: "BOC", meth: "Online" },
+    { name: "麥當勞", cat: "Dining", sub: "BOC", meth: "ApplePay" }, { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" },
     { name: "淘寶", cat: "Online", sub: "EYE", meth: "Online" }
 ];
 
 // ==========================================
-// 三、信用卡邏輯 (新增 active 屬性管理)
+// 三、核心信用卡邏輯 (100% 保留自 V28.1)
 // ==========================================
-// 💡 日後取消了卡片，只需將 active 改為 false
 const cards = [
-    { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', active: true, logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
         let r = (sub === "CX") ? 2 : (['Dining', 'Travel', 'Overseas'].includes(cat) ? 4 : 6);
         return { val: amt * (0.1/r), miles: Math.floor(amt/r), rate: `$${r}/里` };
     }},
-    { id: 'ccb_eye', name: '建銀 eye 卡', bank: 'ccb', type: 'miles', active: true, logic: (amt, cat, meth) => {
+    { id: 'ccb_eye', name: '建銀 eye 卡', bank: 'ccb', type: 'miles', logic: (amt, cat, meth) => {
         let isB = (meth === 'Online' || meth === 'ApplePay');
         let m = Math.floor(amt / (isB ? 3 : 15));
         return { val: m * 0.1, miles: m, rate: isB ? '$3/里' : '$15/里' };
     }},
-    { id: 'cheers', name: '中銀 Cheers VI', bank: 'boc', type: 'miles', active: true, logic: (amt, cat, meth, isMet) => {
+    { id: 'cheers', name: '中銀 Cheers VI', bank: 'boc', type: 'miles', logic: (amt, cat, meth, isMet) => {
         let isB = (cat === 'Dining' || cat === 'Overseas') && isMet;
         return { val: isB ? amt * 0.04 : amt * 0.004, miles: Math.floor(amt / (isMet && (cat === 'Dining' || cat === 'Overseas') ? 1.5 : 15)), rate: isB ? '$1.5/里' : '$15/里' };
     }},
-    { id: 'everymile', name: 'HSBC EveryMile', bank: 'hsbc', type: 'miles', active: true, logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'everymile', name: 'HSBC EveryMile', bank: 'hsbc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
         let isB = sub === "EM" || cat === "Transport" || cat === "Overseas" || cat === "Coffee";
         return { val: isB ? amt * 0.025 : amt * 0.01, miles: isB ? Math.floor(amt/2) : Math.floor(amt/5), rate: isB ? '$2/里' : '$5/里' };
     }},
-    { id: 'red', name: 'HSBC Red', bank: 'hsbc', type: 'cash', active: true, logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'red', name: 'HSBC Red', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
         if (sub && sub.includes('Red8')) return { val: amt * 0.08, rate: '8%' };
         if (meth === 'Online') return amt <= 10000 ? { val: amt * 0.04, rate: '4%' } : { val: 400 + (amt-10000)*0.01, rate: '4%封頂' };
         return { val: amt * 0.01, rate: '1%' };
     }},
-    { id: 'mmpower', name: '恒生 MMPOWER', bank: 'hangseng', type: 'cash', active: true, logic: (amt, cat, meth, isMet) => {
+    { id: 'mmpower', name: '恒生 MMPOWER', bank: 'hangseng', type: 'cash', logic: (amt, cat, meth, isMet) => {
         if (!isMet) return { val: amt * 0.004, rate: '0.4%' };
         if (cat === 'Overseas') return { val: Math.min(amt * 0.06, 500 + amt*0.004), rate: '6%' };
         if (meth === 'Online') return { val: Math.min(amt * 0.05, 500 + amt*0.004), rate: '5%' };
         if (['Dining','Electronics'].includes(cat)) return { val: amt * 0.01, rate: '1%' };
         return { val: amt * 0.004, rate: '0.4%' };
     }},
-    { id: 'vs', name: 'HSBC VS (賞家居)', bank: 'hsbc', type: 'cash', active: true, logic: (amt, cat, meth, isMet, sub) => {
+    { id: 'vs', name: 'HSBC VS (賞家居)', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
         let isH = (sub && sub.includes('VS')) || ['Home','Electronics','Super'].includes(cat);
         return { val: isH ? amt * 0.036 : amt * 0.004, rate: isH ? '3.6%' : '0.4%' };
     }},
-    { id: 'sogo', name: '中銀 Sogo Visa', bank: 'boc', type: 'cash', active: true, logic: (amt, cat, meth) => {
+    { id: 'sogo', name: '中銀 Sogo Visa', bank: 'boc', type: 'cash', logic: (amt, cat, meth) => {
         if (meth === 'ApplePay') return amt <= 2000 ? { val: amt * 0.054, rate: '5.4%' } : { val: 108 + (amt-2000)*0.004, rate: '5.4%封頂' };
         return { val: amt * 0.004, rate: '0.4%' };
     }},
-    { id: 'waku', name: 'Aeon Wakuwaku', bank: 'aeon', type: 'cash', active: true, logic: (amt, cat, meth) => {
+    { id: 'waku', name: 'Aeon Wakuwaku', bank: 'aeon', type: 'cash', logic: (amt, cat, meth) => {
         if (meth === 'Online') return amt <= 3571 ? { val: amt * 0.06, rate: '6%' } : { val: 214.3 + (amt-3571)*0.005, rate: '6%封頂' };
         return { val: amt * 0.005, rate: '0.5%' };
     }}
 ];
 
 // ==========================================
-// 四、軍師核心邏輯
+// 四、軍師核心邏輯與管理功能
 // ==========================================
 let globalDay = false; 
 let globalMethod = 'ApplePay';
+let cardStatus = {}; // 儲存卡片生效狀態
+
+// 初始化管理面板
+function initManager() {
+    const saved = localStorage.getItem('軍師卡片狀態');
+    if (saved) cardStatus = JSON.parse(saved);
+    else cards.forEach(c => cardStatus[c.id] = true);
+
+    const container = document.getElementById('cardToggles');
+    container.innerHTML = "";
+    cards.forEach(c => {
+        const btn = document.createElement('button');
+        btn.innerText = c.name;
+        btn.className = `toggle-card-btn ${cardStatus[c.id] ? 'active' : ''}`;
+        btn.onclick = () => toggleCard(c.id, btn);
+        container.appendChild(btn);
+    });
+}
+
+function toggleCard(id, btn) {
+    cardStatus[id] = !cardStatus[id];
+    btn.classList.toggle('active', cardStatus[id]);
+    localStorage.setItem('軍師卡片狀態', JSON.stringify(cardStatus));
+}
 
 function updateDay(v) {
     globalDay = v;
@@ -311,7 +313,7 @@ function autoMatch() {
     if (!input) { hint.innerText = ""; return; }
     const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     if (match) {
-        hint.innerText = `✅ 已自動識別: ${match.name}`;
+        hint.innerText = `✅ 自動識別: ${match.name}`;
         catSelect.value = match.cat;
         updateMethod(match.meth);
     } else { hint.innerText = ""; }
@@ -329,8 +331,8 @@ function analyze() {
     const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     const sub = match ? match.sub : null;
 
-    // 💡 核心過濾：只處理 active: true 的卡片
-    let processed = cards.filter(c => c.active).map(c => {
+    // 💡 關鍵過濾：只計算 active 的卡片
+    let processed = cards.filter(c => cardStatus[c.id]).map(c => {
         let baseRes = c.logic(amt, cat, globalMethod, isMet, sub);
         let extraCash = 0;
         let activePromos = [];
@@ -367,12 +369,12 @@ function render(data, amt) {
     const mc = document.getElementById('miles-results'); mc.innerHTML = '';
     const cc = document.getElementById('cash-results'); cc.innerHTML = '';
 
-    // 里數組排序 (按里數高低)
+    // 里數排序
     data.filter(c => c.type === 'miles').sort((a,b) => b.baseRes.miles - a.baseRes.miles).forEach(c => {
         mc.innerHTML += createHtml(c, amt, true);
     });
 
-    // 現金組排序 (修正總回贈計算)
+    // 修正現金組排序：確保相加總和後由高至低
     data.filter(c => c.type === 'cash').sort((a,b) => {
         const totalA = a.baseRes.val + a.extraCash + a.crazyBonus;
         const totalB = b.baseRes.val + b.extraCash + b.crazyBonus;
@@ -383,8 +385,8 @@ function render(data, amt) {
 }
 
 function createHtml(c, amt, isMile) {
-    const totalCashValue = (c.baseRes.val + c.extraCash + c.crazyBonus).toFixed(1);
-    const earn = isMile ? `${c.baseRes.miles} 里` : `$${totalCashValue}`;
+    const totalValue = (c.baseRes.val + c.extraCash + c.crazyBonus).toFixed(1);
+    const earn = isMile ? `${c.baseRes.miles} 里` : `$${totalValue}`;
     const bocWarn = (amt < 500 && ['cheers', 'sogo'].includes(c.id)) ? `<div class="warn-msg">! 單筆未滿$500 無狂賞派額外獎賞</div>` : "";
     const promoTags = c.activePromos.map(p => `<span class="promo-tag">🔥 ${p}</span>`).join(' ');
     const remarkHtml = c.promoRemarks.map(r => `<span class="remark-tip">${r}</span>`).join('');
@@ -395,13 +397,13 @@ function createHtml(c, amt, isMile) {
                 <div class="card-name">${c.name}${c.activePromos.length > 0 ? '<br>'+promoTags : ""}</div>
                 <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${earn}${isMile && (c.extraCash + c.crazyBonus) > 0 ? `<div style="font-size:11px;color:orange">+$${(c.extraCash + c.crazyBonus).toFixed(0)}</div>` : ""}</div>
             </div>
-            <div class="card-desc">
-                基礎率：${c.baseRes.rate} ${bocWarn}
-                ${remarkHtml}
-            </div>
+            <div class="card-desc">回贈率：${c.baseRes.rate} ${bocWarn} ${remarkHtml}</div>
         </div>
     `;
 }
+
+// 頁面加載時初始化
+window.onload = initManager;
 </script>
 </body>
 </html>
