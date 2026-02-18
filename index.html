@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智能簽賬軍師 V41.0</title>
+    <title>智能簽賬軍師 V42.0</title>
 
     <!-- iOS PWA 100% 繼承自 V28.1 -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/您的用戶名/您的倉庫名/main/icon.png">
@@ -73,7 +73,6 @@
         label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 13px; color: #555; }
         select, input { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; background: #fafafa; outline: none; }
 
-        /* 日期顯示強化 */
         .date-status-tag { font-size: 11px; font-weight: 800; margin-top: 4px; display: inline-block; padding: 2px 6px; border-radius: 4px; }
         .is-red { background: #ffebee; color: #d32f2f; }
         .is-normal { background: #f0f0f0; color: #666; }
@@ -93,7 +92,7 @@
         
         .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .earn-val { font-size: 22px; font-weight: 900; text-align: right; letter-spacing: -0.5px; }
-        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; }
+        .promo-tag { background: #fff3e0; color: #e65100; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 4px; border: 1px solid #ffe0b2; }
         .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; line-height: 1.5; }
         .remark-tip { font-size: 11px; color: #e65100; font-weight: 600; margin-top: 5px; padding: 4px 0; display: block; border-top: 1px solid #fff3e0; }
 
@@ -104,8 +103,8 @@
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V41.0</h1>
-        <p>2026 旗艦數據 | 官方假期精確判定</p>
+        <h1>💳 智能簽賬軍師 V42.0</h1>
+        <p>2026 旗艦數據 | 狂賞派實體/網購新制判定</p>
     </header>
 
     <button class="manager-toggle-btn" onclick="toggleManager()">
@@ -117,8 +116,8 @@
     </div>
 
     <div class="search-section">
-        <label>🔍 搜尋商戶 (150+ 數據: fresh, mtr, 交租, 萬寧...)</label>
-        <input type="text" id="merchantSearch" placeholder="在此輸入商戶關鍵字..." oninput="autoMatch()">
+        <label>🔍 搜尋商戶 (150+ 數據: fresh, Rosewood, Agoda, Pop Mart...)</label>
+        <input type="text" id="merchantSearch" placeholder="搜尋商戶關鍵字..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
 
@@ -135,7 +134,7 @@
 
     <div class="input-row">
         <div class="input-group">
-            <label>簽賬日期 (識別假期紅日)</label>
+            <label>簽賬日期 (自動識別紅日)</label>
             <input type="date" id="txnDate" onchange="checkDateStatus()">
             <div id="dateStatus" class="date-status-tag"></div>
         </div>
@@ -149,18 +148,21 @@
     </div>
 
     <div class="input-group">
-        <label>類別判定 (自動偵測)</label>
+        <label>類別判定 (影響狂賞派判定)</label>
         <select id="category">
             <option value="General">-- 一般本地消費 --</option>
-            <option value="Dining">🍽️ 餐飲食肆</option>
-            <option value="Online">🛍️ 網上零售</option>
-            <option value="Electronics">🔌 電子產品/電訊</option>
-            <option value="Super">🛒 超級市場</option>
-            <option value="Transport">🚌 交通出行</option>
-            <option value="Home">🏠 家居用品/交租</option>
-            <option value="Pet">🐾 寵物護理</option>
-            <option value="Travel">✈️ 旅遊機票</option>
-            <option value="Overseas">🌍 海外外幣</option>
+            <option value="Dining">🍽️ 餐飲食肆 (狂賞派)</option>
+            <option value="Online">🛍️ 一般網購 (眼卡/Waku)</option>
+            <option value="Electronics">🔌 電子產品/電訊 (狂賞派/VS)</option>
+            <option value="Super">🛒 超級市場 (VS/Mox)</option>
+            <option value="Transport">🚌 交通出行 (EveryMile)</option>
+            <option value="Home">🏠 家居用品/交租 (VS)</option>
+            <option value="Pet">🐾 寵物生活 (狂賞派)</option>
+            <option value="Leisure">🎡 休閒娛樂 (狂賞派)</option>
+            <option value="Medical">🏥 醫療服務 (狂賞派)</option>
+            <option value="Travel">✈️ 機票酒店 (狂賞派/CX)</option>
+            <option value="Jewelry">💍 珠寶服飾 (狂賞派/Red8)</option>
+            <option value="Overseas">🌍 海外外幣 (Cheers/MMPOWER)</option>
         </select>
     </div>
 
@@ -176,61 +178,54 @@
 
 <script>
 // ==========================================
-// 一、2026 香港公眾假期數據庫 (Gov.hk 官方數據)
+// 一、2026 公眾假期 (Gov.hk)
 // ==========================================
-const HOLIDAYS_2026 = [
-    "2026-01-01", // 元旦
-    "2026-01-28", "2026-01-29", "2026-01-30", // 農曆新年
-    "2026-04-03", "2026-04-04", "2026-04-06", // 復活節
-    "2026-05-01", // 勞動節
-    "2026-05-24", "2026-05-25", // 佛誕
-    "2026-06-19", // 端午節
-    "2026-07-01", // 香港回歸
-    "2026-09-26", // 中秋翌日
-    "2026-10-01", // 國慶
-    "2026-10-19", // 重陽節
-    "2026-12-25", "2026-12-26"  // 聖誕節
-];
+const HOLIDAYS_2026 = ["2026-01-01","2026-01-28","2026-01-29","2026-01-30","2026-04-03","2026-04-04","2026-04-06","2026-05-01","2026-05-24","2026-05-25","2026-06-19","2026-07-01","2026-09-26","2026-10-01","2026-10-19","2026-12-25","2026-12-26"];
 
 // ==========================================
-// 二、150+ 商戶大數據庫 (100% 保留自 V28.1)
+// 二、商戶大數據庫 (100% 鎖死保留自 V28.1)
 // ==========================================
 const merchantDB = [
     // 交通
     { name: "港鐵", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "mtr", cat: "Transport", sub: "EM", meth: "ApplePay" },
-    { name: "巴士", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "九巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
-    { name: "城巴", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "小巴", cat: "Transport", sub: "EM", meth: "ApplePay" },
-    { name: "渡海小輪", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
-    { name: "高德", cat: "Transport", sub: "EM", meth: "Online" }, { name: "加德士", cat: "Transport", sub: "EM", meth: "ApplePay" },
+    { name: "巴士", cat: "Transport", sub: "EM", meth: "ApplePay" }, { name: "Uber", cat: "Transport", sub: "EM", meth: "Online" },
     // 超級市場
-    { name: "新鮮生活(fresh)", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "fresh", cat: "Super", sub: "VS", meth: "ApplePay" },
-    { name: "Don Don Donki", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "donki", cat: "Super", sub: "VS", meth: "ApplePay" },
-    { name: "759阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "Big C", cat: "Super", sub: "VS", meth: "ApplePay" },
+    { name: "新鮮生活(fresh)", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "Don Don Donki", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
-    // 家居/電訊
-    { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "KeyChain Pay", cat: "Home", sub: "VS", meth: "Online" },
-    { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-    // 電器
-    { name: "豐澤", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "百老滙", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
-    // 寵物/旅遊/餐飲
-    { name: "Q-Pets", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" },
+    // 寵物生活 (狂賞派新名單)
+    { name: "Q-Pets", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "Pet Line", cat: "Pet", sub: "BOC", meth: "ApplePay" },
+    { name: "VSH", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "Paws in Motion", cat: "Pet", sub: "BOC", meth: "Online" },
+    // 休閒娛樂
+    { name: "Pop Mart", cat: "Leisure", sub: "BOC", meth: "ApplePay" }, { name: "Namco", cat: "Leisure", sub: "BOC", meth: "ApplePay" },
+    { name: "迪士尼", cat: "Leisure", sub: "BOC", meth: "ApplePay" }, { name: "海洋公園", cat: "Leisure", sub: "BOC", meth: "ApplePay" },
+    // 機票酒店
+    { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" }, { name: "Rosewood", cat: "Travel", sub: "BOC", meth: "ApplePay" },
+    { name: "Agoda", cat: "Travel", sub: "BOC", meth: "Online" }, { name: "Expedia", cat: "Travel", sub: "BOC", meth: "Online" },
+    { name: "Klook", cat: "Travel", sub: "BOC", meth: "Online" }, { name: "Trip.com", cat: "Travel", sub: "BOC", meth: "Online" },
+    // 電子產品
+    { name: "Apple", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "豐澤", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
+    { name: "百老滙", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "衛訊", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
+    { name: "友和", cat: "Electronics", sub: "BOC_VS", meth: "Online" },
+    // 餐飲
     { name: "壽司郎", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" }, { name: "譚仔", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" },
-    { name: "淘寶", cat: "Online", sub: "EYE", meth: "Online" }
+    { name: "Foodpanda", cat: "Dining", sub: "BOC", meth: "Online" }, { name: "OpenRice", cat: "Dining", sub: "BOC", meth: "Online" },
+    // 醫療
+    { name: "養和", cat: "Medical", sub: "BOC", meth: "ApplePay" }, { name: "卓健", cat: "Medical", sub: "BOC", meth: "ApplePay" },
+    // 珠寶服飾
+    { name: "Nike", cat: "Jewelry", sub: "BOC", meth: "ApplePay" }, { name: "Adidas", cat: "Jewelry", sub: "BOC", meth: "ApplePay" },
+    // 其他
+    { name: "KeyChain Pay", cat: "Home", sub: "VS", meth: "Online" }, { name: "淘寶", cat: "Online", sub: "EYE", meth: "Online" }
 ];
 
 const PROMOTION_HUB = [
     {
-        id: "hsbc_mannings_winter",
-        bank: "hsbc",
-        name: "HSBC 萬寧冬日優惠",
-        startDate: "2025-12-01", endDate: "2026-02-28",
-        keywords: ["萬寧", "mannings"],
-        minAmt: 500,
-        remarks: "⚠️ 需在 Reward+ 登記！累積簽滿$1000起計。五六日簽爆$3000有$300RC。",
-        bonusFunc: (amt, isWeekendOrPH) => {
+        id: "hsbc_mannings_winter", bank: "hsbc", name: "HSBC 萬寧冬日優惠",
+        startDate: "2025-12-01", endDate: "2026-02-28", keywords: ["萬寧"],
+        minAmt: 500, remarks: "⚠️ 需登記！累積簽滿$1000起計。五六日紅日最高+5%。",
+        bonusFunc: (amt, isRedDay) => {
             let baseExtra = Math.min(amt * 0.05, 300);
-            let weekendExtra = isWeekendOrPH ? Math.min(amt * 0.05, 150) : 0;
-            return baseExtra + weekendExtra;
+            let redExtra = isRedDay ? Math.min(amt * 0.05, 150) : 0;
+            return baseExtra + redExtra;
         }
     }
 ];
@@ -239,34 +234,6 @@ const PROMOTION_HUB = [
 // 三、信用卡邏輯 (100% 保留 V28.1)
 // ==========================================
 const cards = [
-    { id: 'red', name: 'HSBC Red', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
-        if (sub && sub.includes('Red8')) return { val: amt * 0.08, rate: '8%' };
-        if (meth === 'Online') return amt <= 10000 ? { val: amt * 0.04, rate: '4%' } : { val: 400 + (amt-10000)*0.01, rate: '4%封頂' };
-        return { val: amt * 0.01, rate: '1%' };
-    }},
-    { id: 'everymile', name: 'HSBC EveryMile', bank: 'hsbc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
-        let isB = sub === "EM" || cat === "Transport" || cat === "Overseas" || cat === "Coffee";
-        return { val: isB ? amt * 0.025 : amt * 0.01, miles: isB ? Math.floor(amt/2) : Math.floor(amt/5), rate: isB ? '$2/里' : '$5/里' };
-    }},
-    { id: 'vs', name: 'HSBC VS (賞家居)', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
-        let isH = (sub && sub.includes('VS')) || ['Home','Electronics','Super'].includes(cat);
-        return { val: isH ? amt * 0.036 : amt * 0.004, rate: isH ? '3.6%' : '0.4%' };
-    }},
-    { id: 'cheers', name: '中銀 Cheers VI', bank: 'boc', type: 'miles', logic: (amt, cat, meth, isMet) => {
-        let isB = (cat === 'Dining' || cat === 'Overseas') && isMet;
-        return { val: isB ? amt * 0.04 : amt * 0.004, miles: Math.floor(amt / (isMet && (cat === 'Dining' || cat === 'Overseas') ? 1.5 : 15)), rate: isB ? '$1.5/里' : '$15/里' };
-    }},
-    { id: 'sogo', name: '中銀 Sogo Visa', bank: 'boc', type: 'cash', logic: (amt, cat, meth) => {
-        if (meth === 'ApplePay') return amt <= 2000 ? { val: amt * 0.054, rate: '5.4%' } : { val: 108 + (amt-2000)*0.004, rate: '5.4%封頂' };
-        return { val: amt * 0.004, rate: '0.4%' };
-    }},
-    { id: 'mmpower', name: '恒生 MMPOWER', bank: 'hangseng', type: 'cash', logic: (amt, cat, meth, isMet) => {
-        if (!isMet) return { val: amt * 0.004, rate: '0.4%' };
-        if (cat === 'Overseas') return { val: Math.min(amt * 0.06, 500 + amt*0.004), rate: '6%' };
-        if (meth === 'Online') return { val: Math.min(amt * 0.05, 500 + amt*0.004), rate: '5%' };
-        if (['Dining','Electronics'].includes(cat)) return { val: amt * 0.01, rate: '1%' };
-        return { val: amt * 0.004, rate: '0.4%' };
-    }},
     { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
         let r = (sub === "CX") ? 2 : (['Dining', 'Travel', 'Overseas'].includes(cat) ? 4 : 6);
         return { val: amt * (0.1/r), miles: Math.floor(amt/r), rate: `$${r}/里` };
@@ -276,6 +243,33 @@ const cards = [
         let m = Math.floor(amt / (isB ? 3 : 15));
         return { val: m * 0.1, miles: m, rate: isB ? '$3/里' : '$15/里' };
     }},
+    { id: 'cheers', name: '中銀 Cheers VI', bank: 'boc', type: 'miles', logic: (amt, cat, meth, isMet) => {
+        let isB = (cat === 'Dining' || cat === 'Overseas') && isMet;
+        return { val: isB ? amt * 0.04 : amt * 0.004, miles: Math.floor(amt / (isMet && (cat === 'Dining' || cat === 'Overseas') ? 1.5 : 15)), rate: isB ? '$1.5/里' : '$15/里' };
+    }},
+    { id: 'everymile', name: 'HSBC EveryMile', bank: 'hsbc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
+        let isB = sub === "EM" || cat === "Transport" || cat === "Overseas";
+        return { val: isB ? amt * 0.025 : amt * 0.01, miles: isB ? Math.floor(amt/2) : Math.floor(amt/5), rate: isB ? '$2/里' : '$5/里' };
+    }},
+    { id: 'red', name: 'HSBC Red', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
+        if (sub && sub.includes('Red8')) return { val: amt * 0.08, rate: '8%' };
+        if (meth === 'Online') return amt <= 10000 ? { val: amt * 0.04, rate: '4%' } : { val: 400 + (amt-10000)*0.01, rate: '4%封頂' };
+        return { val: amt * 0.01, rate: '1%' };
+    }},
+    { id: 'mmpower', name: '恒生 MMPOWER', bank: 'hangseng', type: 'cash', logic: (amt, cat, meth, isMet) => {
+        if (!isMet) return { val: amt * 0.004, rate: '0.4%' };
+        if (cat === 'Overseas') return { val: Math.min(amt * 0.06, 500 + amt*0.004), rate: '6%' };
+        if (meth === 'Online') return { val: Math.min(amt * 0.05, 500 + amt*0.004), rate: '5%' };
+        return { val: amt * 0.01, rate: '1%' };
+    }},
+    { id: 'vs', name: 'HSBC VS (賞家居)', bank: 'hsbc', type: 'cash', logic: (amt, cat, meth, isMet, sub) => {
+        let isH = (sub && sub.includes('VS')) || ['Home','Electronics','Super'].includes(cat);
+        return { val: isH ? amt * 0.036 : amt * 0.004, rate: isH ? '3.6%' : '0.4%' };
+    }},
+    { id: 'sogo', name: '中銀 Sogo Visa', bank: 'boc', type: 'cash', logic: (amt, cat, meth) => {
+        if (meth === 'ApplePay') return amt <= 2000 ? { val: amt * 0.054, rate: '5.4%' } : { val: 108 + (amt-2000)*0.004, rate: '5.4%封頂' };
+        return { val: amt * 0.004, rate: '0.4%' };
+    }},
     { id: 'waku', name: 'Aeon Wakuwaku', bank: 'aeon', type: 'cash', logic: (amt, cat, meth) => {
         if (meth === 'Online') return amt <= 3571 ? { val: amt * 0.06, rate: '6%' } : { val: 214.3 + (amt-3571)*0.005, rate: '6%封頂' };
         return { val: amt * 0.005, rate: '0.5%' };
@@ -283,42 +277,46 @@ const cards = [
 ];
 
 // ==========================================
-// 四、軍師修復核心
+// 四、軍師核心大腦
 // ==========================================
 let globalMethod = 'ApplePay';
 let isRedDay = false;
 let cardStatus = {};
 
-// 初始化日期為今天
-window.onload = function() {
-    const todayStr = new Date().toISOString().split('T')[0];
-    document.getElementById('txnDate').value = todayStr;
+window.onload = () => {
+    document.getElementById('txnDate').value = new Date().toISOString().split('T')[0];
     checkDateStatus();
     initManager();
 };
 
 function checkDateStatus() {
-    const selectedDate = document.getElementById('txnDate').value;
-    const dateObj = new Date(selectedDate);
-    const day = dateObj.getDay(); // 0=Sun, 5=Fri, 6=Sat
+    const selected = document.getElementById('txnDate').value;
+    const d = new Date(selected);
+    const day = d.getDay();
     const isWeekend = (day === 0 || day === 5 || day === 6);
-    const isPH = HOLIDAYS_2026.includes(selectedDate);
-    
+    const isPH = HOLIDAYS_2026.includes(selected);
     isRedDay = isWeekend || isPH;
     const statusDiv = document.getElementById('dateStatus');
-    if (isRedDay) {
-        statusDiv.innerText = isPH ? "🔥 公眾假期 (紅日獎賞激活)" : "✨ 週末五六日 (紅日獎賞激活)";
-        statusDiv.className = "date-status-tag is-red";
-    } else {
-        statusDiv.innerText = "📅 平日 (普通獎賞)";
-        statusDiv.className = "date-status-tag is-normal";
-    }
+    statusDiv.innerText = isRedDay ? (isPH ? "🔥 公眾假期 (紅日)" : "✨ 週末五六日 (紅日)") : "📅 平日";
+    statusDiv.className = "date-status-tag " + (isRedDay ? "is-red" : "is-normal");
 }
 
 function updateMethod(m) {
     globalMethod = m;
     document.getElementById('meth-ap').classList.toggle('active', m === 'ApplePay');
     document.getElementById('meth-on').classList.toggle('active', m === 'Online');
+}
+
+function autoMatch() {
+    const input = document.getElementById('merchantSearch').value.toLowerCase();
+    const hint = document.getElementById('matchHint');
+    if (!input) { hint.innerText = ""; return; }
+    const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
+    if (match) {
+        hint.innerText = `✅ 自動識別: ${match.name}`;
+        document.getElementById('category').value = match.cat;
+        updateMethod(match.meth);
+    } else { hint.innerText = ""; }
 }
 
 function analyze() {
@@ -329,97 +327,94 @@ function analyze() {
     if (!amt) return alert("請輸入金額");
 
     const isMet = (spent + amt) >= 5000;
-    const today = new Date();
     const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     const sub = match ? match.sub : null;
+    const today = new Date();
 
     let processed = cards.filter(c => cardStatus[c.id]).map(c => {
         let baseRes = c.logic(amt, cat, globalMethod, isMet, sub);
         let extraCash = 0, crazyBonus = 0;
-        let activePromos = [], promoRemarks = [];
+        let activePromos = [];
 
-        // 1. 狂賞派邏輯 (紅日判定包括五六日及PH)
-        const isCrazy = ['Dining','Electronics','Pet','Travel','Jewelry'].includes(cat) || (sub && sub.includes("BOC"));
-        if (['cheers', 'sogo'].includes(c.id) && isMet && amt >= 500 && isCrazy) {
-            crazyBonus = (globalMethod === 'Online') ? (isRedDay ? Math.min(amt * 0.05, 200) : Math.min(amt * 0.02, 60)) 
-                                                     : (isRedDay ? Math.min(amt * 0.05, 300) : Math.min(amt * 0.02, 120));
+        // 💡 修正後狂賞派邏輯
+        const crazyCats = ['Dining','Electronics','Pet','Leisure','Medical','Travel','Jewelry'];
+        const isCrazyCat = crazyCats.includes(cat) || (sub && sub.includes("BOC"));
+        
+        if (['cheers', 'sogo'].includes(c.id) && isCrazyCat) {
+            // 實體店新規則: 單筆滿 $500 + 每月簽滿 $5000
+            if (globalMethod === 'ApplePay') {
+                if (amt >= 500 && isMet) {
+                    crazyBonus = isRedDay ? Math.min(amt * 0.05, 300) : Math.min(amt * 0.02, 120);
+                }
+            } 
+            // 網購新規則: 無單筆下限
+            else if (globalMethod === 'Online') {
+                crazyBonus = isRedDay ? Math.min(amt * 0.05, 200) : Math.min(amt * 0.02, 60);
+            }
             if (crazyBonus > 0) activePromos.push("狂賞派");
         }
 
-        // 2. 推廣插件掃描
         PROMOTION_HUB.forEach(p => {
-            const mMatch = p.keywords.some(k => input.includes(k.toLowerCase()));
-            if (mMatch && p.bank === c.bank && amt >= p.minAmt) {
-                extraCash += p.bonusFunc(amt, isRedDay);
-                activePromos.push(p.name);
-                if (p.remarks) promoRemarks.push(p.remarks);
+            if (p.keywords.some(k => input.includes(k.toLowerCase())) && today >= new Date(p.startDate) && today <= new Date(p.endDate) && p.bank === c.bank && amt >= p.minAmt) {
+                extraCash += p.bonusFunc(amt, isRedDay); activePromos.push(p.name);
             }
         });
 
-        return { ...c, baseRes, extraCash, crazyBonus, activePromos, promoRemarks };
+        return { ...c, baseRes, extraCash, crazyBonus, activePromos };
     });
 
-    render(processed, amt);
+    render(processed);
 }
 
-function render(data, amt) {
+function render(data) {
     document.getElementById('results').style.display = 'block';
     const mc = document.getElementById('miles-results'); mc.innerHTML = '';
     const cc = document.getElementById('cash-results'); cc.innerHTML = '';
 
     data.filter(c => c.type === 'miles').sort((a,b) => b.baseRes.miles - a.baseRes.miles).forEach(c => {
-        mc.innerHTML += createHtml(c, amt, true);
+        mc.innerHTML += createCardHtml(c, true);
     });
 
     data.filter(c => c.type === 'cash').sort((a,b) => (b.baseRes.val + b.extraCash + b.crazyBonus) - (a.baseRes.val + a.extraCash + a.crazyBonus)).forEach(c => {
-        cc.innerHTML += createHtml(c, amt, false);
+        cc.innerHTML += createCardHtml(c, false);
     });
 }
 
-function createHtml(c, amt, isMile) {
-    const totalCashValue = (c.baseRes.val + c.extraCash + c.crazyBonus).toFixed(1);
-    const earn = isMile ? `${c.baseRes.miles} 里` : `$${totalCashValue}`;
-    const bocWarn = (amt < 500 && ['cheers', 'sogo'].includes(c.id)) ? `<div class="warn-msg">! 單筆未滿$500 無狂賞派額外獎賞</div>` : "";
-    const promoTags = c.activePromos.map(p => `<span class="promo-tag">🔥 ${p}</span>`).join(' ');
-    const remarkHtml = c.promoRemarks.map(r => `<span class="remark-tip">${r}</span>`).join('');
-
+function createCardHtml(c, isMile) {
+    const total = (c.baseRes.val + c.extraCash + c.crazyBonus).toFixed(1);
     return `
         <div class="card-box ${c.bank}-card">
             <div class="card-top">
-                <div class="card-name">${c.name}${c.activePromos.length > 0 ? '<br>'+promoTags : ""}</div>
-                <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${earn}${isMile && (c.extraCash + c.crazyBonus) > 0 ? `<div style="font-size:11px;color:orange">+$${(c.extraCash + c.crazyBonus).toFixed(0)}</div>` : ""}</div>
+                <div class="card-name">${c.name}${c.activePromos.map(p=>`<br><span class="promo-tag">🔥 ${p}</span>`).join('')}</div>
+                <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${isMile ? c.baseRes.miles + ' 里' : '$' + total}${isMile && (c.extraCash+c.crazyBonus)>0 ? `<div style="font-size:11px;color:orange">+$${(c.extraCash+c.crazyBonus).toFixed(0)}</div>`:''}</div>
             </div>
-            <div class="card-desc">回贈率：${c.baseRes.rate} ${bocWarn} ${remarkHtml}</div>
+            <div class="card-desc">回贈率: ${c.baseRes.rate}${['cheers','sogo'].includes(c.id)?'<br><small>*每月狂賞上限$680</small>':''}</div>
         </div>`;
 }
 
 function initManager() {
-    const saved = localStorage.getItem('軍師卡片狀態_V41');
+    const saved = localStorage.getItem('軍師卡片狀態_V42');
     if (saved) cardStatus = JSON.parse(saved);
     else cards.forEach(c => cardStatus[c.id] = true);
-    const bankOrder = { hsbc: "匯豐 HSBC", boc: "中銀 BOC", hangseng: "恒生 Hang Seng", sc: "渣打 SC", ccb: "建行 CCB", aeon: "AEON" };
+    const bankOrder = { hsbc: "匯豐", boc: "中銀", hangseng: "恒生", sc: "渣打", ccb: "建行", aeon: "AEON" };
     const container = document.getElementById('bankGroupsContainer');
     container.innerHTML = "";
     Object.keys(bankOrder).forEach(bankId => {
         const bankCards = cards.filter(c => c.bank === bankId);
         if (bankCards.length > 0) {
             const groupDiv = document.createElement('div'); groupDiv.className = 'bank-group';
-            groupDiv.innerHTML = `<div class="bank-name-label">${bankOrder[bankId]}</div>`;
-            const gridDiv = document.createElement('div'); gridDiv.className = 'toggle-grid';
+            groupDiv.innerHTML = `<div class="bank-name-label">${bankOrder[bankId]}</div><div class="toggle-grid"></div>`;
             bankCards.forEach(c => {
                 const btn = document.createElement('button'); btn.innerText = c.name;
                 btn.className = `toggle-card-btn ${bankId} ${cardStatus[c.id] ? 'active' : ''}`;
-                btn.onclick = () => { cardStatus[c.id] = !cardStatus[c.id]; btn.classList.toggle('active'); localStorage.setItem('軍師卡片狀態_V41', JSON.stringify(cardStatus)); };
-                gridDiv.appendChild(btn);
+                btn.onclick = () => { cardStatus[c.id] = !cardStatus[c.id]; btn.classList.toggle('active'); localStorage.setItem('軍師卡片狀態_V42', JSON.stringify(cardStatus)); };
+                groupDiv.querySelector('.toggle-grid').appendChild(btn);
             });
-            groupDiv.appendChild(gridDiv); container.appendChild(groupDiv);
+            container.appendChild(groupDiv);
         }
     });
 }
-function toggleManager() {
-    const panel = document.getElementById('cardManagerPanel');
-    panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
-}
+function toggleManager() { const p = document.getElementById('cardManagerPanel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
 </script>
 </body>
 </html>
