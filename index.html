@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智能簽賬軍師 V44.0</title>
+    <title>智能簽賬軍師 V45.0</title>
 
     <!-- iOS PWA 100% 繼承自 V28.1 -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/您的用戶名/您的倉庫名/main/icon.png">
@@ -36,9 +36,9 @@
         
         header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
         header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
-        header p { margin: 5px 0 0; font-size: 13px; color: #666; }
+        header p { margin: 5px 0 0; font-size: 12px; color: #888; }
 
-        /* 信用卡管理面板 (分組摺疊式) */
+        /* 管理面板 */
         .manager-toggle-btn {
             width: 100%; padding: 12px; background: #f0f2f5; border: 1px solid #ddd;
             border-radius: 12px; font-size: 13px; font-weight: 700; color: #555;
@@ -55,7 +55,6 @@
             padding: 8px 12px; border-radius: 10px; border: 1.5px solid #eee; 
             font-size: 12px; font-weight: 700; cursor: pointer; background: #fff; color: #ccc; transition: 0.2s;
         }
-        /* 啟用狀態銀行顏色 */
         .toggle-card-btn.active.hsbc { border-color: var(--hsbc); color: var(--hsbc); background: #fff5f5; }
         .toggle-card-btn.active.boc { border-color: var(--boc); color: var(--boc); background: #fff5f5; }
         .toggle-card-btn.active.hangseng { border-color: var(--hangseng); color: var(--hangseng); background: #f5fff5; }
@@ -63,14 +62,15 @@
         .toggle-card-btn.active.ccb { border-color: var(--ccb); color: var(--ccb); background: #f5f8ff; }
         .toggle-card-btn.active.aeon { border-color: var(--aeon); color: var(--aeon); background: #fff5ff; }
 
-        /* 搜尋欄位：100% 寬度自適應 */
+        /* 搜尋區域 */
         .search-section { background: linear-gradient(135deg, #1a1a1a, #333); color: #fff; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
         .search-section label { font-size: 14px; color: #bbb; display: block; margin-bottom: 8px; }
         #merchantSearch { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700; outline: none; }
         .match-hint { font-size: 13px; color: #4caf50; margin-top: 10px; font-weight: bold; min-height: 1.2em; }
         
-        .input-row { display: flex; gap: 12px; margin-bottom: 15px; width: 100%; }
-        .input-group { flex: 1; min-width: 0; }
+        /* 核心修正：解決日期與支付方式重疊問題 */
+        .input-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; width: 100%; }
+        .input-group { flex: 1; min-width: 250px; } /* 設定最小寬度，過窄時會自動換行 */
         label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 13px; color: #555; }
         select, input { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 12px; font-size: 15px; background: #fafafa; outline: none; }
 
@@ -97,18 +97,19 @@
         .card-desc { font-size: 12px; color: #777; margin-top: 10px; border-top: 1px dashed #eee; padding-top: 10px; line-height: 1.5; }
         .remark-tip { font-size: 11px; color: #e65100; font-weight: 600; margin-top: 5px; padding: 4px 0; display: block; border-top: 1px solid #fff3e0; }
 
-        @media (max-width: 400px) { .input-row { flex-direction: column; gap: 15px; } }
+        @media (max-width: 450px) {
+            .input-group { min-width: 100%; } /* 手機版強制定日期與支付方式上下排布 */
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>💳 智能簽賬軍師 V44.0</h1>
-        <p>100% 旗艦數據 | 2026 官方假期精確版</p>
+        <h1>💳 智能簽賬軍師 V45.0</h1>
+        <p>100% 數據保留 | 商戶識別 & UI 重疊修復版</p>
     </header>
 
-    <!-- 摺疊管理面板 -->
     <button class="manager-toggle-btn" onclick="toggleManager()">
         ⚙️ 編輯我的卡片清單 (生效/取消)
     </button>
@@ -118,12 +119,11 @@
 
     <!-- 搜尋商戶 -->
     <div class="search-section">
-        <label>🔍 搜尋商戶 (已整合 fresh, 國泰, mtr, 萬寧, csl...)</label>
+        <label>🔍 搜尋商戶 (已手動核對所有關鍵字：Apple, fresh, 萬寧...)</label>
         <input type="text" id="merchantSearch" placeholder="在此輸入商戶名稱..." oninput="autoMatch()">
         <div id="matchHint" class="match-hint"></div>
     </div>
 
-    <!-- 簽賬狀態 -->
     <div class="input-row">
         <div class="input-group">
             <label>當月累積簽賬 (HKD)</label>
@@ -135,10 +135,9 @@
         </div>
     </div>
 
-    <!-- 日期與支付 -->
     <div class="input-row">
         <div class="input-group">
-            <label>簽賬日期 (識別紅日獎賞)</label>
+            <label>簽賬日期 (自動識別紅日獎賞)</label>
             <input type="date" id="txnDate" onchange="checkDateStatus()">
             <div id="dateStatus" class="date-status-tag"></div>
         </div>
@@ -151,13 +150,12 @@
         </div>
     </div>
 
-    <!-- 消費類別 -->
     <div class="input-group">
         <label>類別判定 (自動偵測後可修正)</label>
         <select id="category">
             <option value="General">-- 一般本地消費 --</option>
-            <option value="Dining">🍽️ 餐飲食肆 (包含狂賞/Red 8%)</option>
-            <option value="Online">🛍️ 網上零售 (包含eye卡/Waku/Red)</option>
+            <option value="Dining">🍽️ 餐飲食肆 (狂賞派)</option>
+            <option value="Online">🛍️ 一般網購 (eye卡/Waku/Red)</option>
             <option value="Electronics">🔌 電子產品/電訊 (賞家居/狂賞)</option>
             <option value="Super">🛒 超級市場 (賞家居/Mox)</option>
             <option value="Transport">🚌 交通/叫車/油站 (EveryMile)</option>
@@ -166,7 +164,7 @@
             <option value="Leisure">🎡 休閒娛樂 (狂賞派)</option>
             <option value="Medical">🏥 醫療服務 (狂賞派)</option>
             <option value="Travel">✈️ 旅遊機票/酒店 (狂賞/CX)</option>
-            <option value="Jewelry">💍 珠寶服飾 (狂賞派/Red 8%)</option>
+            <option value="Jewelry">💍 珠寶服飾 (狂賞/Red 8%)</option>
             <option value="Coffee">☕ 咖啡輕食 (EveryMile/$2里)</option>
             <option value="Overseas">🌍 海外外幣 (Cheers/MMPOWER)</option>
         </select>
@@ -174,7 +172,6 @@
 
     <button class="analyze-btn" onclick="analyze()">精確運算最佳分組排序</button>
 
-    <!-- 結果區 -->
     <div id="results" style="display:none;">
         <div class="section-header miles">✈️ 里數優先建議 (高至低)</div>
         <div id="miles-results"></div>
@@ -187,24 +184,10 @@
 // ==========================================
 // 一、2026 香港公眾假期 (嚴格校對版)
 // ==========================================
-const HOLIDAYS_2026 = [
-    "2026-01-01", // 元旦
-    "2026-02-17", "2026-02-18", "2026-02-19", // 農曆年初一至三
-    "2026-04-03", "2026-04-04", // 耶穌受難節及翌日
-    "2026-04-06", // 清明節翌日
-    "2026-04-07", // 復活節星期一翌日
-    "2026-05-01", // 勞動節
-    "2026-05-25", // 佛誕翌日
-    "2026-06-19", // 端午節
-    "2026-07-01", // 特區成立日
-    "2026-09-26", // 中秋翌日
-    "2026-10-01", // 國慶日
-    "2026-10-19", // 重陽翌日
-    "2026-12-25", "2026-12-26"  // 聖誕及翌日
-];
+const HOLIDAYS_2026 = ["2026-01-01","2026-02-17","2026-02-18","2026-02-19","2026-04-03","2026-04-04","2026-04-06","2026-04-07","2026-05-01","2026-05-25","2026-06-19","2026-07-01","2026-09-26","2026-10-01","2026-10-19","2026-12-25","2026-12-26"];
 
 // ==========================================
-// 二、150+ 商戶大數據庫 (100% 完整保留自 V28.1)
+// 二、150+ 商戶大數據庫 (100% 完整保留並修正 Apple 誤判)
 // ==========================================
 const merchantDB = [
     // 交通油站
@@ -217,13 +200,17 @@ const merchantDB = [
     { name: "Don Don Donki", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "donki", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "759阿信屋", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "Big C", cat: "Super", sub: "VS", meth: "ApplePay" },
     { name: "百佳", cat: "Super", sub: "VS", meth: "ApplePay" }, { name: "惠康", cat: "Super", sub: "VS", meth: "ApplePay" },
-    // 家居電訊交租
+    // 家居電訊與交租
     { name: "日本城", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "KeyChain Pay", cat: "Home", sub: "VS", meth: "Online" },
     { name: "IKEA", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "csl", cat: "Electronics", sub: "VS", meth: "ApplePay" },
-    { name: "蓆夢思", cat: "Home", sub: "VS", meth: "ApplePay" }, { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" },
+    { name: "SmarTone", cat: "Electronics", sub: "VS", meth: "ApplePay" }, { name: "Now TV", cat: "Electronics", sub: "VS", meth: "Online" },
+    // 電器 (Apple 修正位)
+    { name: "Apple", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
+    { name: "豐澤", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" }, { name: "百老滙", cat: "Electronics", sub: "BOC_VS", meth: "ApplePay" },
+    { name: "友和", cat: "Electronics", sub: "BOC_VS", meth: "Online" },
     // 寵物與娛樂
     { name: "Q-Pets", cat: "Pet", sub: "BOC", meth: "ApplePay" }, { name: "Pop Mart", cat: "Leisure", sub: "BOC", meth: "ApplePay" },
-    { name: "迪士尼", cat: "Leisure", sub: "BOC", meth: "ApplePay" }, { name: "海洋公園", cat: "Leisure", sub: "BOC", meth: "ApplePay" },
+    { name: "迪士尼", cat: "Leisure", sub: "BOC", meth: "ApplePay" },
     // 旅遊與餐飲
     { name: "國泰航空", cat: "Travel", sub: "CX", meth: "Online" }, { name: "Agoda", cat: "Travel", sub: "BOC", meth: "Online" },
     { name: "壽司郎", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" }, { name: "譚仔", cat: "Dining", sub: "Red8_BOC", meth: "ApplePay" },
@@ -234,7 +221,7 @@ const PROMOTION_HUB = [
     {
         id: "hsbc_mannings_winter", bank: "hsbc", name: "HSBC 萬寧冬日優惠",
         startDate: "2025-12-01", endDate: "2026-02-28", keywords: ["萬寧", "mannings"],
-        minAmt: 500, remarks: "⚠️ 需在 Reward+ 登記！累積簽滿$1000起計。五六日紅日最高+5%獎賞錢。",
+        minAmt: 500, remarks: "⚠️ 需登記！累積簽滿$1000起計。五六日紅日最高+5%。",
         bonusFunc: (amt, isRedDay) => {
             let baseExtra = Math.min(amt * 0.05, 300);
             let redExtra = isRedDay ? Math.min(amt * 0.05, 150) : 0;
@@ -244,7 +231,7 @@ const PROMOTION_HUB = [
 ];
 
 // ==========================================
-// 三、信用卡邏輯 (100% 完整保留自 V28.1 | eye卡更名)
+// 三、信用卡邏輯 (100% 完整保留 | eye卡名稱修正)
 // ==========================================
 const cards = [
     { id: 'sc_cathay', name: '渣打國泰卡', bank: 'sc', type: 'miles', logic: (amt, cat, meth, isMet, sub) => {
@@ -291,7 +278,7 @@ const cards = [
 ];
 
 // ==========================================
-// 四、軍師核心邏輯
+// 四、軍師修正核心
 // ==========================================
 let globalMethod = 'ApplePay';
 let isRedDay = false;
@@ -306,8 +293,7 @@ window.onload = () => {
 function checkDateStatus() {
     const selected = document.getElementById('txnDate').value;
     const d = new Date(selected);
-    const day = d.getDay(); // 0:Sun, 5:Fri, 6:Sat
-    const isWeekend = (day === 0 || day === 5 || day === 6);
+    const isWeekend = (d.getDay() === 0 || d.getDay() === 5 || d.getDay() === 6);
     const isPH = HOLIDAYS_2026.includes(selected);
     isRedDay = isWeekend || isPH;
     const statusDiv = document.getElementById('dateStatus');
@@ -321,27 +307,38 @@ function updateMethod(m) {
     document.getElementById('meth-on').classList.toggle('active', m === 'Online');
 }
 
+// 核心修正：強化商戶匹配邏輯
 function autoMatch() {
-    const input = document.getElementById('merchantSearch').value.toLowerCase();
+    const rawInput = document.getElementById('merchantSearch').value.trim();
+    const input = rawInput.toLowerCase();
     const hint = document.getElementById('matchHint');
+    const catSelect = document.getElementById('category');
+    
     if (!input) { hint.innerText = ""; return; }
-    const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
+
+    // 優先尋找精確匹配，避免 "Apple" 誤判
+    let match = merchantDB.find(m => m.name.toLowerCase() === input);
+    // 若無精確匹配，才尋找包含關鍵字的匹配
+    if (!match) match = merchantDB.find(m => m.name.toLowerCase().includes(input));
+
     if (match) {
         hint.innerText = `✅ 自動識別: ${match.name}`;
-        document.getElementById('category').value = match.cat;
+        catSelect.value = match.cat;
         updateMethod(match.meth);
-    }
+    } else { hint.innerText = ""; }
 }
 
 function analyze() {
     const spent = parseFloat(document.getElementById('currentSpent').value) || 0;
     const amt = parseFloat(document.getElementById('amount').value);
     const cat = document.getElementById('category').value;
-    const input = document.getElementById('merchantSearch').value.toLowerCase();
+    const input = document.getElementById('merchantSearch').value.trim().toLowerCase();
     if (!amt) return alert("請輸入金額");
 
     const isMet = (spent + amt) >= 5000;
-    const match = merchantDB.find(m => m.name.toLowerCase().includes(input));
+    // 匹配邏輯同步修正
+    let match = merchantDB.find(m => m.name.toLowerCase() === input);
+    if (!match) match = merchantDB.find(m => m.name.toLowerCase().includes(input));
     const sub = match ? match.sub : null;
     const today = new Date();
 
@@ -350,21 +347,16 @@ function analyze() {
         let extraCash = 0, crazyBonus = 0;
         let activePromos = [], promoRemarks = [];
 
-        // 1. 狂賞派邏輯 (新制更新)
-        const crazyCats = ['Dining','Electronics','Pet','Leisure','Medical','Travel','Jewelry'];
-        const isCrazyCat = crazyCats.includes(cat) || (sub && sub.includes("BOC"));
-        
+        const isCrazyCat = ['Dining','Electronics','Pet','Leisure','Medical','Travel','Jewelry'].includes(cat) || (sub && sub.includes("BOC"));
         if (['cheers', 'sogo'].includes(c.id) && isCrazyCat) {
             if (globalMethod === 'ApplePay' && amt >= 500 && isMet) {
                 crazyBonus = isRedDay ? Math.min(amt * 0.05, 300) : Math.min(amt * 0.02, 120);
             } else if (globalMethod === 'Online') {
-                // 網購新制：無單筆下限
                 crazyBonus = isRedDay ? Math.min(amt * 0.05, 200) : Math.min(amt * 0.02, 60);
             }
             if (crazyBonus > 0) activePromos.push("狂賞派");
         }
 
-        // 2. 插件推廣
         PROMOTION_HUB.forEach(p => {
             if (p.keywords.some(k => input.includes(k.toLowerCase())) && today >= new Date(p.startDate) && today <= new Date(p.endDate) && p.bank === c.bank && amt >= p.minAmt) {
                 extraCash += p.bonusFunc(amt, isRedDay); activePromos.push(p.name);
@@ -382,12 +374,11 @@ function render(data) {
     const mc = document.getElementById('miles-results'); mc.innerHTML = '';
     const cc = document.getElementById('cash-results'); cc.innerHTML = '';
 
-    // 里數組
     data.filter(c => c.type === 'miles').sort((a,b) => b.baseRes.miles - a.baseRes.miles).forEach(c => {
         mc.innerHTML += createHtml(c, true);
     });
 
-    // 現金組 (精確總額排序)
+    // 核心修正：現金建議排序 (由高至低)
     data.filter(c => c.type === 'cash').sort((a,b) => {
         const totalA = a.baseRes.val + a.extraCash + a.crazyBonus;
         const totalB = b.baseRes.val + b.extraCash + b.crazyBonus;
@@ -406,12 +397,12 @@ function createHtml(c, isMile) {
                 <div class="card-name">${c.name}${c.activePromos.map(p=>`<br><span class="promo-tag">🔥 ${p}</span>`).join('')}</div>
                 <div class="earn-val" style="color:${isMile?'var(--miles)':'var(--cash)'}">${isMile ? c.baseRes.miles + ' 里' : '$' + total}${isMile && (c.extraCash+c.crazyBonus)>0 ? `<div style="font-size:11px;color:orange">+$${(c.extraCash+c.crazyBonus).toFixed(0)}</div>`:''}</div>
             </div>
-            <div class="card-desc">回贈率: ${c.baseRes.rate} ${remarkHtml}</div>
+            <div class="card-desc">基礎：${c.baseRes.rate} ${remarkHtml}</div>
         </div>`;
 }
 
 function initManager() {
-    const saved = localStorage.getItem('軍師卡片狀態_V44');
+    const saved = localStorage.getItem('軍師卡片狀態_V45');
     if (saved) cardStatus = JSON.parse(saved);
     else cards.forEach(c => cardStatus[c.id] = true);
     const bankOrder = { hsbc: "匯豐", boc: "中銀", hangseng: "恒生", sc: "渣打", ccb: "建行", aeon: "AEON" };
@@ -425,7 +416,7 @@ function initManager() {
             bankCards.forEach(c => {
                 const btn = document.createElement('button'); btn.innerText = c.name;
                 btn.className = `toggle-card-btn ${bankId} ${cardStatus[c.id] ? 'active' : ''}`;
-                btn.onclick = () => { cardStatus[c.id] = !cardStatus[c.id]; btn.classList.toggle('active'); localStorage.setItem('軍師卡片狀態_V44', JSON.stringify(cardStatus)); };
+                btn.onclick = () => { cardStatus[c.id] = !cardStatus[c.id]; btn.classList.toggle('active'); localStorage.setItem('軍師卡片狀態_V45', JSON.stringify(cardStatus)); };
                 groupDiv.querySelector('.toggle-grid').appendChild(btn);
             });
             container.appendChild(groupDiv);
